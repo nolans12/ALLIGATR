@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ckohl10/Team_ALLIGATR/HUB/main.cpp
+src/headers/CORE.h
+/home/ckohl10/Team_ALLIGATR/HUB/src/headers/CORE.h
+
+/home/ckohl10/Team_ALLIGATR/HUB/src/headers/CORE.h
+iostream
+-
+string
+-
+HUB.h
+/home/ckohl10/Team_ALLIGATR/HUB/src/headers/HUB.h
+
+/home/ckohl10/Team_ALLIGATR/HUB/src/headers/HUB.h
+CORE.h
+/home/ckohl10/Team_ALLIGATR/HUB/src/headers/CORE.h
+
