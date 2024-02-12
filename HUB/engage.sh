@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Sets the font to be bigger on Xterm
+xrdb -merge ~/.Xresources
+
 # Save the file name as a variable called SOURCE_FILE
 SOURCE_FILE=$1
 
@@ -51,6 +54,7 @@ xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
 ################### ADD PROCESSES HERE ######################
 
 run_node gatr_computer_vision blob_detection_node.py
+run_node gatr_computer_vision ARtag_node.py
 
 #############################################################
 
