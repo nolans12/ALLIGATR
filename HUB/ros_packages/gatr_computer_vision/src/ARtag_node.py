@@ -51,7 +51,7 @@ if __name__ == '__main__': # <- Executable
         rospy.sleep(3.0) # Sleep for 1 second
 
         # If camera is not found, output an error message
-        rospy.logwarn("Camera not found. Retrying...")
+        rospy.logwarn("Camera not found. Trying next camera index")
         camera_index += 1
 
         if camera_index > 10:
