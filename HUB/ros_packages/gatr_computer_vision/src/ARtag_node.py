@@ -33,10 +33,11 @@ if __name__ == '__main__': # <- Executable
     faux_camera = False
     attempts = 0
 
-    while not camera_found:
+    # Try to open the 0 index for the webcam
+    camera_index = 0    # Webcam
 
+    while not camera_found:
         # Implement code to check for camera connection here
-        camera_index = 0    # Webcam
 
         # Create a VideoCapture object using the webcam
         cap = cv2.VideoCapture(camera_index)
@@ -51,10 +52,10 @@ if __name__ == '__main__': # <- Executable
 
         # If camera is not found, output an error message
         rospy.logwarn("Camera not found. Retrying...")
-        attempts += 1
+        camera_index += 1
 
-        if attempts > 5:
-            rospy.logfatal("Camera not found after 5 attempts. Providing default centroid output...")
+        if camera_index > 10:
+            rospy.logfatal("Camera not found after 10 attempts.")
             faux_camera = True
             camera_found = True
 
