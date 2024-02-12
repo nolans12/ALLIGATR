@@ -18,15 +18,6 @@ ARUCO_DICT = {
 	"DICT_6X6_100": cv2.aruco.DICT_6X6_100,
 	"DICT_6X6_250": cv2.aruco.DICT_6X6_250,
 	"DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
-	"DICT_7X7_50": cv2.aruco.DICT_7X7_50,
-	"DICT_7X7_100": cv2.aruco.DICT_7X7_100,
-	"DICT_7X7_250": cv2.aruco.DICT_7X7_250,
-	"DICT_7X7_1000": cv2.aruco.DICT_7X7_1000,
-	"DICT_ARUCO_ORIGINAL": cv2.aruco.DICT_ARUCO_ORIGINAL,
-	"DICT_APRILTAG_16h5": cv2.aruco.DICT_APRILTAG_16h5,
-	"DICT_APRILTAG_25h9": cv2.aruco.DICT_APRILTAG_25h9,
-	"DICT_APRILTAG_36h10": cv2.aruco.DICT_APRILTAG_36h10,
-	"DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
 }
 
 # Highlight the detected markers
@@ -55,29 +46,24 @@ def aruco_display(corners, ids, rejected, image):
 aruco_type = "DICT_6X6_250"
 testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
-# %% Video Capture With Webcam
-#cap = cv2.VideoCapture(0)
+# %% Video Capture With Camera
 
-# Open the video capture object for the specified camera index
-#cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-
-# Set the camera index to 0
+# Set the camera index to 0 for the primary camera
 camera_index = 0
 
 # Define the GStreamer pipeline string
-pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+# pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+# Resolution: 
+# Frame Rate: 
 pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
 # Create a VideoCapture object with the GStreamer pipeline
 cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
-
-
 # Check if the camera opened successfully
 if not cap.isOpened():
     print("Error: Could not open camera.")
     exit()
-
 
 #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -91,7 +77,7 @@ while cap.isOpened():
     image = aruco_display(corners, ids, rejected, img)
     
 	# Display the frame
-    cv2.imshow('frame', image)
+    # cv2.imshow('frame', image)
     
 	# Quit
     key = cv2.waitKey(1) & 0xFF
