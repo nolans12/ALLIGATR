@@ -14,7 +14,22 @@ Notes: make sure to use `catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3` on fi
 
 -Xterm, Install with `sudo apt update` then `sudo apt-get install xterm`. This is used to open up new kernals that will run the ROS packages seperately.
 
+-ArduPilot and MavProxy, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/Installing_Ardupilot.md
+
 # Gazebo Dependancies
+
+To check if Gazebo is working:
+1. In terminal one, run
+   ```
+   gazebo --verbose ~/ardupilot_gazebo/worlds/iris_arducopter_runway.world
+   ```
+2. In terminal two, run
+   ```
+   cd ~/ardupilot/ArduCopter/
+   sim_vehicle.py -v ArduCopter -f gazebo-iris --console
+   ```
+
+-Gazebo and Ardupilot plugin, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_gazebo_arduplugin.md
 
 # Computer Vision Dependancies
 
