@@ -1,5 +1,9 @@
-#include "SearchPath.h"
+#include "headers/SearchPath.h"
 #include <math.h>
+#include <stdlib.h>
+#include "headers/getFOVDims.h"
+#include "headers/reachedPoint.h"
+#include "headers/minInd.h"
 using namespace std;
 
 float* search(uas drone, enviornment env, float* path) {
@@ -34,8 +38,8 @@ float* search(uas drone, enviornment env, float* path) {
      *   env.bounds in format [[x1, y1]; [x2, y2]]
      *   drone.state in format [x, y, z]
      *   assumes variables of drone and env are public
-     *   need to define getFOVDims that takes in uas object and outputs float pointer to array [L, W]
-     *   need to define reachedPoint that takes in uas object and point to float array of path and outputs true or false
+     *   need to define getFOVDims that takes in uas object and outputs float pointer to array [L, W] ~~DONE~~
+     *   need to define reachedPoint that takes in uas object and point to float array of path and outputs true or false ~~DONE~~
      *   need to define minInd that takes in 2x2 float array and returns pointer to float array of [i, j] indices of the smallest array entry
      */
 
@@ -144,4 +148,5 @@ float* search(uas drone, enviornment env, float* path) {
         // if we are outside the last p and y we want, set p = 0, restarting search
         drone.p = 0;
     }
+    return path;
 }
