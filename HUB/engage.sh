@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# Initialize our own variables
+# Build flag is used to determine if the ROS packages should be built before execution. Use if changes to ros_packages are made
+BUILD_FLAG=0
+
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+# Parse command line arguments
+while getopts "b" opt; do
+    case "$opt" in
+    b)  BUILD_FLAG=1
+        ;;
+    esac
+done
+
+# Housekeeping, this will shift the command line arguments so that $1 refers to the first argument, $2 to the second, and so on.
+shift $((OPTIND-1))
+[ "${1:-}" = "--" ] && shift
+
 # Sets the font to be bigger on Xterm
 xrdb -merge ~/.Xresources
 
@@ -28,9 +47,10 @@ mkdir -p build
 CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
 
-# Use catkin_make if not using MAVROS and catkin build if using MAVROS
-# catkin_make
-catkin build
+# Build the catkin_ws only if the build flag is set
+if [ $BUILD_FLAG -eq 1 ]; then
+    catkin build
+fi
 
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
