@@ -82,10 +82,10 @@ sleep 2
 # Goes in the form of run_node <package_name> <node_name> <node_title>
 
 # AR Detection Node
-run_node gatr_computer_vision blob_detection_node.py AR_Tag_Detection_Node
+run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
 
 # Blob Detection Node
-run_node gatr_computer_vision ARtag_node.py Blob_Detection_Node
+run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
 # Mision Planner Node
 run_node gatr_missionplanner mp_node Mission_Planner_Node
