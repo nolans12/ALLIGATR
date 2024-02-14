@@ -7,7 +7,7 @@ BUILD_FLAG=0
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
-# Parse command line arguments
+# Parse command line arguments. This will check if the -b command line input is set
 while getopts "b" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
@@ -59,6 +59,7 @@ run_node()
 {
     PKG_NAME=$1
     NODE_NAME=$2
+    NODE_TITLE=$3
 
     # Make sure the node being ran is an executable
     cd ${CURRENT_DIR}/ros_packages/${PKG_NAME}
@@ -68,7 +69,7 @@ run_node()
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
-    xterm -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    xterm -T $NODE_TITLE -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
     sleep 1
 }
 
@@ -78,9 +79,19 @@ sleep 2
 
 
 ################### ADD PROCESSES HERE ######################
+# Goes in the form of run_node <package_name> <node_name> <node_title>
 
-run_node gatr_computer_vision blob_detection_node.py
-run_node gatr_computer_vision ARtag_node.py
+# AR Detection Node
+run_node gatr_computer_vision blob_detection_node.py AR_Tag_Detection_Node
+
+# Blob Detection Node
+run_node gatr_computer_vision ARtag_node.py Blob_Detection_Node
+
+# Mision Planner Node
+run_node gatr_missionplanner mp_node Mission_Planner_Node
+
+#Start the MAVROS node
+xterm -T "mavros" -e "roslaunch iq_sim apm.launch" &
 
 #############################################################
 
