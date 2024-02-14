@@ -4,6 +4,7 @@
 import rospy
 import cv2
 from std_msgs.msg import String
+from std_msgs.msg import Int32MultiArray
 
 
 if __name__ == '__main__': # <- Executable 
@@ -22,7 +23,11 @@ if __name__ == '__main__': # <- Executable
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
-    pub = rospy.Publisher('AR_corners', String, queue_size=10)
+    
+    ################## Publisher Definitions ###########################
+    pub_corners = rospy.Publisher('AR_corners', Int32MultiArray, queue_size=10)
+
+    ####################################################################
     #rospy.init_node('blob_detection_node', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -69,19 +74,22 @@ if __name__ == '__main__': # <- Executable
             
             # Search for Aruco tag
             corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+            corners_msg = Int32MultiArray()
 
             # Output the detected corners
             if corners:
                 out_str = "AR Tag Detected %s" % rospy.get_time()
+                corners_msg.data = [1, 1, 1, 1, 1, 1, 1, 1]
             else:
                 out_str = "No AR Tag %s" % rospy.get_time()
+                corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
             
         # Publish to the ROS node
         rospy.loginfo(out_str)
-        pub.publish(out_str)
+        pub_corners.publish(corners_msg)
         rate.sleep()
 
 
