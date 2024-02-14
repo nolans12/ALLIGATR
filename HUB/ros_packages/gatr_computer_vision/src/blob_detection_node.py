@@ -63,7 +63,7 @@ if __name__ == '__main__': # <- Executable
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
-    pub = rospy.Publisher('Blob_Centroid', String, queue_size=10)
+    pub = rospy.Publisher('Blob_Centroid', Int32MultiArray, queue_size=10)
     #rospy.init_node('blob_detection_node', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
