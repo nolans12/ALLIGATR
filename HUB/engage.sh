@@ -81,17 +81,20 @@ sleep 2
 ################### ADD PROCESSES HERE ######################
 # Goes in the form of run_node <package_name> <node_name> <node_title>
 
-# AR Detection Node
+# Blob Detection Node
 run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
 
-# Blob Detection Node
+# AR Detection Node
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
 # Mision Planner Node
 run_node gatr_missionplanner mp_node Mission_Planner_Node
 
+# Start the MAVLINK connection to cube, opening on ttyTHS1 port
+xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
+
 #Start the MAVROS node
-xterm -T "mavros" -e "roslaunch iq_sim apm.launch" &
+#xterm -T "mavros" -e "roslaunch mavros apm.launch fcu_url:=/dev/ttyTHS1:57600@" &
 
 #############################################################
 
