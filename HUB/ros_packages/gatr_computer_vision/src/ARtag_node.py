@@ -3,7 +3,6 @@
 # Be aware that the tutorial said to use python2, however we built it for py3 I believe
 import rospy
 import cv2
-import sys
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 
