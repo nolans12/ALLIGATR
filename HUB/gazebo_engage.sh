@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Sets the font to be bigger on Xterm
+xrdb -merge ~/.Xresources
+
 # Save the file name as a variable called SOURCE_FILE
 SOURCE_FILE=$1
 
@@ -10,11 +13,11 @@ function cleanup {
 trap cleanup EXIT
 
 # Create a new catkin_ws if one doesnt exist
-if [ -d "~/catkin_ws" ]; then
-    echo "Catkin Workspace Detected!"
-else
-    bash src/build_catkin_ws.sh
-fi
+# if [ -d "~/catkin_ws" ]; then
+#     echo "Catkin Workspace Detected!"
+# else
+#     bash src/build_catkin_ws.sh
+# fi
 
 
 # This will clear any previous builds before building again
@@ -24,7 +27,11 @@ mkdir -p build
 #Compile the ROS packages
 CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
-catkin_make
+
+# Use catkin_make if not using MAVROS and catkin build if using MAVROS
+# catkin_make
+catkin build
+
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
 
@@ -36,20 +43,24 @@ run_node()
     # Make sure the node being ran is an executable
     cd ${CURRENT_DIR}/ros_packages/${PKG_NAME}
     chmod +x scripts/${NODE_NAME}
+    chmod +x src/${NODE_NAME}
     cd ${CURRENT_DIR}
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
     xterm -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    sleep 1
 }
 
 #Opens a roscore terminal. If one already exists, it will close itself
 xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+sleep 2
 
 
 ################### ADD PROCESSES HERE ######################
 
-run_node ros_beginner_package first_cpp_node.cpp
+run_node gatr_computer_vision blob_detection_node.py
+run_node gatr_computer_vision ARtag_node.py
 
 #############################################################
 
