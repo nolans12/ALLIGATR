@@ -30,6 +30,7 @@ To check if Gazebo is working:
    ```
 
 -Gazebo and Ardupilot plugin, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_gazebo_arduplugin.md
+    --Incase of error installing GeographicLib (OS not supported), follow this guide too https://docs.px4.io/main/en/ros/mavros_installation.html
 
 # Computer Vision Dependancies
 
