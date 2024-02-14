@@ -32,11 +32,6 @@ if __name__ == '__main__': # <- Executable
     #rospy.init_node('blob_detection_node', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
-    # Log the version of Python and OpenCV
-    rospy.loginfo("Python Version: " + sys.version)
-    rospy.loginfo("OpenCV Version: " + cv2.__version__)
-
-
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
 
