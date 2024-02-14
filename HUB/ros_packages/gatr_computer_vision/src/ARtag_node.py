@@ -87,8 +87,16 @@ if __name__ == '__main__': # <- Executable
 
             # Output the detected corners if detected
             if corners:
+                # Format the corners as an array
+                firstCorners = corners[0][0]
+                topLeft = firstCorners[1]
+                topRight = firstCorners[2]
+                bottomRight = firstCorners[3]
+                bottomLeft = firstCorners[0]
+                testArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+
                 out_str = "AR Tag Detected %s" % rospy.get_time()
-                corners_msg.data = [1, 1, 1, 1, 1, 1, 1, 1]
+                corners_msg.data = testArr
             else:
                 out_str = "No AR Tag %s" % rospy.get_time()
                 corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
