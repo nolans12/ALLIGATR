@@ -1,1 +1,1 @@
-/usr/bin/c++     CMakeFiles/main.dir/main.cpp.o  -o main 
+/usr/lib/ccache/c++     CMakeFiles/main.dir/main.cpp.o  -o main 

@@ -13,11 +13,11 @@ function cleanup {
 trap cleanup EXIT
 
 # Create a new catkin_ws if one doesnt exist
-if [ -d "~/catkin_ws" ]; then
-    echo "Catkin Workspace Detected!"
-else
-    bash src/build_catkin_ws.sh
-fi
+# if [ -d "~/catkin_ws" ]; then
+#     echo "Catkin Workspace Detected!"
+# else
+#     bash src/build_catkin_ws.sh
+# fi
 
 
 # This will clear any previous builds before building again
@@ -27,7 +27,11 @@ mkdir -p build
 #Compile the ROS packages
 CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
-catkin_make
+
+# Use catkin_make if not using MAVROS and catkin build if using MAVROS
+# catkin_make
+catkin build
+
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
 
@@ -45,10 +49,12 @@ run_node()
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
     xterm -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    sleep 1
 }
 
 #Opens a roscore terminal. If one already exists, it will close itself
 xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+sleep 2
 
 
 ################### ADD PROCESSES HERE ######################

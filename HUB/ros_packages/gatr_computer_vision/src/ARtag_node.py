@@ -1,4 +1,4 @@
-#!/usr/bin/env python2 
+#!/usr/bin/env python 
 # <- This is the shebang line which tells the OS which interpreter to use
 # Be aware that the tutorial said to use python2, however we built it for py3 I believe
 import rospy
