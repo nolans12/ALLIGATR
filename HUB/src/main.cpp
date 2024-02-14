@@ -1,6 +1,7 @@
 // Main HUB Script
 
-#include "src/headers/CORE.h"
+#include "headers/CORE.h"
+
 
 /*
 TO-DO and STRUCTURE:
@@ -19,21 +20,23 @@ TO-DO and STRUCTURE:
         - Establish connection to the cube, send waypoints, and recieve data from the cube.
 */
 
-int main(){
+int main(int argc, char** argv){
 
     // Print the engaging message
-    std::cout << "ENGAGING AUTO AL..." << std::endl;
+    std::cout << std::endl << "ENGAGING AUTO AL..." << std::endl;
 
     // $$$$$$$$$$$$$ PRECHECK LIST $$$$$$$$$$$$$$$$
         //WIFI CONNECTION
-
-        //ROS CONNECTION
+        std::cout << std::endl << "Checking WiFi connection..." << std::endl;
+        WIFI wifi;
+        int ping = wifi.ping_all();
 
         //MANUAL CONTROLLER CONNECTION
 
         //CUBE CONNECTION
 
         //CAMERA CONNECTION
+        std::cout << std::endl << "Checking camera connection..." << std::endl;
 
         //Wait until mode set to auto
 

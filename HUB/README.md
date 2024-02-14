@@ -4,11 +4,11 @@
 
 `bash create_ws.sh bare`: Configures a bare-bones ROS workspace (DOES NOT INCLUDE SIM AND MAVROS)
 
-`bash engage.sh main.cpp`: Executes the autopilot + system checks (FOR JETSON NANO).
+`bash engage.sh`: Executes the autopilot + system checks (FOR JETSON NANO).
 
-`bash engage.sh -b main.cpp`: Builds and executes the autopilot + system checks. Use when changes are made in `ros_packages` (FOR JETSON NANO).
+`bash engage.sh -b`: Builds and executes the autopilot + system checks. Use when changes are made in `ros_packages` (FOR JETSON NANO).
 
-`bash gazebo_engage.sh main.cpp`: Builds and executes the autopilot in a gazebo simulation. (FOR SITL)
+`bash gazebo_engage.sh`: Builds and executes the autopilot in a gazebo simulation. (FOR SITL)
 
 # Operating the HUB
 
@@ -19,7 +19,7 @@ After building the workspace, if it is the first time on a fresh install, you ne
 
 Note: A lot of github repos will be cloned in the build process, it may be beneficial to set up an ssh key linked to your github account if you run into errors with github during this process.
 
-**Engaging the Drone**: From the HUB directory run `bash engage.sh -b main.cpp` to begin the autonomous procedure laid out in the main.cpp script. To run a simulation of the mission, run `bash gazebo_engage.sh main.cpp`.
+**Engaging the Drone**: From the HUB directory run `bash engage.sh -b` to begin the autonomous procedure laid out in the main.cpp script. To run a simulation of the mission, run `bash gazebo_engage.sh`.
 
 # Authors:
 

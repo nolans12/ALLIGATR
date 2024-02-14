@@ -7,5 +7,5 @@ class Camera{
 		Camera();
 
 	public:
-		void test(string msg);
+		//void test(string msg);
 };

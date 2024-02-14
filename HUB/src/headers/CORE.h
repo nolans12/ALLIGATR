@@ -4,4 +4,13 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <set>
+
+// Custom headers
 #include "HUB.h"
+#include "WIFI.h"
+#include "CameraObject.h"
+#include "pathStep.h"
+#include "phaseStep.h"
+#include "uas.h"

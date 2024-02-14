@@ -18,7 +18,7 @@ file(GLOB SRC_FILES "src/*.cpp")
 # Create a library from the source files in src/
 #add_library(helper_functions STATIC ${SRC_FILES})
 
-add_executable(main ${SOURCE_FILE})
+add_executable(main ${SRC_FILES})
 
 # Link the OpenCV library to the executable
 #target_link_libraries(main ${OpenCV_LIBS})
