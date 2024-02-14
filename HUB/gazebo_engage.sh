@@ -53,14 +53,35 @@ run_node()
 }
 
 #Opens a roscore terminal. If one already exists, it will close itself
-xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
-sleep 2
+#xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+#sleep 2
+
+#Get the screen size so windows can display properly
+Xaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
+
+Yaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f2)
 
 
 ################### ADD PROCESSES HERE ######################
 
-run_node gatr_computer_vision blob_detection_node.py
-run_node gatr_computer_vision ARtag_node.py
+#run_node gatr_computer_vision blob_detection_node.py
+#run_node gatr_computer_vision ARtag_node.py
+
+#Start the Gazebo simulation
+xterm -geometry 80x10+100+0 -T "Simulation Host" -e "roslaunch iq_sim runway.launch" & 
+sleep 5
+
+#Start the ArduPilot Plugin for Software in the Loop (SITL)
+xterm -geometry 80x10+100+350 -T "SITL - ArduPlugin" -e "cd ~/ardupilot/ArduCopter/ && sim_vehicle.py -v ArduCopter -f gazebo-iris --console" &
+sleep 2
+
+#Start the MAVROS node
+xterm -geometry 80x10+$(($Xaxis/2))+0 -T "MAVROS COMMAND" -e "roslaunch iq_sim apm.launch" &
+sleep 2
+
+#Start the Mission Planner
+xterm -geometry 80x10+$(($Xaxis/2))+350 -T "Mission Planner" -e "rosrun iq_gnc square" &
+sleep 2
 
 #############################################################
 

@@ -33,10 +33,6 @@ if [ "$ARG1" != "bare" ]; then
 
     catkin build
 
-    # By adding this file to your source, there won't be issues finding ROS packages
-    RED='\033[0;31m'
-    echo -e "${RED}WARNING: Do "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc If this is your first run on this computer"
-
     source ~/catkin_ws/devel/setup.bash
     source ~/.bashrc
 
@@ -45,6 +41,12 @@ if [ "$ARG1" != "bare" ]; then
 
     # Try following these steps if you need to download GeographicLib
     # https://docs.px4.io/main/en/ros/mavros_installation.html
+
+    cd ~/catkin_ws/src
+    git clone https://github.com/Intelligent-Quads/iq_sim.git  #Need for Gazebo sims
+    #git clone https://github.com/Intelligent-Quads/iq_gnc.git  #Need for Gazebo GNC, copy included however in repo under ros_packages
+
+    
 fi
 
 #######################################################
@@ -55,5 +57,12 @@ cd ..
 
 catkin build #Use catkin_make if not using MAVROS and catkin build if using MAVROS
 source devel/setup.bash
+source ~/.bashrc
 cd ${CURRENT_DIR} #Go back to the build directory
+
+#################### ADDITIONAL STEPS #####################
+    # By adding this file to your source, there won't be issues finding ROS packages
+    RED='\033[0;31m'
+    echo -e "${RED}WARNING: Do "echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc" If this is your first run on this computer"
+    echo -e "${RED}WARNING: Do "echo "GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/catkin_ws/src/iq_sim/models" >> ~/.bashrc" If this is your first run on this computer"
 
