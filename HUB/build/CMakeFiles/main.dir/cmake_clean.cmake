@@ -7,8 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/main.dir/src/pathStep.cpp.o"
   "CMakeFiles/main.dir/src/phaseStep.cpp.o"
   "CMakeFiles/main.dir/src/uas.cpp.o"
-  "main"
   "main.pdb"
+  "main"
 )
 
 # Per-language clean rules from dependency scanning.
