@@ -45,7 +45,7 @@ if __name__ == '__main__': # <- Executable
     attempts = 0
 
     # Try to open the 0 index for the secondary camera
-    camera_index = 1   
+    camera_index = 0   
 
     while not camera_found:
         # Setup the GStreamer Pipeline
