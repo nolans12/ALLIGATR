@@ -108,7 +108,7 @@ if __name__ == '__main__': # <- Executable
     attempts = 0
 
     # Try to open the 0 index for the primary camera
-    camera_index = 1   
+    camera_index = 0   
 
     while not camera_found:
         # Setup the GStreamer Pipeline
@@ -158,7 +158,7 @@ if __name__ == '__main__': # <- Executable
                 for i in centroid:
                     centOut.append(i[0])
                     centOut.append(i[1])
-                rosOut.data = [1, 1, 1, 1] 
+                rosOut.data = centOut
 
         else:
             out_str = ("Camera Connection Lost %s" % rospy.get_time())
