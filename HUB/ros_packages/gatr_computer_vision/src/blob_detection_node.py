@@ -4,6 +4,7 @@
 import rospy
 import cv2
 from std_msgs.msg import String
+from std_msgs.msg import Int32MultiArray
 import numpy as np
 
 
@@ -136,20 +137,22 @@ if __name__ == '__main__': # <- Executable
 
             # Call blob detection
             centroid = detectBlob(img)
+            rosOut = Int32MultiArray()
 
-
-            # Output the detected corners if detected
-            if corners:
-                out_str = "AR Tag Detected %s" % rospy.get_time()
+            # Output the detected blob if detected
+            if centroid:
+                out_str = "Blob Detected %s" % rospy.get_time()
+                rosOut.data = [1, 1, 1, 1, 1, 1, 1, 1]  # Detected
             else:
-                out_str = "No AR Tag %s" % rospy.get_time()
+                out_str = "Blob Not Detected %s" % rospy.get_time()
+                rosOut.data = [0, 0, 0, 0, 0, 0, 0, 0]  # Not Detected
 
         else:
-            out_str = "Camera Connection Lost %s" % rospy.get_time()
+            out_str = ("Camera Connection Lost %s" % rospy.get_time())
             
         # Publish to the ROS node
         rospy.loginfo(out_str)
-        pub.publish(out_str)
+        pub.publish(rosOut)
         rate.sleep()
 
     cv2.destroyAllWindows()         # Close everything and release the camera
