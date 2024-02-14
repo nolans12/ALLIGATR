@@ -38,7 +38,7 @@ if __name__ == '__main__': # <- Executable
     faux_camera = False
     attempts = 0
 
-    # Try to open the 0 index for the primary camera
+    # Try to open the 0 index for the secondary camera
     camera_index = 0   
 
     while not camera_found:
