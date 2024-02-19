@@ -29,6 +29,8 @@ To check if Gazebo is working:
    sim_vehicle.py -v ArduCopter -f gazebo-iris --console
    ```
 
+   In the case of a symbol lookup error, try running this command `sudo apt upgrade libignition-math2`
+
 -Gazebo and Ardupilot plugin, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_gazebo_arduplugin.md
     --Incase of error installing GeographicLib (OS not supported), follow this guide too https://docs.px4.io/main/en/ros/mavros_installation.html
 
