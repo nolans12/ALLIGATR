@@ -141,7 +141,6 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():                      # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
-            cv2.imshow('frame', img)
 
             # ROS message
             rosOut = Int32MultiArray()
