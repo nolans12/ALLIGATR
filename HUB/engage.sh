@@ -87,6 +87,9 @@ run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
 # AR Detection Node
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
+# Localization Node
+run_node gatr_computer_vision localize_node.py Localize_Node
+
 # Mision Planner Node
 run_node gatr_missionplanner mp_node Mission_Planner_Node
 
