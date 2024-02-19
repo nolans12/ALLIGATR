@@ -118,8 +118,8 @@ if __name__ == '__main__': # <- Executable
 
         # Check if the camera opened successfully
         if cap.isOpened():
-            cap.set(cv2.CAP_PROP_BUFFERSIZE, 5);                            # Set the buffer size so it doesn't go beyond 5 frames
-            cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
+            #cap.set(cv2.CAP_PROP_BUFFERSIZE, 5);                            # Set the buffer size so it doesn't go beyond 5 frames
+            #cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
             camera_found = True                                             # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
             break            
