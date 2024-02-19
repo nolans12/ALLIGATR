@@ -43,7 +43,7 @@ if __name__ == '__main__': # <- Executable
     # Begin the main loop that consistently outputs Localization estimates
     while not rospy.is_shutdown():
         # Spin so the script keeps looking for messages
-        rospy.spinOnce()
+        rospy.spin()
             
 
 
