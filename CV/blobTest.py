@@ -2,6 +2,10 @@
 import cv2
 import numpy as np
 
+def clearBuffer(cap, bufferSize):
+    for i in range(bufferSize):
+        cap.read()
+    
 
 # A function to fix HSV range
 def fixHSVRange(h, s, v):
@@ -94,9 +98,12 @@ while not camera_found:
     # Create a VideoCapture object with the GStreamer pipeline
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
+    # Set buffer size
+    bufferSize = 5
+
     # Check if the camera opened successfully
     if cap.isOpened():
-        cap.set(cv2.CAP_PROP_BUFFERSIZE, 5);                            # Set the buffer size so it doesn't go beyond 5 frames
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, bufferSize);                            # Set the buffer size so it doesn't go beyond 5 frames
         cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
         camera_found = True                                             # Camera is found
         print("Camera connected")
@@ -112,6 +119,9 @@ while not camera_found:
 while True:
 
     if cap.isOpened():                      # Capture image while camera is opened
+        # Clear the buffer
+        clearBuffer(cap, bufferSize)
+
         # Get the current video feed frame
         ret, img = cap.read()
         cv2.imshow('frame', img)
