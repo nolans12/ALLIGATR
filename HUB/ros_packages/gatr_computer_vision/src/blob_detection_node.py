@@ -142,25 +142,33 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
 
-            # Call blob detection
-            centroid = detectBlob(img)
+            # ROS message
             rosOut = Int32MultiArray()
 
-            # Output detection
-            if centroid == -1:                                      # Not Detected
-                out_str = "Blob Not Detected %s" % rospy.get_time()
-                centOut = -1
+            # Check if the image is empty, failed to get image
+            if img is None:
+                out_str = "Camera Connection Lost %s" % rospy.get_time()
                 rosOut.data = [0, 0, 0, 0]
-            else:                                                   # Detected, format as array
-                out_str = "Blob Detected %s" % rospy.get_time()
-                centOut = []
-                for i in centroid:
-                    centOut.append(i[0])
-                    centOut.append(i[1])
-                rosOut.data = centOut
+            else:
+                # Call blob detection
+                centroid = detectBlob(img)
+
+                # Output detection
+                if centroid == -1:                                      # Not Detected
+                    out_str = "Blob Not Detected %s" % rospy.get_time()
+                    centOut = -1
+                    rosOut.data = [0, 0, 0, 0]
+                else:                                                   # Detected, format as array
+                    out_str = "Blob Detected %s" % rospy.get_time()
+                    centOut = []
+                    for i in centroid:
+                        centOut.append(i[0])
+                        centOut.append(i[1])
+                    rosOut.data = centOut
 
         else:
             out_str = ("Camera Connection Lost %s" % rospy.get_time())
+            rosOut.data = [0, 0, 0, 0]
             
         # Publish to the ROS node
         rospy.loginfo(out_str)

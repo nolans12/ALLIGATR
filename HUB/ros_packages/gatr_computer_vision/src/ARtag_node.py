@@ -74,29 +74,37 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():                      # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
-            
-            # Search for Aruco tag
-            corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+
+            # Output message
             corners_msg = Int32MultiArray()
 
-            # Output the detected corners if detected
-            if corners:
-                # Format the corners as an array
-                firstCorners = corners[0][0]
-                topLeft = firstCorners[1]
-                topRight = firstCorners[2]
-                bottomRight = firstCorners[3]
-                bottomLeft = firstCorners[0]
-                testArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
-
-                out_str = "AR Tag Detected %s" % rospy.get_time()
-                corners_msg.data = testArr
-            else:
-                out_str = "No AR Tag %s" % rospy.get_time()
+            # Check if the image is empty, failed to get image
+            if img is None:
+                out_str = "Camera Connection Lost %s" % rospy.get_time()
                 corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
+            else:            
+                # Search for Aruco tag
+                corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+
+                # Output the detected corners if detected
+                if corners:
+                    # Format the corners as an array
+                    firstCorners = corners[0][0]
+                    topLeft = firstCorners[1]
+                    topRight = firstCorners[2]
+                    bottomRight = firstCorners[3]
+                    bottomLeft = firstCorners[0]
+                    testArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+
+                    out_str = "AR Tag Detected %s" % rospy.get_time()
+                    corners_msg.data = testArr
+                else:
+                    out_str = "No AR Tag %s" % rospy.get_time()
+                    corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
+            corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
             
         # Publish to the ROS node
         rospy.loginfo(out_str)
