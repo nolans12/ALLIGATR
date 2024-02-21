@@ -7,6 +7,13 @@ from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 import numpy as np
 
+# Meta data
+BUFFERSIZE = 5      # 5 Frames for the image buffer
+
+# Clear the buffer in the video stream object
+def clearBuffer(cap, bufferSize):
+    for i in range(bufferSize):
+        cap.read()
 
 # A function to fix HSV range
 def fixHSVRange(h, s, v):
@@ -118,7 +125,7 @@ if __name__ == '__main__': # <- Executable
 
         # Check if the camera opened successfully
         if cap.isOpened():
-            cap.set(cv2.CAP_PROP_BUFFERSIZE, 5);                            # Set the buffer size so it doesn't go beyond 5 frames
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, BUFFERSIZE);                   # Set the buffer size so it doesn't go beyond 5 frames
             cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
             camera_found = True                                             # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
@@ -139,6 +146,9 @@ if __name__ == '__main__': # <- Executable
     while not rospy.is_shutdown():
 
         if cap.isOpened():                      # Capture image while camera is opened
+            # Clear the buffer
+            clearBuffer(cap, BUFFERSIZE)
+            
             # Get the current video feed frame
             ret, img = cap.read()
 
