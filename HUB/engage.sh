@@ -85,7 +85,7 @@ if [ -z "$1" ]; then
 else
 
     # Define the remote ROS master URI
-    REMOTE_ROS_MASTER_URI="http://192.168.16.1:11311"
+    REMOTE_ROS_MASTER_URI="http://$1:11311"
 
     # Export the remote ROS master URI
     export ROS_MASTER_URI=$REMOTE_ROS_MASTER_URI
