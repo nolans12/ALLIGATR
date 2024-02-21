@@ -104,15 +104,13 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Establishing camera connection...")
 
     camera_found = False
-    faux_camera = False
     attempts = 0
 
     # Try to open the 0 index for the primary camera
-    camera_index = 0   
+    camera_index = 1   
 
     while not camera_found:
         # Setup the GStreamer Pipeline
-        #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
         pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
         # Create a VideoCapture object with the GStreamer pipeline
@@ -120,19 +118,20 @@ if __name__ == '__main__': # <- Executable
 
         # Check if the camera opened successfully
         if cap.isOpened():
-            camera_found = True     # Camera is found
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 5);                            # Set the buffer size so it doesn't go beyond 5 frames
+            cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
+            camera_found = True                                             # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
             break            
 
-        rospy.sleep(3.0) # Sleep for 1 second
+        rospy.sleep(3.0) # Sleep for 3 seconds
 
         # If camera is not found, output an error message
         rospy.logwarn("Camera not found. Trying again...")
-        camera_index += 1
+        attempts += 1
 
-        if camera_index > 10:
+        if attempts > 10:
             rospy.logfatal("Camera not found after 10 attempts.")
-            faux_camera = True
             camera_found = True
 
 
@@ -143,31 +142,39 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
 
-            # Call blob detection
-            centroid = detectBlob(img)
+            # ROS message
             rosOut = Int32MultiArray()
 
-            # Output detection
-            if centroid == -1:                                      # Not Detected
-                out_str = "Blob Not Detected %s" % rospy.get_time()
-                centOut = -1
+            # Check if the image is empty, failed to get image
+            if img is None:
+                out_str = "Camera Connection Lost %s" % rospy.get_time()
                 rosOut.data = [0, 0, 0, 0]
-            else:                                                   # Detected, format as array
-                out_str = "Blob Detected %s" % rospy.get_time()
-                centOut = []
-                for i in centroid:
-                    centOut.append(i[0])
-                    centOut.append(i[1])
-                rosOut.data = centOut
+            else:
+                # Call blob detection
+                centroid = detectBlob(img)
+
+                # Output detection
+                if centroid == -1:                                      # Not Detected
+                    out_str = "Blob Not Detected %s" % rospy.get_time()
+                    centOut = -1
+                    rosOut.data = [0, 0, 0, 0]
+                else:                                                   # Detected, format as array
+                    out_str = "Blob Detected %s" % rospy.get_time()
+                    centOut = []
+                    for i in centroid:
+                        centOut.append(i[0])
+                        centOut.append(i[1])
+                    rosOut.data = centOut
 
         else:
             out_str = ("Camera Connection Lost %s" % rospy.get_time())
+            rosOut.data = [0, 0, 0, 0]
             
         # Publish to the ROS node
         rospy.loginfo(out_str)
         pub.publish(rosOut)
         rate.sleep()
 
-    cv2.destroyAllWindows()         # Close everything and release the camera
-    cap.release()
-    rospy.loginfo("End of blob detection program") # This will output to the terminal
+    cv2.destroyAllWindows()                         # Close everything and release the camera
+    cap.release()                                   # Release the capture object
+    rospy.loginfo("End of blob detection program")  # This will output to the terminal
