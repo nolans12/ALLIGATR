@@ -134,7 +134,7 @@ run_node gatr_computer_vision localize_node.py Localize_Node
 #run_node gatr_missionplanner mp_node Mission_Planner_Node
 
 # Start the MAVLINK connection to cube, opening on ttyTHS1 port
-#xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
+xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
 
 #Start the MAVROS node
 #xterm -T "mavros" -e "roslaunch mavros apm.launch fcu_url:=/dev/ttyTHS1:57600@" &
