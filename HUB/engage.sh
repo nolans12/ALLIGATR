@@ -92,7 +92,7 @@ else
 
     # Attempt to connect to the remote ROS master
     # Here we use rostopic list as a method to check connectivity. Adjust the timeout as needed.
-    if rostopic list -v --timeout=3; then
+    if timeout 3 rostopic list -v; then
         echo "Successfully connected to the remote ROS master at $ROS_MASTER_URI."
     else
         echo "Failed to connect to the remote ROS master. Starting a local roscore."
