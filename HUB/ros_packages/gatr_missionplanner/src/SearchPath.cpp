@@ -12,10 +12,10 @@ float* search(uas drone, enviornment env, float* path) {
      * Input:
      *     drone  -  uas object
      *     env    -  enviornment object
-     *     path   -  length 3 vector of the previously commanded point [x, y, z]
+     *     path   -  length 4 vector of the previously commanded point and yaw [x, y, z, psi]
      *     Any units, so long as consistent between passed arguments
      * Output:
-     *     path   - length 3 vector of the new commanded point [x, y, z]
+     *     path   - length 4 vector of the new commanded point and yaw [x, y, z, psi]
      *     drone  - uas object with p property updated
      *     env    - enviornment object with boundery property updated
      * The function makes use of the uas p iterator property to track the
@@ -119,12 +119,14 @@ float* search(uas drone, enviornment env, float* path) {
             path[0] = env.bounds[0][1]-xneg*W;
             path[1] = drone.state[1];
             path[2] = drone.state[2];
+            path[3] = 0;
         }
         else if (abs(drone.state[0]-(env.bounds[1][0]+xneg*W)) < 0.2) {
             // if drone is on the right, set commanded point to the left
             path[0] = env.bounds[0][0]+xneg*W;
             path[1] = drone.state[1];
             path[2] = drone.state[2];
+            path[3] = 0;
         }
     }
     else if (((drone.p % 2) == 1) && (drone.p != 1)) {
@@ -133,6 +135,7 @@ float* search(uas drone, enviornment env, float* path) {
         path[0] = drone.state[0];
         path[1] = env.bounds[0][1]+yneg*L*drone.p;
         path[2] = drone.state[2];
+        path[3] = 90;
     }
 
     // get the p and y of the last phase we want

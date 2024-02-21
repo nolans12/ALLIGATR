@@ -74,8 +74,48 @@ run_node()
 }
 
 #Opens a roscore terminal. If one already exists, it will close itself
-xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
-sleep 2
+# xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+# sleep 2
+
+# Check if an argument was provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <ip_address> to connect to roscore ip"
+    xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+    
+else
+
+    # Define the remote ROS master URI
+    REMOTE_ROS_MASTER_URI="http://$1:11311"
+
+    # Export the remote ROS master URI
+    export ROS_MASTER_URI=$REMOTE_ROS_MASTER_URI
+
+    # Attempt to connect to the remote ROS master
+    # Here we use rostopic list as a method to check connectivity. Adjust the timeout as needed.
+    if timeout 3 rostopic list -v; then
+        echo "Successfully connected to the remote ROS master at $ROS_MASTER_URI."
+    else
+        echo "Failed to connect to the remote ROS master. Starting a local roscore."
+
+        # Unset the ROS_MASTER_URI to avoid conflicts
+        unset ROS_MASTER_URI
+
+        # Start a local roscore
+        # It's recommended to run roscore in the background or in a separate terminal/session
+        # because it does not exit until manually stopped.
+        xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+
+        # Capture the PID of the last background process (roscore)
+        ROSCORE_PID=$!
+
+        echo "Local roscore started with PID $ROSCORE_PID."
+
+        # Optional: wait or perform additional tasks here
+
+        # If you need to stop the local roscore at the end of this script, use:
+        # kill $ROSCORE_PID
+    fi
+fi
 
 
 ################### ADD PROCESSES HERE ######################
