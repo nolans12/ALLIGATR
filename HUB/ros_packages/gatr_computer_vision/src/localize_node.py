@@ -15,16 +15,14 @@ ALTITUDE = 30                           # Assume we localize at 30 ft
 
 # Global Meta Data
 AR_LENGTH = 0.15875                     # AR Tag length in meters
+XPIXELS = 1920
+YPIXELS = 1080
 
 # Localization function
 def localize():
-    # Image is 1920 by 1080 pixels
-    xPixels = 1920
-    yPixels = 1080
-
     # Define the center of the image
-    cx = xPixels / 2
-    cy = yPixels / 2
+    cx = XPIXELS / 2
+    cy = YPIXELS / 2
 
     # Get the centroid coordinates of the AR tag and the corners
     topLeft = AR_CORNERS[0:1]
