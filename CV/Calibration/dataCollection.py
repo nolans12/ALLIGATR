@@ -16,7 +16,7 @@ while cap.isOpened():
     if k == ord('q'):
         break
     elif k == ord('s'): # wait for 's' key to save and exit
-        cv2.imwrite('AutoImages/img' + str(num) + '.png', img)
+        cv2.imwrite('BigBoiImages/img' + str(num) + '.png', img)
         print("Image Saved")
         num += 1
 
