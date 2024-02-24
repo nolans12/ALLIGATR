@@ -69,7 +69,7 @@ testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'BigMatrix.pkl'
+pickle_file_path = 'AutoMatrix.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
@@ -78,7 +78,7 @@ with open(pickle_file_path, 'rb') as file:
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'BigDist.pkl'
+pickle_file_path = 'AutoDist.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
