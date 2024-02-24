@@ -69,7 +69,7 @@ testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'WideMatrix.pkl'
+pickle_file_path = 'BigMatrix.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
@@ -78,7 +78,7 @@ with open(pickle_file_path, 'rb') as file:
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'WideDist.pkl'
+pickle_file_path = 'BigDist.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
@@ -125,7 +125,7 @@ with open(pickle_file_path, 'rb') as file:
 
 # %% Video Capture With Webcam
 # Open the camera
-camera_index = 0
+camera_index = 1
 pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
