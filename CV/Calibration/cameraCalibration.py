@@ -6,10 +6,8 @@ import pickle
 
 
 ################ FIND CHESSBOARD CORNERS - OBJECT POINTS AND IMAGE POINTS #############################
-
 chessboardSize = (9,6)
 frameSize = (640,480)
-
 
 
 # termination criteria
@@ -29,7 +27,7 @@ objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
 
-images = glob.glob('Calibration/Images/*.png')
+images = glob.glob('BigBoiImages/*.png')
 
 for image in images:
 
@@ -58,16 +56,13 @@ cv.destroyAllWindows()
 
 
 ############## CALIBRATION #######################################################
-
 ret, cameraMatrix, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
 
-print(cameraMatrix)
 
 # Save the camera calibration result for later use (we won't worry about rvecs / tvecs)
-pickle.dump((cameraMatrix, dist), open( "calibration.pkl", "wb" ))
-pickle.dump(cameraMatrix, open( "cameraMatrix.pkl", "wb" ))
-pickle.dump(dist, open( "dist.pkl", "wb" ))
-
+#pickle.dump((cameraMatrix, dist), open( "calibration.pkl", "wb" ))
+pickle.dump(cameraMatrix, open( "BigMatrix.pkl", "wb" ))
+pickle.dump(dist, open( "BigDist.pkl", "wb" ))
 
 # Reprojection Error
 mean_error = 0

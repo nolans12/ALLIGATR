@@ -65,11 +65,11 @@ aruco_type = "DICT_6X6_250"
 testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
 # # Insantiate parameters
-arucoParams = cv2.aruco.DetectorParameters()
+#arucoParams = cv2.aruco.DetectorParameters()
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'Calibration/cameraMatrix.pkl'
+pickle_file_path = 'WideMatrix.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
@@ -78,7 +78,7 @@ with open(pickle_file_path, 'rb') as file:
 
 
 # Specify the path to your pickle file
-pickle_file_path = 'Calibration/dist.pkl'
+pickle_file_path = 'WideDist.pkl'
 
 # Open the pickle file in binary mode ('rb' for reading binary)
 with open(pickle_file_path, 'rb') as file:
@@ -124,22 +124,22 @@ with open(pickle_file_path, 'rb') as file:
 # cv2.destroyAllWindows()
 
 # %% Video Capture With Webcam
-cap = cv2.VideoCapture(0)
+# Open the camera
+camera_index = 0
+pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 while cap.isOpened():
     # Get the current video feed frame
     ret, img = cap.read()
     
     # Locate the Aruco tag
-    corners, ids, rejected = cv2.aruco.detectMarkers(img, testDict, parameters=arucoParams)
+    corners, ids, rejected = cv2.aruco.detectMarkers(img, testDict)
     image = aruco_display(corners, ids, rejected, img)
     
     # Get the centroid coordinates of the AR tag and the corners
     if corners:
-
         firstCorners = corners[0][0]
         topLeft = firstCorners[1]
         topRight = firstCorners[2]
@@ -152,7 +152,6 @@ while cap.isOpened():
 
         print(tVec)
     
-
 	# Display the frame
     cv2.imshow('frame', image)
     
