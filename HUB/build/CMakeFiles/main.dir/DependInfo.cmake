@@ -4,14 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/jetson/ALLIGATR/HUB/src/CameraObject.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/CameraObject.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/HUB.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/HUB.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/WIFI.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/WIFI.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/environment.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/environment.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/main.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/main.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/pathStep.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/pathStep.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/phaseStep.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/phaseStep.cpp.o"
-  "/home/jetson/ALLIGATR/HUB/src/uas.cpp" "/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/uas.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/CameraObject.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/CameraObject.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/HUB.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/HUB.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/WIFI.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/WIFI.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/environment.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/environment.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/main.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/main.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/pathStep.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/pathStep.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/phaseStep.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/phaseStep.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/uas.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/uas.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
