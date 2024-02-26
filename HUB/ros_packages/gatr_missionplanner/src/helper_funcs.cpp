@@ -1,5 +1,6 @@
-#include "headers/minInd.h"
+#include "headers/helper_funcs.h"
 
+// Returns the indices of the smallest value in a 2x2 array
 short int* minInd(float arr[2][2]) {
     short int i, j;
     float smallest = arr[0][0];

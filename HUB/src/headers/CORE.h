@@ -13,4 +13,3 @@
 #include "CameraObject.h"
 #include "pathStep.h"
 #include "phaseStep.h"
-#include "uas.h"

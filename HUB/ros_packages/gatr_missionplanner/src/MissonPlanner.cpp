@@ -1,21 +1,28 @@
-#include "headers/SearchPath.h"
+#include "../headers/MissionPlanner.h"
 #include <math.h>
 #include <stdlib.h>
-#include "headers/getFOVDims.h"
-#include "headers/reachedPoint.h"
-#include "headers/minInd.h"
+#include <memory>
+#include <vector>
+#include <mavros_msgs/CommandTOL.h> // Add missing include
+
 using namespace std;
 
-float* search(uas drone, enviornment env, float* path) {
+MissionPlanner::MissionPlanner() {
+    // Constructor
+    drone = uas();
+    env = environment();
+}
+
+std::vector<float> MissionPlanner::search(std::vector<float> waypoint) {
     /* 
      * Returns the next point for a creeping line search pattern
      * Input:
      *     drone  -  uas object
      *     env    -  enviornment object
-     *     path   -  length 4 vector of the previously commanded point and yaw [x, y, z, psi]
+     *     waypoint   -  length 4 vector of the previously commanded point and yaw [x, y, z, psi]
      *     Any units, so long as consistent between passed arguments
      * Output:
-     *     path   - length 4 vector of the new commanded point and yaw [x, y, z, psi]
+     *     waypoint   - length 4 vector of the new commanded point and yaw [x, y, z, psi]
      *     drone  - uas object with p property updated
      *     env    - enviornment object with boundery property updated
      * The function makes use of the uas p iterator property to track the
@@ -42,7 +49,7 @@ float* search(uas drone, enviornment env, float* path) {
 
 
     // variables always used
-    float* fovDims;
+    std::vector<float> fovDims;
     float L, W, yEnd;
     short int xneg = 1, yneg = 1, pEnd;
 
@@ -53,7 +60,7 @@ float* search(uas drone, enviornment env, float* path) {
     float x1_old, y1_old;
 
     // length and width of the camera projected box on ground
-    fovDims = getFOVDims(drone);
+    fovDims = drone.getFOVDims();
     // remove some distance to allow for margin of error as well as RGV moving into last search line from new search line before drone reaches that point
     // 10% margin can be adjusted as needed
     L = fovDims[0] * 0.8;
@@ -66,7 +73,7 @@ float* search(uas drone, enviornment env, float* path) {
         yneg = -1;
     }
 
-    if ((drone.p != 0) && reachedPoint(drone, path)) {
+    if ((drone.p != 0) && check_waypoint_reached(drone.epsilon) == 1) {
         // if the drone has reached the commanded point from the previous phase of search, increase the iteration counter p by 1
         drone.p++;
     }
@@ -106,9 +113,9 @@ float* search(uas drone, enviornment env, float* path) {
                 yneg = -1;
             }
             // set commanded point to the closest corner + camera buffer
-            path[0] = env.bounds[0][0]+xneg*W;
-            path[1] = env.bounds[0][1]+yneg*L;
-            path[2] = drone.state[3];
+            waypoint[0] = env.bounds[0][0]+xneg*W;
+            waypoint[1] = env.bounds[0][1]+yneg*L;
+            waypoint[2] = drone.state[3];
             drone.p++;
         }
     }
@@ -116,26 +123,26 @@ float* search(uas drone, enviornment env, float* path) {
         // if p is even, the drone is on left-right portion of flight
         if (abs(drone.state[0]-(env.bounds[0][0]+xneg*W)) < 0.2) {
             // if drone is on the left, set commanded point to the right
-            path[0] = env.bounds[0][1]-xneg*W;
-            path[1] = drone.state[1];
-            path[2] = drone.state[2];
-            path[3] = 0;
+            waypoint[0] = env.bounds[0][1]-xneg*W;
+            waypoint[1] = drone.state[1];
+            waypoint[2] = drone.state[2];
+            waypoint[3] = 0;
         }
         else if (abs(drone.state[0]-(env.bounds[1][0]+xneg*W)) < 0.2) {
             // if drone is on the right, set commanded point to the left
-            path[0] = env.bounds[0][0]+xneg*W;
-            path[1] = drone.state[1];
-            path[2] = drone.state[2];
-            path[3] = 0;
+            waypoint[0] = env.bounds[0][0]+xneg*W;
+            waypoint[1] = drone.state[1];
+            waypoint[2] = drone.state[2];
+            waypoint[3] = 0;
         }
     }
     else if (((drone.p % 2) == 1) && (drone.p != 1)) {
         // if p is odd, the drone is on upwards portion of flight
         // ignore when p is 1 - moving to search start point
-        path[0] = drone.state[0];
-        path[1] = env.bounds[0][1]+yneg*L*drone.p;
-        path[2] = drone.state[2];
-        path[3] = 90;
+        waypoint[0] = drone.state[0];
+        waypoint[1] = env.bounds[0][1]+yneg*L*drone.p;
+        waypoint[2] = drone.state[2];
+        waypoint[3] = 90;
     }
 
     // get the p and y of the last phase we want
@@ -148,5 +155,21 @@ float* search(uas drone, enviornment env, float* path) {
         // if we are outside the last p and y we want, set p = 0, restarting search
         drone.p = 0;
     }
-    return path;
+    return waypoint;
+}
+
+// Makes the drone fly in a square pattern around the environment bounds
+std::vector<float> MissionPlanner::bounds_trace(std::vector<float> waypoint){
+
+    //Check to see if the drone has reached the commanded point
+    if (check_waypoint_reached(drone.epsilon) == 1){
+
+        //Trace the bounds of the environment
+        set_destination(env.bounds[drone.p][0], env.bounds[drone.p][1], drone.state[2], 0);
+
+        //If the drone has reached the commanded point, increment the p counter
+        drone.p = (drone.p + 1) % 4;
+    }
+
+    return waypoint;
 }
