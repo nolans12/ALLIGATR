@@ -207,7 +207,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-file(GLOB SOURCES "source/*.cpp")
+file(GLOB SOURCES "src/*.cpp")
+
 
 add_executable(mp_node src/mp_node.cpp ${SOURCES})
 target_link_libraries(mp_node ${catkin_LIBRARIES})

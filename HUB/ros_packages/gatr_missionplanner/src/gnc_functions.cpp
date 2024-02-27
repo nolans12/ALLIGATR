@@ -1,30 +1,4 @@
-#pragma once
-#include <mavros_msgs/CommandTOL.h>
-#include <mavros_msgs/CommandLong.h>
-#include <mavros_msgs/WaypointPull.h>
-#include <mavros_msgs/WaypointPush.h>
-#include <mavros_msgs/WaypointSetCurrent.h>
-#include <mavros_msgs/GlobalPositionTarget.h>
-#include <geographic_msgs/GeoPoseStamped.h>
-#include <mavros_msgs/State.h>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <cmath>
-#include <math.h>
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/String.h>
-#include <mavros_msgs/CommandBool.h>
-#include <mavros_msgs/SetMode.h>
-#include <mavros_msgs/PositionTarget.h>
-#include <unistd.h>
-#include <vector>
-#include <ros/duration.h>
-#include <iostream>
-#include <string>
-
-
+#include "headers/gnc_functions.hpp"
 
 /**
 \defgroup control_functions
@@ -62,12 +36,6 @@ ros::ServiceClient auto_waypoint_set_current_client;
 \ingroup control_functions
 This structure is a convenient way to format waypoints
 */
-struct gnc_api_waypoint{
-	float x; ///< distance in x with respect to your reference frame
-	float y; ///< distance in y with respect to your reference frame
-	float z; ///< distance in z with respect to your reference frame
-	float psi; ///< rotation about the third axis of your reference frame
-};
 
 //get armed state
 void state_cb(const mavros_msgs::State::ConstPtr& msg)
@@ -394,7 +362,7 @@ This function returns an int of 1 or 0. THis function can be used to check when 
 @return 1 - waypoint reached 
 @return 0 - waypoint not reached
 */
-int check_waypoint_reached(float pos_tolerance=0.3, float heading_tolerance=0.01)
+int check_waypoint_reached(float pos_tolerance, float heading_tolerance)
 {
 	local_pos_pub.publish(waypoint_g);
 	

@@ -1,11 +1,9 @@
 #include "headers/uas.h"
 //#include "headers/pathStep.h"
-#include <string>
-#include <math.h>
 
 uas::uas() {
     /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  1x3 array containing current uas position [ft]
+     *  state         -  1x4 array containing current uas position and heading[ft]
      *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
      *  pathNow       -  points to the most recent entry of the pathStep linked list
      *  fovNarrow     -  narrow FOV of the camera [deg]
@@ -19,10 +17,8 @@ uas::uas() {
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    epsilon = 0.2;
-    state[0] = 0.;
-    state[1] = 0.;
-    state[2] = 0.;
+    epsilon = 1;
+    state = {0., 0., 0., 0.};
     // pathRoot = new pathStep;
     // pathNow = pathRoot;
     // pathRoot->path[0] = 0.;
@@ -32,15 +28,15 @@ uas::uas() {
     fovWide = 102;
 
     p = 0;
-    theta = -1.;
-    thetaJoint = 0.;
-    jointTime = 0.;
+    theta = -1.0f;
+    thetaJoint = 0.0f;
+    jointTime = 0.0f;
     jointComplete = false;
     // phaseRoot = new phaseStep;
     // phaseNow = phaseRoot;
     // phaseRoot->time = 0.;
     // phaseRoot->phase = "Takeoff";
-    status = "Takeoff";
+    status = "STANDBY";
 }
 
 /// @brief Gets the dimensions of the field of view of the camera when projected onto the ground

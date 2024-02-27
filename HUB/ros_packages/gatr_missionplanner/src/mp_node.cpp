@@ -1,5 +1,5 @@
-#include <gnc_functions.hpp>
-#include "headers/MissionPlanner.h"
+#include "headers/mp_node_headers.h"
+
 //include API 
 
 int main(int argc, char** argv)
@@ -39,13 +39,21 @@ int main(int argc, char** argv)
 
 	//initialize the uas and environment objects
 	MissionPlanner mp;
-	std::vector<float> curr_waypoint(4);
+	std::vector<float> curr_waypoint_new(4);
+	std::vector<float> curr_waypoint_prev(4);
 
 	// MAIN LOOP //
 	while(ros::ok())
 	{
 		ros::spinOnce();
 		rate.sleep();
+
+		//Update the drone's position
+		mp.update_drone_state();
+		mp.output_drone_state();
+
+		// Save the previous waypoint
+		curr_waypoint_prev = curr_waypoint_new;
 
 		////////// Original Square Code //////////
 		// if(check_waypoint_reached(.3) == 1)
@@ -62,9 +70,17 @@ int main(int argc, char** argv)
 		//////////////////////////////////////////
 
 		//////////// Only Search Code ////////////
-		curr_waypoint = mp.bounds_trace(curr_waypoint);
+		curr_waypoint_new = mp.bounds_trace(curr_waypoint_prev);
 
 		//////////////////////////////////////////
+
+		// If the waypoint has changed, set the new waypoint
+		if (curr_waypoint_new != curr_waypoint_prev) {
+
+			// Set the new waypoint
+			float heading_angle = 0; //Nolan can you make this the same as the LTL planner?
+			set_destination(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], heading_angle);
+		}
 
 	}
 	return 0;

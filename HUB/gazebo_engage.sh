@@ -68,7 +68,7 @@ Yaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f2)
 #run_node gatr_computer_vision ARtag_node.py
 
 #Start the Gazebo simulation
-xterm -geometry 40x10 -T "Simulation Host" -e "roslaunch iq_sim runway.launch" & 
+xterm -geometry 40x10 -T "Simulation Host" -e "roslaunch gatr_missionplanner multi_rgv_stationary.launch" & 
 sleep 5
 
 #Start the ArduPilot Plugin for Software in the Loop (SITL)

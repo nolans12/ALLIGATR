@@ -1,24 +1,35 @@
 #pragma once
-#include <iostream>
+#include "gnc_functions.hpp"
 #include "uas.h"
 #include "environment.h"
-#include <gnc_functions.hpp>
 #include <vector>
+#include <iomanip>
 
 class MissionPlanner {
     public:
         MissionPlanner();
 
-        // Search phase
-        std::vector<float> search(std::vector<float> path);
+        /////////// Testing Modes /////////////////////////
+        // Makes the drone fly in a square pattern around the environment bounds
+        std::vector<float> bounds_trace(std::vector<float> waypoint);
 
-        std::vector<float> bounds_trace(std::vector<float> path);
+        /////////// Search Phase //////////////////////////
+        std::vector<float> search(std::vector<float> waypoint);
 
-        // Course Localization Phase
+        /////////// Course Localization Phase /////////////
 
-        // Fine Localization Phase
+        /////////// Fine Localization Phase ///////////////
 
-        // Joint Localization Phase
+        /////////// Joint Localization Phase //////////////
+
+        /////////// Helper Functions //////////////////////
+        
+        // Output the current state of the drone
+        void output_drone_state();
+
+        // Update the state of the drone
+        void update_drone_state();
+
     
     private:
         uas drone;

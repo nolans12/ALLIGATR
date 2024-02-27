@@ -64,5 +64,5 @@ cd ${CURRENT_DIR} #Go back to the build directory
     # By adding this file to your source, there won't be issues finding ROS packages
     RED='\033[0;31m'
     echo -e "${RED}WARNING: Do "echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc" If this is your first run on this computer"
-    echo -e "${RED}WARNING: Do "echo "GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/catkin_ws/src/iq_sim/models" >> ~/.bashrc" If this is your first run on this computer"
+    echo -e "${RED}WARNING: Do "echo "export GAZEBO_MODEL_PATH=~/ALLIGATR/HUB/models:~/ardupilot_gazebo/models:~/catkin_ws/src/iq_sim/models" >> ~/.bashrc" If this is your first run on this computer"
 

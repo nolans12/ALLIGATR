@@ -1,13 +1,15 @@
 #pragma once
-#include <string>
 #include <vector>
+#include <string>
+#include <iostream>
+#include <cmath>
 //#include "phaseStep.h"
 //#include "pathStep.h"
 
 class uas {
 public:
     /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  1x3 array containing current uas position [ft]
+     *  state         -  1x4 array containing current uas position [ft]
      *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
      *  pathNow       -  points to the most recent entry of the pathStep linked list
      *  fovNarrow     -  narrow FOV of the camera [deg]
@@ -21,7 +23,7 @@ public:
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    std::vector<float> state;
+    std::vector<double> state;
     float epsilon, fovNarrow, fovWide, theta, thetaJoint, jointTime;
     bool jointComplete;
     std::string status;

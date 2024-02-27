@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="jackal">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <pose>0 0 0.0714375 0 0 0</pose>
+        <mass>5</mass>
+        <!-- approximate as uniform box 0.387 x 0.387 x 0.092 m -->
+        <inertia>
+          <ixx>0.06814656666666667</ixx>
+          <ixy>0.0000</ixy>
+          <iyy>0.06814656666666667</iyy>
+          <ixz>0.0000</ixz>
+          <iyz>0.0000</iyz>
+          <izz>0.1248075</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <scale>0.04 0.04 0.04</scale>
+            <uri>model://jackal/meshes/jackal_1_lowpoly.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
