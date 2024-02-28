@@ -18,13 +18,17 @@ def callback(data):
   rospy.loginfo("Received Frame")
    
   # Convert ROS Image message to OpenCV image
-  current_frame = br.imgmsg_to_cv2(data)
+  img = br.imgmsg_to_cv2(data)
+
+  corners_msg = Int32MultiArray()
 
   # Run AR tag detection
-  #corners_msg.data = processImg(img)
+  corners_msg.data = processImg(img)
    
   # Display image
-  cv2.imshow("camera", current_frame)
+  cv2.imshow("camera", img)
+
+  pub_corners.publish(corners_msg)
    
   cv2.waitKey(1)
 
@@ -101,7 +105,7 @@ if __name__ == '__main__': # <- Executable
     # Try to open the 0 index for the secondary camera
     camera_index = 0   
 
-    while not camera_found:
+    while not camera_found and not faux_camera:
         # Setup the GStreamer Pipeline
         #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
         pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
@@ -122,7 +126,7 @@ if __name__ == '__main__': # <- Executable
         attempts += 1
 
         # Camera wasn't found after multiple attempts. 
-        if attempts > 10:
+        if attempts > 5:
             rospy.logfatal("Camera not found after 10 attempts. Connecting to faux camera.")
             faux_camera = True
             camera_found = False

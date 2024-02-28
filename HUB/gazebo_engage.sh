@@ -87,6 +87,8 @@ xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_vie
 #xterm -e "roslaunch iq_sim apm.launch" &
 sleep 3
 
+run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
+
 #Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
 if [ -z "$1" ]; then
     xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
