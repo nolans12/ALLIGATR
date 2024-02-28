@@ -58,10 +58,16 @@ def processImg(img):
 # Highlight the detected markers
 def aruco_display(corners, image):
     if corners.data[0]: # Are any aruco tags detected
-        topLeft = corners.data[0:1]
-        topRight = corners.data[2:3]
-        bottomRight = corners.data[4:5]
-        bottomLeft = corners.data[6:7]
+        # Ensure that corners.data has at least 8 elements
+        if len(corners.data) >= 8:
+            topLeft = (int(corners.data[0]), int(corners.data[1]))
+            topRight = (int(corners.data[2]), int(corners.data[3]))
+            bottomRight = (int(corners.data[4]), int(corners.data[5]))
+            bottomLeft = (int(corners.data[6]), int(corners.data[7]))
+            # Rest of your code...
+        else:
+            rospy.loginfo("Not enough data in corners to display AR tag")
+            return image
 
         # Cast the data to integers
         topRight = (int(topRight[0]), int(topRight[1]))
