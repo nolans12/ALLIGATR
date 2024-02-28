@@ -16,14 +16,14 @@ def callback(data):
    
   # Convert ROS Image message to OpenCV image
   img = br.imgmsg_to_cv2(data)
-
   corners_msg = Int32MultiArray()
 
   # Run AR tag detection
   corners_msg.data = processImg(img)
    
   # Display image
-  cv2.imshow("camera", img)
+  outImage = aruco_display(corners_msg, img)
+  cv2.imshow("camera", outImage)
 
   pub_corners.publish(corners_msg)
    
@@ -61,9 +61,11 @@ def processImg(img):
 def aruco_display(corners, image):
     if(len(corners) > 0): # Are any aruco tags detected
         
-        for (markerCorner, markerID) in zip(corners, ids):
-            corners = markerCorner.reshape((4,2))
-            (topLeft, topRight, bottomRight, bottomLeft) = corners  # Get the corners
+        for markerCorner in corners:
+            topLeft = corners[0:1]
+            topRight = corners[2:3]
+            bottomRight = corners[4:5]
+            bottomLeft = corners[6:7]
 
             # Cast the data to integers
             topRight = (int(topRight[0]), int(topRight[1]))
