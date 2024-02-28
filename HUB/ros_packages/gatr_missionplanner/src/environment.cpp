@@ -13,12 +13,11 @@ environment::environment() {
     slt.x_cell = 0;
     slt.y_cell = 0;
     
-    slt.num_cells_x = 3;
-    slt.num_cells_y = 3;
+    slt.num_cells_x = 5;
+    slt.num_cells_y = 5;
 
-    // Need this statement to start search going in the positive direction
-    slt.x_iter = slt.num_cells_x;
-    slt.y_iter = slt.num_cells_y;
+    slt.x_iter = 0;
+    slt.y_iter = 0;
 
     slt.recently_transitioned = true;
 }
@@ -50,11 +49,11 @@ std::vector<double> environment::next_searchpoint() {
     // Increment the search location tracker
 
     // The drone is at the edge of the x axis
-    if (slt.x_cell%(slt.num_cells_x-1) == 0)
+    if (slt.x_iter%(slt.num_cells_x-1) == 0 && !slt.recently_transitioned)
     {
         // Move the y_cell component of the search location tracker
         slt.y_iter += 1;
-        slt.y_cell == abs((slt.y_iter % (2*slt.num_cells_y)-1)-slt.num_cells_y);
+        slt.y_cell = abs((slt.y_iter % (2*(slt.num_cells_y-1)))-(slt.num_cells_y-1));
         slt.recently_transitioned = true;
     } 
 
@@ -68,12 +67,13 @@ std::vector<double> environment::next_searchpoint() {
     // }
 
     // The drone is not at the edge of the x axis
-    // else
-    // {
+    else
+    {
         // Use the sign of a sine wave with a period of num_cells_x to determine the direction of the search
         slt.x_iter += 1;
-        slt.x_cell = abs((slt.x_iter % (2*slt.num_cells_x)-2)-(slt.num_cells_x-1));
-    // }
+        slt.x_cell = abs((slt.x_iter % (2*(slt.num_cells_x-1)))-(slt.num_cells_x-1));
+        slt.recently_transitioned = false;
+    }
 
 
     std::cout << "slt.x_cell: " << slt.x_cell << " slt.y_cell: " << slt.y_cell << std::endl;

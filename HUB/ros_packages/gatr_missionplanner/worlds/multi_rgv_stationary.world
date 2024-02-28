@@ -109,9 +109,9 @@
       <pose> 9 -14 0 0 0 -20</pose>
     </model>
 
-    <model name="iris">
+    <model name="gatr_drone">
       <include>
-        <uri>model://drone_with_camera</uri>
+        <uri>model://gatr_drone</uri>
       </include>
       <pose> 0 0 0 0 0 0</pose>
     </model>

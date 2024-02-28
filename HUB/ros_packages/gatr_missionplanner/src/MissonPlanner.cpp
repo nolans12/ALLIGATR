@@ -11,6 +11,7 @@ MissionPlanner::MissionPlanner() {
 std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
 
     // Check if the drone has identified an RGV
+    waypoint = env.get_searchpoint();
     
     //Check to see if the drone has reached the commanded point
     if (check_waypoint_reached(drone.epsilon) == 1){
