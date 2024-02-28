@@ -13,6 +13,9 @@ class MissionPlanner {
         // Makes the drone fly in a square pattern around the environment bounds
         std::vector<double> bounds_trace(std::vector<double> waypoint);
 
+        // Directly flies to an RGV
+        std::vector<double> direct_locate(std::vector<double> waypoint);
+
         /////////// Search Phase //////////////////////////
         std::vector<double> search(std::vector<double> waypoint);
 

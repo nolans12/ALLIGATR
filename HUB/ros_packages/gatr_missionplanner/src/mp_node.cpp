@@ -68,6 +68,10 @@ int main(int argc, char** argv)
 		{
 			curr_waypoint_new = mp.search(curr_waypoint_new);
 		}
+		else if (pattern_name == "locate")
+		{
+			curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
+		}
 		else
 		{
 			//////////// MAIN LOOP HERE ////////////

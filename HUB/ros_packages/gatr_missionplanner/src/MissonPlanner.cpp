@@ -73,6 +73,15 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     return false;
 }
 
+//Improvised mode to just go directly to the rgvs locations
+std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint){
+    //Trace the bounds of the environment
+    waypoint = std::vector<double>{14.0, 9.0, 8, 0};
+
+    return waypoint;
+
+}
+
 // std::vector<float> MissionPlanner::search(std::vector<float> waypoint) {
 //     /* 
 //      * Returns the next point for a creeping line search pattern

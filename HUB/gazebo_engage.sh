@@ -83,9 +83,9 @@ xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
 sleep 3
 
 #Start the Camera Viewer node
-xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_view image:=/webcam/image_raw/compressed" &
+#xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_view image:=/webcam/image_raw/compressed" &
 #xterm -e "roslaunch iq_sim apm.launch" &
-sleep 3
+#sleep 3
 
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
