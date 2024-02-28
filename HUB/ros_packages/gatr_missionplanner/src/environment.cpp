@@ -16,8 +16,9 @@ environment::environment() {
     slt.num_cells_x = 5;
     slt.num_cells_y = 5;
 
-    slt.x_iter = 0;
-    slt.y_iter = 0;
+    //This line starts the search off at the 1,1 cell
+    slt.x_iter = slt.num_cells_x-1;
+    slt.y_iter = slt.num_cells_y-1;
 
     slt.recently_transitioned = true;
 }
@@ -57,27 +58,14 @@ std::vector<double> environment::next_searchpoint() {
         slt.recently_transitioned = true;
     } 
 
-    // The drone is at the edge of the x axis but already transitioned its y_cell
-    // else if (slt.x_cell%slt.num_cells_x == 0 && slt.recently_transitioned)
-    // {
-    //     // Use the sign of a sine wave with a period of num_cells_x to determine the direction of the search
-    //     slt.x_iter += 1;
-    //     slt.x_cell = abs((slt.x_iter % (2*slt.num_cells_x))-slt.num_cells_x);
-    //     slt.recently_transitioned = false;
-    // }
-
     // The drone is not at the edge of the x axis
     else
     {
-        // Use the sign of a sine wave with a period of num_cells_x to determine the direction of the search
+        // Move the x_cell component of the search location tracker
         slt.x_iter += 1;
         slt.x_cell = abs((slt.x_iter % (2*(slt.num_cells_x-1)))-(slt.num_cells_x-1));
         slt.recently_transitioned = false;
     }
-
-
-    std::cout << "slt.x_cell: " << slt.x_cell << " slt.y_cell: " << slt.y_cell << std::endl;
-    std::cout << "slt.x_iter: " << slt.x_iter << " slt.y_iter: " << slt.y_iter << std::endl;
 
     // Calculate the search point
     searchPoint = get_searchpoint();

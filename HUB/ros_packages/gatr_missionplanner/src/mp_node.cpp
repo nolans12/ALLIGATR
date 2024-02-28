@@ -43,16 +43,6 @@ int main(int argc, char** argv)
 	//request takeoff
 	takeoff(3);
 
-	//specify some waypoints 
-	std::vector<gnc_api_waypoint> waypointList;
-	gnc_api_waypoint nextWayPoint;
-	// nextWayPoint.x = 0;
-	// nextWayPoint.y = 0;
-	// nextWayPoint.z = 3;
-	// nextWayPoint.psi = 0;
-	// waypointList.push_back(nextWayPoint);
-
-
 	//specify control loop rate. We recommend a low frequency to not over load the FCU with messages. Too many messages will cause the drone to be sluggish
 	ros::Rate rate(2.0);
 	int counter = 0;
@@ -69,21 +59,6 @@ int main(int argc, char** argv)
 
 		// Save the previous waypoint
 		curr_waypoint_prev = curr_waypoint_new;
-
-		////////// Original Square Code //////////
-		// if(check_waypoint_reached(.3) == 1)
-		// {
-		// 	if (counter < waypointList.size())
-		// 	{
-		// 		set_destination(waypointList[counter].x,waypointList[counter].y,waypointList[counter].z, waypointList[counter].psi);
-		// 		counter++;	
-		// 	}else{
-		// 		//land after all waypoints are reached
-		// 		land();
-		// 	}	
-		// }	
-		//////////////////////////////////////////
-
 		
 		// Check the command line argument to see what loop to run
 		if (pattern_name == "bounds"){
