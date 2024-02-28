@@ -59,11 +59,11 @@ def processImg(img):
     
 # Highlight the detected markers
 def aruco_display(corners, image):
-    if corners[0]: # Are any aruco tags detected
-        topLeft = corners[0:1]
-        topRight = corners[2:3]
-        bottomRight = corners[4:5]
-        bottomLeft = corners[6:7]
+    if corners.data[0]: # Are any aruco tags detected
+        topLeft = corners.data[0:1]
+        topRight = corners.data[2:3]
+        bottomRight = corners.data[4:5]
+        bottomLeft = corners.data[6:7]
 
         # Cast the data to integers
         topRight = (int(topRight[0]), int(topRight[1]))
