@@ -13,9 +13,6 @@ from cv_bridge import CvBridge
 def callback(data):
   # Used to convert between ROS and OpenCV images
   br = CvBridge()
- 
-  # Output debugging information to the terminal
-  rospy.loginfo("Received Frame")
    
   # Convert ROS Image message to OpenCV image
   img = br.imgmsg_to_cv2(data)
@@ -31,8 +28,6 @@ def callback(data):
   pub_corners.publish(corners_msg)
    
   cv2.waitKey(1)
-
-
 
 # Function that checks a given image for an AR tag and returns corners if its found
 def processImg(img):
@@ -61,6 +56,29 @@ def processImg(img):
 
         rospy.loginfo(out_str)
         return corners
+    
+# Highlight the detected markers
+def aruco_display(corners, image):
+    if(len(corners) > 0): # Are any aruco tags detected
+        
+        for (markerCorner, markerID) in zip(corners, ids):
+            corners = markerCorner.reshape((4,2))
+            (topLeft, topRight, bottomRight, bottomLeft) = corners  # Get the corners
+
+            # Cast the data to integers
+            topRight = (int(topRight[0]), int(topRight[1]))
+            bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
+            bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
+            topLeft = (int(topLeft[0]), int(topLeft[1]))
+
+            # Draw the lines for the AR tag detection
+            cv2.line(image, topLeft, topRight, (0, 0, 255), 2)
+            cv2.line(image, topRight, bottomRight, (0, 0, 255), 2)
+            cv2.line(image, bottomRight, bottomLeft, (0, 0, 255), 2)
+            cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
+
+    return image
+
 
 if __name__ == '__main__': # <- Executable 
     # ArUco dictionary
@@ -156,7 +174,7 @@ if __name__ == '__main__': # <- Executable
         elif faux_camera:
             # Wait for received image with the callback
             pass
-        
+
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
             corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
