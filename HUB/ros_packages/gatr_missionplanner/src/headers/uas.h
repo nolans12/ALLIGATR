@@ -24,6 +24,7 @@ public:
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
     std::vector<double> state;
+    std::vector<double> dest;
     float epsilon, fovNarrow, fovWide, theta, thetaJoint, jointTime;
     bool jointComplete;
     std::string status;

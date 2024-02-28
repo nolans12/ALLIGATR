@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Get the command line arguments if there are any
+
 # Sets the font to be bigger on Xterm
 xrdb -merge ~/.Xresources
 
@@ -80,8 +82,12 @@ xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
 #xterm -e "roslaunch iq_sim apm.launch" &
 sleep 3
 
-#Start the Mission Planner
-xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
+#Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
+if [ -z "$1" ]; then
+    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
+else
+    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
+fi
 sleep 3
 
 #############################################################

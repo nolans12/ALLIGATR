@@ -11,10 +11,10 @@ class MissionPlanner {
 
         /////////// Testing Modes /////////////////////////
         // Makes the drone fly in a square pattern around the environment bounds
-        std::vector<float> bounds_trace(std::vector<float> waypoint);
+        std::vector<double> bounds_trace(std::vector<double> waypoint);
 
         /////////// Search Phase //////////////////////////
-        std::vector<float> search(std::vector<float> waypoint);
+        std::vector<double> search(std::vector<double> waypoint);
 
         /////////// Course Localization Phase /////////////
 
@@ -28,10 +28,14 @@ class MissionPlanner {
         void output_drone_state();
 
         // Update the state of the drone
-        void update_drone_state();
+        void update_drone_state(std::vector<double> waypoint);
 
-    
-    private:
+        // Check if a waypoint would fall outside of the environment bounds
+        bool out_of_bounds(std::vector<double> waypoint);
+
         uas drone;
         environment env;
+        
+    private:
+
 };

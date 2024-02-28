@@ -17,8 +17,9 @@ uas::uas() {
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    epsilon = 1;
+    epsilon = 3;
     state = {0., 0., 0., 0.};
+    dest = {0., 0., 0., 0.};
     // pathRoot = new pathStep;
     // pathNow = pathRoot;
     // pathRoot->path[0] = 0.;
@@ -49,6 +50,6 @@ std::vector<float> uas::getFOVDims(){
 }
 
 /// @brief Checks if the UAS has reached a commanded point
-bool uas::reachedPoint(std::vector<float> waypoint) {
-    return (abs(state[0]-waypoint[0]) < epsilon) && (abs(state[1]-waypoint[1]) < epsilon) && (abs(state[2]-waypoint[2]) < epsilon);
-}
+// bool uas::reachedPoint(std::vector<float> waypoint) {
+//     return (abs(state[0]-waypoint[0]) < epsilon) && (abs(state[1]-waypoint[1]) < epsilon) && (abs(state[2]-waypoint[2]) < epsilon);
+// }

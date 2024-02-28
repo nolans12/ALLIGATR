@@ -16,3 +16,7 @@ short int* minInd(float arr[2][2]) {
     }
     return indices;
 }
+
+int sign(float num) {
+    return (num >= 0) - (num < 0);
+}
