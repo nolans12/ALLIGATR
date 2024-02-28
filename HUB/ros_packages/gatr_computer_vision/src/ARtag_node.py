@@ -1,13 +1,11 @@
 #!/usr/bin/env python 
 # <- This is the shebang line which tells the OS which interpreter to use
-# Be aware that the tutorial said to use python2, however we built it for py3 I believe
 import rospy
 import cv2
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-
 
 # Image callback for received image
 def callback(data):
