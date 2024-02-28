@@ -55,8 +55,8 @@ run_node()
 }
 
 #Opens a roscore terminal. If one already exists, it will close itself
-#xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
-#sleep 2
+xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+sleep 2
 
 #Get the screen size so windows can display properly
 Xaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
@@ -79,6 +79,11 @@ sleep 3
 
 #Start the MAVROS node
 xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
+#xterm -e "roslaunch iq_sim apm.launch" &
+sleep 3
+
+#Start the Camera Viewer node
+xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_view image:=/webcam/image_raw/compressed" &
 #xterm -e "roslaunch iq_sim apm.launch" &
 sleep 3
 
