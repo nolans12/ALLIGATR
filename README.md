@@ -16,6 +16,8 @@ Repo for code that will run on the Jetson Nano
 
 -ArduPilot and MavProxy, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/Installing_Ardupilot.md
 
+-Catkin and dependencies, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_ros.md
+
 # Gazebo Dependancies
 
 To check if Gazebo is working:
