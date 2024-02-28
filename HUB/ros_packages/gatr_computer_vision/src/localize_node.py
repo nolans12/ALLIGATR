@@ -70,7 +70,7 @@ def callbackAR(data):
     AR_CORNERS = data           # Update AR Tag corner estimate
     relX, relY = localize()     # Get relative coordinates in meters
     outData.data = [relX, relY]
-    pubCoord.publish(outData)   # Output estimates
+    pubCoord.publish(outData)   # Output estimatess
     rate.sleep()
 
 def callbackBlob(data):
