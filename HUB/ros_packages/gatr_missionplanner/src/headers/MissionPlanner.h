@@ -32,10 +32,9 @@ class MissionPlanner {
 
         // Check if a waypoint would fall outside of the environment bounds
         bool out_of_bounds(std::vector<double> waypoint);
-
-        uas drone;
-        environment env;
         
     private:
+        uas drone;
+        environment env;
 
 };
