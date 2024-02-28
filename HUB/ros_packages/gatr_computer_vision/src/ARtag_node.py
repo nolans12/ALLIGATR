@@ -5,6 +5,30 @@ import rospy
 import cv2
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
+
+# Image callback for received image
+def callback(data):
+  # Used to convert between ROS and OpenCV images
+  br = CvBridge()
+ 
+  # Output debugging information to the terminal
+  rospy.loginfo("Received Frame")
+   
+  # Convert ROS Image message to OpenCV image
+  current_frame = br.imgmsg_to_cv2(data)
+
+  # Run AR tag detection
+  #corners_msg.data = processImg(img)
+   
+  # Display image
+  cv2.imshow("camera", current_frame)
+   
+  cv2.waitKey(1)
+
+
 
 # Function that checks a given image for an AR tag and returns corners if its found
 def processImg(img):
@@ -53,14 +77,23 @@ if __name__ == '__main__': # <- Executable
     
     ################## Publisher Definitions ###########################
     pub_corners = rospy.Publisher('AR_corners', Int32MultiArray, queue_size=10)
+    pub_image = rospy.Publisher('Secondary_Video', Image, queue_size=10)
+
+    ####################################################################
+
+    ################## Subscriber Definitions ###########################
     #sub_img = rospy.Subscriber('webcam/image_raw', )
     ####################################################################
-    #rospy.init_node('blob_detection_node', anonymous=True)
+
     rate = rospy.Rate(10) # 10hz
+
+    # Used to convert between ROS and OpenCV images
+    br = CvBridge()
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
 
+    # Search for camera, if not found open faux camera
     camera_found = False
     faux_camera = False
     attempts = 0
@@ -73,7 +106,6 @@ if __name__ == '__main__': # <- Executable
         #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
         pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
-
         # Create a VideoCapture object with the GStreamer pipeline
         cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
@@ -83,42 +115,44 @@ if __name__ == '__main__': # <- Executable
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
             break            
 
-        rospy.sleep(3.0) # Sleep for 1 second
+        rospy.sleep(1.0) # Sleep for 1 second
 
         # If camera is not found, output an error message
         rospy.logwarn("Camera not found. Trying again...")
-        camera_index += 1
+        attempts += 1
 
         # Camera wasn't found after multiple attempts. 
-        if camera_index > 10:
-            rospy.logfatal("Camera not found after 10 attempts.")
+        if attempts > 10:
+            rospy.logfatal("Camera not found after 10 attempts. Connecting to faux camera.")
             faux_camera = True
             camera_found = False
 
     if faux_camera:
         # Verify that there is a connection to the webcam/image_raw topic
+        sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
+        rospy.spin()
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
+        # Output message
+        corners_msg = Int32MultiArray()
 
-        if cap.isOpened():                      # Capture image while camera is opened
+        if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
 
-            # Output message
-            corners_msg = Int32MultiArray()
+            # Publish image message to image topic
+            pub_image.publish(br.cv2_to_imgmsg(img))
 
+            # Output message with corners
             corners_msg.data = processImg(img)
-
-            #Publish the image
 
         # If the camera is connected through a faux camera in ROS
         elif faux_camera:
-            # Read in rostopic webcam/image_raw
-
-            corners_msg.data = processImg(img)
-
+            # Wait for received image with the callback
+            pass
+        
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
             corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
