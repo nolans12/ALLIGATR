@@ -59,26 +59,23 @@ def processImg(img):
     
 # Highlight the detected markers
 def aruco_display(corners, image):
-    if(len(corners) > 0): # Are any aruco tags detected
-        
-        for markerCorner in corners:
-            topLeft = corners[0:1]
-            topRight = corners[2:3]
-            bottomRight = corners[4:5]
-            bottomLeft = corners[6:7]
+    if corners[0]: # Are any aruco tags detected
+        topLeft = corners[0:1]
+        topRight = corners[2:3]
+        bottomRight = corners[4:5]
+        bottomLeft = corners[6:7]
 
-            # Cast the data to integers
-            topRight = (int(topRight[0]), int(topRight[1]))
-            bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
-            bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
-            topLeft = (int(topLeft[0]), int(topLeft[1]))
+        # Cast the data to integers
+        topRight = (int(topRight[0]), int(topRight[1]))
+        bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
+        bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
+        topLeft = (int(topLeft[0]), int(topLeft[1]))
 
-            # Draw the lines for the AR tag detection
-            cv2.line(image, topLeft, topRight, (0, 0, 255), 2)
-            cv2.line(image, topRight, bottomRight, (0, 0, 255), 2)
-            cv2.line(image, bottomRight, bottomLeft, (0, 0, 255), 2)
-            cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
-
+        # Draw the lines for the AR tag detection
+        cv2.line(image, topLeft, topRight, (0, 0, 255), 2)
+        cv2.line(image, topRight, bottomRight, (0, 0, 255), 2)
+        cv2.line(image, bottomRight, bottomLeft, (0, 0, 255), 2)
+        cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
     return image
 
 
