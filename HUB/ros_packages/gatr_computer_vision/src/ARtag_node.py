@@ -6,6 +6,32 @@ import cv2
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 
+# Function that checks a given image for an AR tag and returns corners if its found
+def processImg(img):
+    if img is None:
+        out_str = "Camera Connection Lost %s" % rospy.get_time()
+        corners = [0, 0, 0, 0, 0, 0, 0, 0]
+    else:            
+        # Search for Aruco tag
+        corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+
+        # Output the detected corners if detected
+        if corners:
+            # Format the corners as an array
+            firstCorners = corners[0][0]
+            topLeft = firstCorners[1]
+            topRight = firstCorners[2]
+            bottomRight = firstCorners[3]
+            bottomLeft = firstCorners[0]
+            testArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+
+            out_str = "AR Tag Detected %s" % rospy.get_time()
+            corners = testArr
+        else:
+            out_str = "No AR Tag %s" % rospy.get_time()
+            corners = [0, 0, 0, 0, 0, 0, 0, 0]
+
+        return corners
 
 if __name__ == '__main__': # <- Executable 
     # ArUco dictionary
@@ -26,7 +52,7 @@ if __name__ == '__main__': # <- Executable
     
     ################## Publisher Definitions ###########################
     pub_corners = rospy.Publisher('AR_corners', Int32MultiArray, queue_size=10)
-
+    #sub_img = rospy.Subscriber('webcam/image_raw', )
     ####################################################################
     #rospy.init_node('blob_detection_node', anonymous=True)
     rate = rospy.Rate(10) # 10hz
@@ -62,10 +88,14 @@ if __name__ == '__main__': # <- Executable
         rospy.logwarn("Camera not found. Trying again...")
         camera_index += 1
 
+        # Camera wasn't found after multiple attempts. 
         if camera_index > 10:
             rospy.logfatal("Camera not found after 10 attempts.")
             faux_camera = True
-            camera_found = True
+            camera_found = False
+
+    if faux_camera:
+        # Verify that there is a connection to the webcam/image_raw topic
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
@@ -101,6 +131,12 @@ if __name__ == '__main__': # <- Executable
                 else:
                     out_str = "No AR Tag %s" % rospy.get_time()
                     corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
+
+        # If the camera is connected through a faux camera in ROS
+        elif faux_camera:
+            # Read in rostopic webcam/image_raw
+
+            # corners_msg.data = processImg(img)
 
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
