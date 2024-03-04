@@ -1,4 +1,7 @@
 #pragma once
+#include "uas.h"
+#include "environment.h"
+#include <math.h>
 
 // Helper functions
 
