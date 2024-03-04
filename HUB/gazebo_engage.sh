@@ -34,6 +34,12 @@ cd ~/catkin_ws
 # catkin_make
 catkin build
 
+# If the build failed, exit the script
+if [ $? -ne 0 ]; then
+    echo "Build failed!"
+    exit 1
+fi
+
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
 

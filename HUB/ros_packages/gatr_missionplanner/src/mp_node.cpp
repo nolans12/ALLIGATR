@@ -1,12 +1,30 @@
 #include "headers/mp_node_headers.h"
 
-//include API 
+// Global variable to hold the RGV detection status
+bool rgvAInView;
+
+// Callback function to be updated when the RGV is detected
+void rgv_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+{
+	// Display coords
+	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
+
+	// Check if the RGV is in view
+    if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
+		ROS_INFO("Coarsly localizing...");
+		rgvAInView = true;
+	}
+	else{
+		rgvAInView = false;
+	}
+    
+}
 
 int main(int argc, char** argv)
 {
 	//initialize ros 
 	ros::init(argc, argv, "gnc_node");
-	ros::NodeHandle gnc_node("~");
+	ros::NodeHandle gnc_node;
 	std::string pattern_name;
 
 	// If the pattern_name string is not provided, default to full mission
@@ -30,6 +48,9 @@ int main(int argc, char** argv)
 	MissionPlanner mp;
 	std::vector<double> curr_waypoint_new(4);
 	std::vector<double> curr_waypoint_prev(4);
+
+	// Create subscriber to rel_coord topic
+	ros::Subscriber rel_coord_sub = gnc_node.subscribe("rel_coord", 10, rgv_detected_callback);
 
   	// wait for FCU connection
 	wait4connect();
@@ -70,11 +91,25 @@ int main(int argc, char** argv)
 		}
 		else if (pattern_name == "locate")
 		{
-			curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
+			if (rgvAInView == true){
+				curr_waypoint_new = mp.coarse(curr_waypoint_new);
+			}
+			else{
+				curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
+			}
 		}
 		else
 		{
 			//////////// MAIN LOOP HERE ////////////
+			
+			// Determine the phase of the mission at the given timestep
+			mp.determine_phase();
+			
+			
+			
+			
+			
+			
 			land();
 
 
