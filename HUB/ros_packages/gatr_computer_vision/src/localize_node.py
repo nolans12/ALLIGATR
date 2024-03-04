@@ -3,8 +3,8 @@
 # This node will pull AR tag estimates and the altitude of the drone and return the relative localization measurements in meters
 import rospy
 import numpy as np
-from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Float32MultiArray
 
 # Global current state variables
 AR_CORNERS = Int32MultiArray()
@@ -21,16 +21,16 @@ XPIXELS = 1920
 YPIXELS = 1080
 
 # Localization function
-def localize():
+def localize(ARCorners):
     # Define the center of the image
     cx = XPIXELS / 2
     cy = YPIXELS / 2
 
     # Get the centroid coordinates of the AR tag and the corners
-    topLeft = (AR_CORNERS.data[0], AR_CORNERS.data[1])
-    topRight = (AR_CORNERS.data[2], AR_CORNERS.data[3])
-    bottomRight = (AR_CORNERS.data[4], AR_CORNERS.data[5])
-    bottomLeft = (AR_CORNERS.data[6], AR_CORNERS.data[7])
+    topLeft = (ARCorners.data[0], ARCorners.data[1])
+    topRight = (ARCorners.data[2], ARCorners.data[3])
+    bottomRight = (ARCorners.data[4], ARCorners.data[5])
+    bottomLeft = (ARCorners.data[6], ARCorners.data[7])
 
     # Centroid
     xf = (topLeft[0] + bottomRight[0]) / 2
@@ -65,14 +65,21 @@ def localize():
 # Callback function that will execute whenever data is received
 def callbackAR(data):
     # Echo data to the ROS node
-    out_str = "AR Data Received"
+    outData = Float32MultiArray()
+    AR_CORNERS = data               # Update AR Tag corner estimate
+
+    if(data.data[0] == 0):          # Condition for no AR tag detection
+        outData.data = [0.0, 0.0]
+        out_str = "No AR Data Received"
+    else:
+        relX, relY = localize(AR_CORNERS)     # Get relative coordinates in meters
+        outData.data = [relX, relY]
+        out_str = "AR Data Received"
+
     rospy.loginfo(out_str)
-    outData = Int32MultiArray()
-    AR_CORNERS = data           # Update AR Tag corner estimate
-    relX, relY = localize()     # Get relative coordinates in meters
-    outData.data = [relX, relY]
-    pubCoord.publish(outData)   # Output estimates
+    pubCoord.publish(outData)       # Output estimates
     rate.sleep()
+
 
 def callbackBlob(data):
     # Echo data to the ROS node
