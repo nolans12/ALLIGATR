@@ -41,7 +41,7 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
     std::vector<double> target;
     double x, y;
     double thetaStep = 6 * M_PI/180; // change in circle angle over time step [rad]
-    int r = 10; // radius of the orbital path [m]
+    int r = 2; // radius of the orbital path [m]
 
     ////// TODO: add branches determining which RGV to target //////
     // if both RGVs in view, target closest one
