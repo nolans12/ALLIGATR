@@ -7,7 +7,8 @@ from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 
 # Global current state variables
-AR_CORNERS = [0, 0, 0, 0, 0, 0, 0, 0]
+AR_CORNERS = Int32MultiArray()
+AR_CORNERS.data = [0, 0, 0, 0, 0, 0, 0, 0]
 BLOB_CENTROID = [0, 0]
 THETA = 0
 PHI = 0
