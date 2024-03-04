@@ -47,7 +47,7 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
     // if both RGVs in view, target closest one
     // if only one RGV in view, target that one
     // if no RGV in view, target most recent RGV estimate (moving has put RGV out of camera view)
-    target = waypoint;
+    target = env.rgvAPosition;
 
     // now get the commanded x,y
 
@@ -156,6 +156,11 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
         return true;
     }
+    return false;
+}
+
+bool MissionPlanner::RGV_detected(){
+    // Check if an RGV is detected through the AR tag node
     return false;
 }
 

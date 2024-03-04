@@ -40,6 +40,9 @@ class MissionPlanner {
 
         // Check if a waypoint would fall outside of the environment bounds
         bool out_of_bounds(std::vector<double> waypoint);
+
+        // Check if an RGV is detected through the AR tag node
+        bool RGV_detected();
         
     private:
         std::string phase;
