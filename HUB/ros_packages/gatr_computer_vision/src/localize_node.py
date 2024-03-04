@@ -68,7 +68,7 @@ def callbackAR(data):
     outData = Float32MultiArray()
     AR_CORNERS = data               # Update AR Tag corner estimate
 
-    if(data.data[0] == 0):          # Condition for no AR tag detection
+    if(AR_CORNERS.data[0] == 0):          # Condition for no AR tag detection
         outData.data = [0.0, 0.0]
         out_str = "No AR Data Received"
     else:
