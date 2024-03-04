@@ -30,6 +30,57 @@ std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
     return waypoint;
 }
 
+std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
+    /* Circles around an RGV
+     * Output:
+     *         waypoint - 1x3 double vector of commanded point
+     * Makes use of the uas theta iterative property to track where in the orbit
+     * the drone is. Makes additional adjustments to the commanded point to
+     * avoid exiting the boundary, when necessary. 
+     */
+    std::vector<double> target;
+    double x, y;
+    double thetaStep = 6 * M_PI/180; // change in circle angle over time step [rad]
+    int r = 10; // radius of the orbital path [m]
+
+    ////// TODO: add branches determining which RGV to target //////
+    // if both RGVs in view, target closest one
+    // if only one RGV in view, target that one
+    // if no RGV in view, target most recent RGV estimate (moving has put RGV out of camera view)
+    target = waypoint;
+
+    // now get the commanded x,y
+
+    if (drone.theta == -1) {
+        // if coarse hasn't started yet, initialize the starting angle based
+        // on current drone position
+        drone.theta = atan2(drone.state[1]-target[1], drone.state[0]-target[0]);
+    }
+    // increment the angle of the orbit by thetaStep
+    drone.theta += thetaStep;
+    // set the x and y of the commanded point
+    x = target[0] + r*cos(drone.theta);
+    y = target[1] + r*sin(drone.theta);
+
+    // if the commanded point would place the drone outside the bounds,
+    // change the commanded point to move along the boundary instead
+    if (x > (env.bounds[1][0]-1)) {
+        x = env.bounds[1][0]-1;
+    }
+    else if (x < (env.bounds[0][0]+1)) {
+        x = env.bounds[0][0]+1;
+    }
+    if (y > (env.bounds[1][1]-1)) {
+        y = env.bounds[1][1]-1;
+    }
+    else if (y < (env.bounds[0][1]+1)) {
+        y = env.bounds[0][1]+1;
+    }
+
+    waypoint = {x, y, env.bounds[0][2]};
+    return waypoint;
+}
+
 // Makes the drone fly in a square pattern around the environment bounds
 std::vector<double> MissionPlanner::bounds_trace(std::vector<double> waypoint){
 
@@ -75,15 +126,6 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
         return true;
     }
     return false;
-}
-
-//Improvised mode to just go directly to the rgvs locations
-std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint){
-    //Trace the bounds of the environment
-    waypoint = std::vector<double>{14.0, 9.0, 8, 0};
-
-    return waypoint;
-
 }
 
 // std::vector<float> MissionPlanner::search(std::vector<float> waypoint) {

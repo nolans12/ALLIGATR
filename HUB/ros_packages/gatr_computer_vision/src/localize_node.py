@@ -11,10 +11,11 @@ AR_CORNERS = [0, 0, 0, 0, 0, 0, 0, 0]
 BLOB_CENTROID = [0, 0]
 THETA = 0
 PHI = 0
-ALTITUDE = 30                           # Assume we localize at 30 ft
+ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
 
-# Global Meta Data
-AR_LENGTH = 0.15875                     # AR Tag length in meters
+# Global Data
+#AR_LENGTH = 0.15875                     # AR Tag length in meters
+AR_LENGTH = 0.2496                       # Gazebo sim value
 XPIXELS = 1920
 YPIXELS = 1080
 
@@ -25,10 +26,10 @@ def localize():
     cy = YPIXELS / 2
 
     # Get the centroid coordinates of the AR tag and the corners
-    topLeft = AR_CORNERS[0:1]
-    topRight = AR_CORNERS[2:3]
-    bottomRight = AR_CORNERS[4:5]
-    bottomLeft = AR_CORNERS[6:7]
+    topLeft = (AR_CORNERS.data[0], AR_CORNERS.data[1])
+    topRight = (AR_CORNERS.data[2], AR_CORNERS.data[3])
+    bottomRight = (AR_CORNERS.data[4], AR_CORNERS.data[5])
+    bottomLeft = (AR_CORNERS.data[6], AR_CORNERS.data[7])
 
     # Centroid
     xf = (topLeft[0] + bottomRight[0]) / 2
@@ -65,7 +66,11 @@ def callbackAR(data):
     # Echo data to the ROS node
     out_str = "AR Data Received"
     rospy.loginfo(out_str)
-    pubCoord.publish(data)      # Echo data
+    outData = Int32MultiArray()
+    AR_CORNERS = data           # Update AR Tag corner estimate
+    relX, relY = localize()     # Get relative coordinates in meters
+    outData.data = [relX, relY]
+    pubCoord.publish(outData)   # Output estimatess
     rate.sleep()
 
 def callbackBlob(data):
@@ -90,7 +95,7 @@ if __name__ == '__main__': # <- Executable
 
     ################## Subscriber Definitions ###########################
     subCorners = rospy.Subscriber('AR_corners', Int32MultiArray, callbackAR)
-    subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
+    #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     #subIMU = rospy.Subscriber('MAVROS/Something, Int32MultiArray, callbackIMU)
 
     ####################################################################

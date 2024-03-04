@@ -21,7 +21,7 @@ def callback(data):
    
   # Display image
   outImage = aruco_display(corners_msg, img)
-  cv2.imshow("camera", outImage)
+  cv2.imshow("camera", outImage)    # Comment this line out for headless detection
 
   pub_corners.publish(corners_msg)
    
