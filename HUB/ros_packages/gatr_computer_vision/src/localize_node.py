@@ -99,7 +99,7 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord = rospy.Publisher('rel_coord', Int32MultiArray, queue_size=10)
+    pubCoord = rospy.Publisher('rel_coord', Float32MultiArray, queue_size=10)
 
     ################## Subscriber Definitions ###########################
     subCorners = rospy.Subscriber('AR_corners', Int32MultiArray, callbackAR)
