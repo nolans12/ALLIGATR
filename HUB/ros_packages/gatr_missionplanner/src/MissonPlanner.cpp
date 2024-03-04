@@ -97,6 +97,13 @@ std::vector<double> MissionPlanner::bounds_trace(std::vector<double> waypoint){
     return waypoint;
 }
 
+std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
+{
+    // Directly flies to an RGV
+    waypoint = {14, 9, 9.144, 0};
+    return waypoint;
+}
+
 void MissionPlanner::output_drone_state(){
 
     // Output the current location of the UAS and the next location it is going to
