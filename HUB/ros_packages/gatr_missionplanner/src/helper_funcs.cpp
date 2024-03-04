@@ -1,4 +1,5 @@
 #include "headers/helper_funcs.h"
+#include <math.h>
 
 // Returns the indices of the smallest value in a 2x2 array
 short int* minInd(float arr[2][2]) {
@@ -19,4 +20,12 @@ short int* minInd(float arr[2][2]) {
 
 int sign(float num) {
     return (num >= 0) - (num < 0);
+}
+
+bool isRGVAClosest() {
+    double distA, distB;
+    distA = pow(pow(drone.state[0]-env.rgvAPostion[0], 2) + pow(drone.state[1]-env.rgvAPosition[1], 2), 0.5);
+    distB = pow(pow(drone.state[0]-env.rgvBPostion[0], 2) + pow(drone.state[1]-env.rgvBPosition[1], 2), 0.5);
+
+    return (distA <= distB);
 }
