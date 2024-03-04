@@ -7,3 +7,6 @@ short int* minInd(float arr[2][2]);
 
 // @brief Returns the sign of a number
 int sign(float num);
+
+// @brief Returns true if RGV-A is the closest RGV to the drone
+bool isRGVAClosest();
