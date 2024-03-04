@@ -8,6 +8,10 @@ MissionPlanner::MissionPlanner() {
     // env = environment();
 }
 
+void MissionPlanner::determine_phase(){
+    
+}
+
 std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
 
     // Check if the drone has identified an RGV

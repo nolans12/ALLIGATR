@@ -13,8 +13,8 @@ environment::environment() {
     slt.x_cell = 0;
     slt.y_cell = 0;
     
-    slt.num_cells_x = 5;
-    slt.num_cells_y = 8;
+    slt.num_cells_x = 3;
+    slt.num_cells_y = 3;
 
     //This line starts the search off at the 1,1 cell
     slt.x_iter = slt.num_cells_x-1;

@@ -9,6 +9,9 @@ class MissionPlanner {
     public:
         MissionPlanner();
 
+        // Deteremines the phase
+        void determine_phase();
+
         /////////// Testing Modes /////////////////////////
         // Makes the drone fly in a square pattern around the environment bounds
         std::vector<double> bounds_trace(std::vector<double> waypoint);
@@ -37,6 +40,7 @@ class MissionPlanner {
         bool out_of_bounds(std::vector<double> waypoint);
         
     private:
+        std::string phase;
         uas drone;
         environment env;
 
