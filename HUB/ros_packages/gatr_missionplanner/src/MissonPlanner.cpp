@@ -81,6 +81,30 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
     return waypoint;
 }
 
+std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
+
+    if (env.rgvAInView && env.rgvBInView) {
+        // if both RGVs are in view, follow closest one
+        if (isRGVAClosest(drone, env)) {
+            waypoint = env.rgvAPosition;
+        }
+        else {
+            waypoint = env.rgvBPosition;
+        }
+    }
+    else if (env.rgvAInView) {
+        // if RGV-A is in view, follow it
+        waypoint = env.rgvAPosition;
+    }
+    else if (env.rgvBInView) {
+        // if RGV-B is in view, follow it
+        waypoint = env.rgvBPosition;
+    }
+    // if neither RGV is in view, remain at the same point
+
+    return waypoint;
+}
+
 // Makes the drone fly in a square pattern around the environment bounds
 std::vector<double> MissionPlanner::bounds_trace(std::vector<double> waypoint){
 

@@ -26,6 +26,7 @@ class MissionPlanner {
         std::vector<double> coarse(std::vector<double> waypoint);
 
         /////////// Fine Localization Phase ///////////////
+        std::vector<double> fine(std::vector<double> waypoint);
 
         /////////// Joint Localization Phase //////////////
 
