@@ -32,7 +32,7 @@ public:
     // pathStep* pathNow;
     // phaseStep* phaseRoot;
     // phaseStep* phaseNow;
-    unsigned short int p;
+    //unsigned short int p;
 
     uas(); //Default Constructor
 
