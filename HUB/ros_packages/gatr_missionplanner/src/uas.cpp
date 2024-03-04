@@ -28,7 +28,7 @@ uas::uas() {
     fovNarrow = 67;
     fovWide = 102;
 
-    p = 0;
+    //p = 0;
     theta = -1.0f;
     thetaJoint = 0.0f;
     jointTime = 0.0f;
