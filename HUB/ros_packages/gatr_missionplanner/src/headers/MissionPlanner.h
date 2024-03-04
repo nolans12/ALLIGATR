@@ -20,6 +20,7 @@ class MissionPlanner {
         std::vector<double> search(std::vector<double> waypoint);
 
         /////////// Course Localization Phase /////////////
+        std::vector<double> coarse(std::vector<double> waypoint);
 
         /////////// Fine Localization Phase ///////////////
 
