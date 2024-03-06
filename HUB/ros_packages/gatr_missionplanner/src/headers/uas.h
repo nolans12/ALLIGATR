@@ -9,7 +9,7 @@
 class uas {
 public:
     /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  1x4 array containing current uas position [ft]
+     *  state         -  nx4 array containing current uas position [ft] and heading
      *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
      *  pathNow       -  points to the most recent entry of the pathStep linked list
      *  fovNarrow     -  narrow FOV of the camera [deg]
@@ -23,7 +23,7 @@ public:
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    std::vector<double> state;
+    std::vector<std::vector<double>> state;
     std::vector<double> dest;
     float epsilon, fovNarrow, fovWide, theta, thetaJoint, jointTime;
     bool jointComplete;
@@ -32,7 +32,7 @@ public:
     // pathStep* pathNow;
     // phaseStep* phaseRoot;
     // phaseStep* phaseNow;
-    unsigned short int p;
+    // unsigned short int p;
 
     uas(); //Default Constructor
 

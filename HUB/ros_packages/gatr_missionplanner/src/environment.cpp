@@ -5,8 +5,8 @@ environment::environment() {
     // timeStep = 1.;
     // Bounds are in the form {{xMin, yMin, zMin}, {xMax, yMax, zMax}}
     bounds = {{0.0f, 0.0f, 30.0f * 0.3048f}, {150.0f * 0.3048f, 150.0f * 0.3048f, 60.0f * 0.3048f}};
-    rgvAPosition = {0.0, 0.0, 0.0};
-    rgvBPosition = {0.0, 0.0, 0.0};
+    //rgvAPosition = {{0.0, 0.0, 0.0, 0.0}};
+    //rgvBPosition = {{0.0, 0.0, 0.0, 0.0}};
     rgvAInView = false;
     rgvBInView = false;
 
@@ -29,8 +29,8 @@ environment::environment(std::vector<std::vector<float>> boundsIn) {
     for (int i = 0; i < 3; i++) {
         bounds[i] = boundsIn[i];
     }
-    rgvAPosition = {0.0, 0.0, 0.0};
-    rgvBPosition = {0.0, 0.0, 0.0};
+    //rgvAPosition = {{0.0, 0.0, 0.0, 0.0}};
+    //rgvBPosition = {{0.0, 0.0, 0.0, 0.0}};
     rgvAInView = false;
     rgvBInView = false;
 }

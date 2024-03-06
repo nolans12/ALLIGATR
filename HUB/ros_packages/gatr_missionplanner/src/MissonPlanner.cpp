@@ -38,23 +38,46 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
      * the drone is. Makes additional adjustments to the commanded point to
      * avoid exiting the boundary, when necessary. 
      */
-    std::vector<double> target;
+    std::vector<double> target, dronePos, rgvAPos, rgvBPos;
     double x, y;
     double thetaStep = 6 * M_PI/180; // change in circle angle over time step [rad]
     int r = 10; // radius of the orbital path [m]
+    // get vectors of all the most recent entries to drone state and RGV positions to minimize calls to back()
+    dronePos = drone.state.back();
+    rgvAPos = env.rgvAPosition.back();
+    rgvBPos = env.rgvBPosition.back();
 
-    ////// TODO: add branches determining which RGV to target //////
-    // if both RGVs in view, target closest one
-    // if only one RGV in view, target that one
-    // if no RGV in view, target most recent RGV estimate (moving has put RGV out of camera view)
-    target = waypoint;
+    if (env.rgvAInView && env.rgvBInView) {
+        // if both RGVs are in view, set target to the closest one
+        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+            target = (rgvAPos.begin(), rgvAPos.end()-1);
+        }
+        else {
+            target = (rgvBPos.begin(), rgvBPos.end()-1);
+        }
+    }
+    else if (env.rgvAInView) {
+        // if RGV-A is in view, target it
+        target = (rgvAPos.begin(), rgvAPos.end()-1);
+    }
+    else if (env.rgvBInView) {
+        // if RGV-B is in view, target it
+        target = (rgvBPos.begin(), rgvBPos.end()-1);
+    }
+    else if (rgvAPos[3] > rgvBPos) {
+        // if no RGV is in view, but most recent rgv detected is RGV-A, target the last known position of it
+        target = (rgvAPos.begin(), rgvAPos.end()-1);
+    }
+    else {
+        // if no RGV is in view, but most recent rgv detected is RGV-B, target the last known position of it
+        target = (rgvBPos.begin(), rgvBPos.end()-1);
+    }
 
     // now get the commanded x,y
-
     if (drone.theta == -1) {
         // if coarse hasn't started yet, initialize the starting angle based
         // on current drone position
-        drone.theta = atan2(drone.state[1]-target[1], drone.state[0]-target[0]);
+        drone.theta = atan2(dronePos[1]-target[1], dronePos[0]-target[0]);
     }
     // increment the angle of the orbit by thetaStep
     drone.theta += thetaStep;
@@ -83,22 +106,28 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
 
 std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
 
+    // get vectors of all the most recent entries to drone state and RGV positions to minimize calls to back()
+    std::vector<double> dronePos, rgvAPos, rgvBPos;
+    dronePos = drone.state.back();
+    rgvAPos = env.rgvAPosition.back();
+    rgvBPos = env.rgvBPosition.back();
+
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, follow closest one
-        if (isRGVAClosest(drone, env)) {
-            waypoint = env.rgvAPosition;
+        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+            waypoint = rgvAPos;
         }
         else {
-            waypoint = env.rgvBPosition;
+            waypoint = rgvBPos;
         }
     }
     else if (env.rgvAInView) {
         // if RGV-A is in view, follow it
-        waypoint = env.rgvAPosition;
+        waypoint = rgvAPos;
     }
     else if (env.rgvBInView) {
         // if RGV-B is in view, follow it
-        waypoint = env.rgvBPosition;
+        waypoint = rgvBPos;
     }
     // if neither RGV is in view, remain at the same point
 
@@ -129,20 +158,22 @@ std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
 }
 
 void MissionPlanner::output_drone_state(){
-
+    std::vector<double> dronePos = drone.state.back();
     // Output the current location of the UAS and the next location it is going to
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Current Position: " << drone.state[0] << ", " << drone.state[1] << ", " << drone.state[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
+    std::cout << "Current Position: " << dronePos[0] << ", " << dronePos[1] << ", " << dronePos[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
 
 }
 
 void MissionPlanner::update_drone_state(std::vector<double> waypoint){
     // Update the state of the UAS
     geometry_msgs::Point state = get_current_location();
-    drone.state[0] = state.x;
+    std::vector<double> dronePos = {state.x, state.y, state.z, get_current_heading()};
+    /*drone.state[0] = state.x;
     drone.state[1] = state.y;
     drone.state[2] = state.z;
-    drone.state[3] = get_current_heading();
+    drone.state[3] = get_current_heading();*/
+    drone.state.push_back(dronePos);
 
     // Update the destination of the UAS
     drone.dest[0] = waypoint[0];
