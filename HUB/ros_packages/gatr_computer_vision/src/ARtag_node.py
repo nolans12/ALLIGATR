@@ -9,51 +9,65 @@ from cv_bridge import CvBridge
 
 # Image callback for received image
 def callback(data):
-  # Used to convert between ROS and OpenCV images
-  br = CvBridge()
-   
-  # Convert ROS Image message to OpenCV image
-  img = br.imgmsg_to_cv2(data)
-  corners_msg = Int32MultiArray()
+    # Used to convert between ROS and OpenCV images
+    br = CvBridge()
+    
+    # Convert ROS Image message to OpenCV image
+    img = br.imgmsg_to_cv2(data)
+    corners_msg_A = Int32MultiArray()
+    corners_msg_B = Int32MultiArray()
 
-  # Run AR tag detection
-  corners_msg.data = processImg(img)
-   
-  # Display image
-  outImage = aruco_display(corners_msg, img)
-  cv2.imshow("camera", outImage)    # Comment this line out for headless detection
+    # Run AR tag detection
+    corners_msg_A.data, corners_msg_B.data = processImg(img)
+    
+    # Display image
+    outImage = aruco_display(corners_msg_A, img)
+    outImage = aruco_display(corners_msg_B, outImage)
+    cv2.imshow("camera", outImage)    # Comment this line out for headless detection
 
-  pub_corners.publish(corners_msg)
-   
-  cv2.waitKey(1)
+    # Publish if they are detected
+    if corners_msg_A.data[0]:
+        pub_corners_A.publish(corners_msg_A)
+    if corners_msg_B.data[0]:
+        pub_corners_B.publish(corners_msg_B)
+    
+    cv2.waitKey(1)
 
 # Function that checks a given image for an AR tag and returns corners if its found
 def processImg(img):
+    corners_A = [0, 0, 0, 0, 0, 0, 0, 0]
+    corners_B = [0, 0, 0, 0, 0, 0, 0, 0]
+
     if img is None:
         out_str = "Camera Connection Lost %s" % rospy.get_time()
-        corners = [0, 0, 0, 0, 0, 0, 0, 0]
-    else:            
+    else:          
         # Search for Aruco tag
         corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
 
         # Output the detected corners if detected
         if corners:
-            # Format the corners as an array
-            firstCorners = corners[0][0]
-            topLeft = firstCorners[1]
-            topRight = firstCorners[2]
-            bottomRight = firstCorners[3]
-            bottomLeft = firstCorners[0]
-            testArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+            k = 0
+            for i in ids:
+                # Format the corners as an array
+                firstCorners = corners[k][0]
+                topLeft = firstCorners[1]
+                topRight = firstCorners[2]
+                bottomRight = firstCorners[3]
+                bottomLeft = firstCorners[0]
+                outArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+
+                if i == 1:
+                    corners_A = outArr
+                else:
+                    corners_B = outArr
+                k = k + 1
 
             out_str = "AR Tag Detected %s" % rospy.get_time()
-            corners = testArr
         else:
             out_str = "No AR Tag %s" % rospy.get_time()
-            corners = [0, 0, 0, 0, 0, 0, 0, 0]
 
         rospy.loginfo(out_str)
-        return corners
+        return corners_A, corners_B
     
 # Highlight the detected markers
 def aruco_display(corners, image):
@@ -89,8 +103,9 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pub_corners = rospy.Publisher('AR_corners', Int32MultiArray, queue_size=10)
-    pub_image = rospy.Publisher('Secondary_Video', Image, queue_size=10)
+    pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=10)     # RGV A
+    pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=10)     # RGV B
+    pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=10)
 
     ####################################################################
 
@@ -148,8 +163,11 @@ if __name__ == '__main__': # <- Executable
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
-        # Output message
-        corners_msg = Int32MultiArray()
+        # Output messages
+        corners_msg_A = Int32MultiArray()
+        corners_msg_B = Int32MultiArray()
+        corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
+        corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
@@ -159,19 +177,21 @@ if __name__ == '__main__': # <- Executable
             pub_image.publish(br.cv2_to_imgmsg(img))
 
             # Output message with corners
-            corners_msg.data = processImg(img)
+            corners_msg_A.data, corners_msg_B.data = processImg(img)
 
         # If the camera is connected through a faux camera in ROS
         elif faux_camera:
             # Wait for received image with the callback
             pass
-
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
-            corners_msg.data = [0, 0, 0, 0, 0, 0, 0, 0]
             
         # Publish to the ROS node
-        pub_corners.publish(corners_msg)
+        if corners_msg_A.data[0]:
+            pub_corners_A.publish(corners_msg_A)
+        if corners_msg_B.data[0]:
+            pub_corners_B.publish(corners_msg_B)
+
         rate.sleep()
 
     cv2.destroyAllWindows()         # Close everything and release the camera

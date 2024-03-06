@@ -235,6 +235,11 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     return false;
 }
 
+bool MissionPlanner::RGV_detected(){
+    // Check if an RGV is detected through the AR tag node
+    return false;
+}
+
 // std::vector<float> MissionPlanner::search(std::vector<float> waypoint) {
 //     /* 
 //      * Returns the next point for a creeping line search pattern

@@ -2,6 +2,9 @@
 #include "uas.h"
 #include "environment.h"
 #include <math.h>
+#include "uas.h"
+#include "environment.h"
+#include <math.h>
 
 // Helper functions
 
