@@ -85,7 +85,7 @@ std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
 
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, follow closest one
-        if (isRGVAClosest(drone, env)) {
+        if (isRGVAClosest()) {
             waypoint = env.rgvAPosition;
         }
         else {
@@ -162,6 +162,24 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
 bool MissionPlanner::RGV_detected(){
     // Check if an RGV is detected through the AR tag node
     return false;
+}
+
+bool MissionPlanner::isRGVAClosest(){
+        /* Returns true if the closest RGV to the drone is RGV-A
+     * Input:  
+     *         drone - uas object
+     *         env   - enviornment object
+     * Output: 
+     *         isRGVAClosest - bool true or false
+     */
+
+    double distA, distB;
+    // get the x-y plane 2d distance from the drone to each RGV
+    distA = pow(pow(drone.state[0]-env.rgvAPosition[0], 2) + pow(drone.state[1]-env.rgvAPosition[1], 2), 0.5);
+    distB = pow(pow(drone.state[0]-env.rgvBPosition[0], 2) + pow(drone.state[1]-env.rgvBPosition[1], 2), 0.5);
+
+    // return true if the distance from the drone to RGV-A is smaller than the distance to RGV-B
+    return (distA <= distB);
 }
 
 // std::vector<float> MissionPlanner::search(std::vector<float> waypoint) {

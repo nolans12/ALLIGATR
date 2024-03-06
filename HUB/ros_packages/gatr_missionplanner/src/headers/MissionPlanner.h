@@ -43,6 +43,8 @@ class MissionPlanner {
 
         // Check if an RGV is detected through the AR tag node
         bool RGV_detected();
+
+        bool isRGVAClosest();
         
     private:
         std::string phase;

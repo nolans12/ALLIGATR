@@ -12,4 +12,4 @@ short int* minInd(float arr[2][2]);
 int sign(float num);
 
 // @brief Returns true if RGV-A is the closest RGV to the drone
-bool isRGVAClosest(uas drone, environment env);
+//bool isRGVAClosest(uas drone, environment env);
