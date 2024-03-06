@@ -113,12 +113,12 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord_A = rospy.Publisher('rel_coord_A', Float32MultiArray, queue_size=10)
-    pubCoord_B = rospy.Publisher('rel_coord_B', Float32MultiArray, queue_size=10)
+    pubCoord_A = rospy.Publisher('CV/rel_coord_A', Float32MultiArray, queue_size=10)
+    pubCoord_B = rospy.Publisher('CV/rel_coord_B', Float32MultiArray, queue_size=10)
 
     ################## Subscriber Definitions ###########################
-    subCorners_A = rospy.Subscriber('AR_corners_A', Int32MultiArray, callbackAR_A)
-    subCorners_B = rospy.Subscriber('AR_corners_B', Int32MultiArray, callbackAR_B)
+    subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
+    subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
     #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     #subIMU = rospy.Subscriber('MAVROS/Something, Int32MultiArray, callbackIMU)
 
