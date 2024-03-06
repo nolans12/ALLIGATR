@@ -105,6 +105,10 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
 }
 
 std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
+    /* Hovers directly over an RGV
+     * Output:
+     *         waypoint - 1x3 double vector of commanded point
+     */
 
     // get vectors of all the most recent entries to drone state and RGV positions to minimize calls to back()
     std::vector<double> dronePos, rgvAPos, rgvBPos;
