@@ -30,6 +30,47 @@ std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
     return waypoint;
 }
 
+std::vector<double> MissionPlanner::trail(std::vector<double> waypoint) {
+    /* Moves toward/follows an RGV
+     * Output:
+     *         waypoint - 1x3 double vector of commanded point
+     */
+
+    // get vectors of all the most recent entries to drone state and RGV positions to minimize calls to back()
+    std::vector<double> dronePos, rgvAPos, rgvBPos;
+    dronePos = drone.state.back();
+    rgvAPos = env.rgvAPosition.back();
+    rgvBPos = env.rgvBPosition.back();
+
+    if (env.rgvAInView && env.rgvBInView) {
+        // if both RGVs are in view, follow closest one
+        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+            waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
+        }
+        else {
+            waypoint = (rgvBPos.begin(), rgvBPos.end()-1);
+        }
+    }
+    else if (env.rgvAInView) {
+        // if RGV-A is in view, follow it
+        waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
+    }
+    else if (env.rgvBInView) {
+        // if RGV-B is in view, follow it
+        waypoint = (rgvBPos.begin(), rgvBPos.end()-1);
+    }
+    else if (rgvAPos[3] > rgvBPos[3]) {
+        // if no RGV is in view, but most recent rgv detected is RGV-A, target the last known position of it
+        target = (rgvAPos.begin(), rgvAPos.end()-1);
+    }
+    else {
+        // if no RGV is in view, but most recent rgv detected is RGV-B, target the last known position of it
+        target = (rgvBPos.begin(), rgvBPos.end()-1);
+    }
+
+    return waypoint;
+}
+
 std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
     /* Circles around an RGV
      * Output:
@@ -64,7 +105,7 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
         // if RGV-B is in view, target it
         target = (rgvBPos.begin(), rgvBPos.end()-1);
     }
-    else if (rgvAPos[3] > rgvBPos) {
+    else if (rgvAPos[3] > rgvBPos[3]) {
         // if no RGV is in view, but most recent rgv detected is RGV-A, target the last known position of it
         target = (rgvAPos.begin(), rgvAPos.end()-1);
     }
@@ -119,19 +160,19 @@ std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, follow closest one
         if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
-            waypoint = rgvAPos;
+            waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
         }
         else {
-            waypoint = rgvBPos;
+            waypoint = (rgvBPos.begin(), rgvBPos.end()-1);
         }
     }
     else if (env.rgvAInView) {
         // if RGV-A is in view, follow it
-        waypoint = rgvAPos;
+        waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
     }
     else if (env.rgvBInView) {
         // if RGV-B is in view, follow it
-        waypoint = rgvBPos;
+        waypoint = (rgvBPos.begin(), rgvBPos.end()-1);
     }
     // if neither RGV is in view, remain at the same point
 

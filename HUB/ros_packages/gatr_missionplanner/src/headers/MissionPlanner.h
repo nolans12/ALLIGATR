@@ -22,6 +22,9 @@ class MissionPlanner {
         /////////// Search Phase //////////////////////////
         std::vector<double> search(std::vector<double> waypoint);
 
+        /////////// Trail Phase ///////////////////////////
+        std::vector<double> trail(std::vector<double> waypoint);
+
         /////////// Course Localization Phase /////////////
         std::vector<double> coarse(std::vector<double> waypoint);
 
