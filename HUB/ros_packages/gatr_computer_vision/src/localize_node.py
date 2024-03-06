@@ -7,8 +7,12 @@ from std_msgs.msg import Int32MultiArray
 from std_msgs.msg import Float32MultiArray
 
 # Global current state variables
-AR_CORNERS = Int32MultiArray()
-AR_CORNERS.data = [0, 0, 0, 0, 0, 0, 0, 0]
+AR_CORNERS_A = Int32MultiArray()
+AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
+
+AR_CORNERS_B = Int32MultiArray()
+AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
+
 BLOB_CENTROID = [0, 0]
 THETA = 0
 PHI = 0
@@ -63,21 +67,31 @@ def localize(ARCorners):
     return relX, relY
 
 # Callback function that will execute whenever data is received
-def callbackAR(data):
+def callbackAR_A(data):
     # Echo data to the ROS node
     outData = Float32MultiArray()
-    AR_CORNERS = data               # Update AR Tag corner estimate
+    AR_CORNERS_A = data               # Update AR Tag corner estimate
 
-    if(AR_CORNERS.data[0] == 0):          # Condition for no AR tag detection
-        outData.data = [0.0, 0.0]
-        out_str = "No AR Data Received"
-    else:
-        relX, relY = localize(AR_CORNERS)     # Get relative coordinates in meters
-        outData.data = [relX, relY]
-        out_str = "AR Data Received"
+    relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
+    outData.data = [relX, relY]
+    out_str = "AR A"
 
     rospy.loginfo(out_str)
-    pubCoord.publish(outData)       # Output estimates
+    pubCoord_A.publish(outData)       # Output estimates
+    rate.sleep()
+
+# RGV B callback
+def callbackAR_B(data):
+    # Echo data to the ROS node
+    outData = Float32MultiArray()
+    AR_CORNERS_B = data               # Update AR Tag corner estimate
+
+    relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
+    outData.data = [relX, relY]
+    out_str = "AR B"
+
+    rospy.loginfo(out_str)
+    pubCoord_B.publish(outData)       # Output estimates
     rate.sleep()
 
 
@@ -85,7 +99,7 @@ def callbackBlob(data):
     # Echo data to the ROS node
     out_str = "Blob Data Received"
     rospy.loginfo(out_str)
-    pubCoord.publish(data)      # Echo data
+    #pubCoord.publish(data)      # Echo data
     rate.sleep()
 
 
@@ -99,10 +113,12 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord = rospy.Publisher('rel_coord', Float32MultiArray, queue_size=10)
+    pubCoord_A = rospy.Publisher('rel_coord_A', Float32MultiArray, queue_size=10)
+    pubCoord_B = rospy.Publisher('rel_coord_B', Float32MultiArray, queue_size=10)
 
     ################## Subscriber Definitions ###########################
-    subCorners = rospy.Subscriber('AR_corners', Int32MultiArray, callbackAR)
+    subCorners_A = rospy.Subscriber('AR_corners_A', Int32MultiArray, callbackAR_A)
+    subCorners_B = rospy.Subscriber('AR_corners_B', Int32MultiArray, callbackAR_B)
     #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     #subIMU = rospy.Subscriber('MAVROS/Something, Int32MultiArray, callbackIMU)
 
