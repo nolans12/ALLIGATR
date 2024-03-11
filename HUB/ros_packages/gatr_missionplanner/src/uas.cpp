@@ -30,7 +30,7 @@ uas::uas() {
 
     // p = 0;
     theta = -1.0f;
-    thetaJoint = 0.0f;
+    //thetaJoint = 0.0f;
     jointTime = 0.0f;
     jointComplete = false;
     // phaseRoot = new phaseStep;

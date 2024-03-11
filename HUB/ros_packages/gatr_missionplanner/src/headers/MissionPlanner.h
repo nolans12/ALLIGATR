@@ -19,6 +19,9 @@ class MissionPlanner {
         // Directly flies to an RGV
         std::vector<double> direct_locate(std::vector<double> waypoint);
 
+        /////////// Boundary Control //////////////////////
+        std::vector<double> boundary_control(std::vector<double> waypoint);
+
         /////////// Search Phase //////////////////////////
         std::vector<double> search(std::vector<double> waypoint);
 
@@ -32,8 +35,16 @@ class MissionPlanner {
         std::vector<double> fine(std::vector<double> waypoint);
 
         /////////// Joint Localization Phase //////////////
+        std::vector<double> joint(std::vector<double> waypoint);
 
         /////////// Helper Functions //////////////////////
+        double getYaw(std::vector<double> waypoint);
+
+        std::vector<double> cross(std::vector<double> const &a, std::vector<double> const &b);
+
+        double dot(std::vector<double> const &a, std::vector<double> const &b);
+
+        double norm(std::vector<double> const &a);
         
         // Output the current state of the drone
         void output_drone_state();

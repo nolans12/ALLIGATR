@@ -25,7 +25,7 @@ public:
      */
     std::vector<std::vector<double>> state;
     std::vector<double> dest;
-    float epsilon, fovNarrow, fovWide, theta, thetaJoint, jointTime;
+    float epsilon, fovNarrow, fovWide, theta, jointTime;
     bool jointComplete;
     std::string status;
     // pathStep* pathRoot;
