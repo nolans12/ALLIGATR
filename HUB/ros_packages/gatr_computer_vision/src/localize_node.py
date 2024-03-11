@@ -113,8 +113,8 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord_A = rospy.Publisher('CV/rel_coord_A', Float32MultiArray, queue_size=10)
-    pubCoord_B = rospy.Publisher('CV/rel_coord_B', Float32MultiArray, queue_size=10)
+    pubCoord_A = rospy.Publisher('CV/rel_coord_A', Float32MultiArray, queue_size=1)
+    pubCoord_B = rospy.Publisher('CV/rel_coord_B', Float32MultiArray, queue_size=1)
 
     ################## Subscriber Definitions ###########################
     subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)

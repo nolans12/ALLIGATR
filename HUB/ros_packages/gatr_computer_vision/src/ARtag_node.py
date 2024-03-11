@@ -103,9 +103,9 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=10)     # RGV A
-    pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=10)     # RGV B
-    pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=10)
+    pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
+    pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
+    pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=1)
 
     ####################################################################
 
@@ -141,6 +141,14 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():
             camera_found = True     # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
+
+            # Get the frame width and height
+            frame_width = int(cap.get(3)) 
+            frame_height = int(cap.get(4)) 
+            size = (frame_width, frame_height) 
+            
+            # Create video writer object
+            writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
             break            
 
         rospy.sleep(1.0) # Sleep for 1 second
@@ -173,6 +181,9 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
 
+            # Save the frame
+            writeObj.write(img)
+
             # Publish image message to image topic
             pub_image.publish(br.cv2_to_imgmsg(img))
 
@@ -194,6 +205,7 @@ if __name__ == '__main__': # <- Executable
 
         rate.sleep()
 
+    writeObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
