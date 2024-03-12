@@ -44,7 +44,7 @@ camera_found = False
 while not camera_found:
     # Setup the GStreamer Pipeline
     #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-    pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+    pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
     # Create a VideoCapture object with the GStreamer pipeline
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
@@ -75,6 +75,7 @@ while not camera_found:
 frames = []
 while cap.isOpened():
 
+    boolCapture = 1
     try:
         # Get the current video feed frame
         ret, img = cap.read()
@@ -86,8 +87,10 @@ while cap.isOpened():
         # Update frames
         #frames.append(image)
 
-        # Save the frame
-        writeObj.write(img)
+        # Save the frame every other frame (30 fps)
+        if boolCapture:
+            writeObj.write(img)
+            boolCapture = not boolCapture
         
         # Display the frame
         #cv2.imshow('frame', image)
