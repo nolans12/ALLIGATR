@@ -80,17 +80,17 @@ while cap.isOpened():
         ret, img = cap.read()
 
         # Locate the Aruco tag
-        corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
-        image = aruco_display(corners, ids, rejected, img)
+        #corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+        #image = aruco_display(corners, ids, rejected, img)
 
         # Update frames
-        frames.append(image)
+        #frames.append(image)
 
         # Save the frame
         writeObj.write(img)
         
         # Display the frame
-        cv2.imshow('frame', image)
+        #cv2.imshow('frame', image)
         
         # Quit
         key = cv2.waitKey(1) & 0xFF
