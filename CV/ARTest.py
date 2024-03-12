@@ -53,6 +53,15 @@ while not camera_found:
     if cap.isOpened():
         print("Camera Connected!")
         camera_found = True     # Camera is found
+
+        # Get the frame width and height
+        frame_width = int(cap.get(3)) 
+        frame_height = int(cap.get(4)) 
+        size = (frame_width, frame_height) 
+        
+        # Create video writer object
+        writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
+        
         break            
     camera_index += 1
 
@@ -75,6 +84,9 @@ while cap.isOpened():
 
     # Update frames
     frames.append(image)
+
+    # Save the frame
+    writeObj.write(img)
     
 	# Display the frame
     cv2.imshow('frame', image)
@@ -94,6 +106,7 @@ while cap.isOpened():
 #    out.write(i)
 #out.release()
     
-
+    
+writeObj.release()
 cv2.destroyAllWindows()         # Close everything and release the camera
 cap.release()
