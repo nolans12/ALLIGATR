@@ -75,26 +75,33 @@ while not camera_found:
 frames = []
 while cap.isOpened():
 
-    # Get the current video feed frame
-    ret, img = cap.read()
+    try:
+        # Get the current video feed frame
+        ret, img = cap.read()
 
-    # Locate the Aruco tag
-    corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
-    image = aruco_display(corners, ids, rejected, img)
+        # Locate the Aruco tag
+        corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+        image = aruco_display(corners, ids, rejected, img)
 
-    # Update frames
-    frames.append(image)
+        # Update frames
+        frames.append(image)
 
-    # Save the frame
-    writeObj.write(img)
+        # Save the frame
+        writeObj.write(img)
+        
+        # Display the frame
+        cv2.imshow('frame', image)
+        
+        # Quit
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
     
-	# Display the frame
-    cv2.imshow('frame', image)
-    
-	# Quit
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        break
+    except KeyboardInterrupt:
+        writeObj.release()
+        cv2.destroyAllWindows()         # Close everything and release the camera
+        cap.release()
+
 
 
 # Save images to a file
