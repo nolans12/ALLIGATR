@@ -38,7 +38,7 @@ finalDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
 
 # Try to open the 0 index for the secondary camera
-camera_index = 1   
+camera_index = 0   
 camera_found = False
 
 while not camera_found:
