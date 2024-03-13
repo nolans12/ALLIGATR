@@ -2,33 +2,24 @@
 //#include "headers/pathStep.h"
 
 uas::uas() {
-    /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  nx4 array containing current uas position [ft] and heading
-     *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
-     *  pathNow       -  points to the most recent entry of the pathStep linked list
+    /*  state         -  1x4 double vector containing current uas position [ft] and yaw
+     *  phase         -  1x5 string vector containing the last 5 output phases from the mission planner
+     *  epsilon       -  allowable positional error, used in reachedPoint [ft]
      *  fovNarrow     -  narrow FOV of the camera [deg]
      *  fovWide       -  wide FOV of the camera [deg]
-     *  p             -  keeps track of search iteration, used in SearchPath
      *  theta         -  keeps track of orbiting flight path iteration, used in coarsePath [deg]
      *  thetaJoint    -  keeps track of angle for joint phase
+     *  courseATime   -  tracks how much time has been spent collecting data on RGV-A in coarse phase [s]
+     *  courseBTime   -  tracks how much time has been spent collecting data on RGV-B in coarse phase [s]
+     *  fineATime     -  tracks how much time has been spent collecting data on RGV-A in fine phase [s]
+     *  fineBTime     -  tracks how much time has been spent collecting data on RGV-B in fine phase [s]
      *  jointTime     -  tracks how much time has been spent collecting data in joint phase [s]
-     *  jointComplete -  boolean holding whether the joint phase has been completed or not
-     *  phaseRoot     -  points to the root of phaseStep linked list where each node has the time [s] and a string of the phase
-     *  phaseNow      -  points to the most recent entry of the phaseStep linked list
-     *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
+     *  status        -  holds the current phase of the mission string (may be redundant with phase - track in further implementation)
      */
-    Phase phaseData;
     epsilon = 10;
     state = {0., 0., 0., 0.};
     dest = {0., 0., 0., 0.};
-    phaseData.phase = "STANDBY";
-    phaseData.time = 0.0;
-    phase = {phaseData};
-    // pathRoot = new pathStep;
-    // pathNow = pathRoot;
-    // pathRoot->path[0] = 0.;
-    // pathRoot->path[1] = 0.;
-    // pathRoot->path[2] = 0.;
+    phase = {"STANDBY"};
     fovNarrow = 67;
     fovWide = 102;
 
@@ -39,15 +30,15 @@ uas::uas() {
 
     p = 0;
     theta = -1.0f;
-    theta_step = 6 * M_PI/180; // 6 degrees // change in circle angle over time step [rad]
+    theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
     orbit_radius = 10.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
+    coarseATime = 0.0;
+    coarseBTime = 0.0;
+    fineATime = 0.0;
+    fineBTime = 0.0;
     jointTime = 0.0f;
     jointComplete = false;
-    // phaseRoot = new phaseStep;
-    // phaseNow = phaseRoot;
-    // phaseRoot->time = 0.;
-    // phaseRoot->phase = "Takeoff";
     status = "STANDBY";
 }
 
