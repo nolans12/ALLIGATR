@@ -182,7 +182,7 @@ if __name__ == '__main__': # <- Executable
             ret, img = cap.read()
 
             # Save the frame
-            writeObj.write(img)
+            #writeObj.write(img)
 
             # Publish image message to image topic
             pub_image.publish(br.cv2_to_imgmsg(img))
