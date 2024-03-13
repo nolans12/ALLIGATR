@@ -71,6 +71,8 @@ class MissionPlanner {
         
     private:
         std::string phase;
+        std::vector<std::string> phases;
+        unsigned short int smootherCount;
         uas drone;
         environment env;
         ros::Subscriber rel_coord_A_sub;
