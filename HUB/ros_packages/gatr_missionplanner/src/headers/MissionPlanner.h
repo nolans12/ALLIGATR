@@ -4,6 +4,7 @@
 #include "environment.h"
 #include <vector>
 #include <iomanip>
+#include <math.h>
 
 class MissionPlanner {
     public:
@@ -25,8 +26,9 @@ class MissionPlanner {
         /////////// Trail Phase ///////////////////////////
         std::vector<double> trail(std::vector<double> waypoint);
 
-        /////////// Course Localization Phase /////////////
+        /////////// Coarse Localization Phase /////////////
         std::vector<double> coarse(std::vector<double> waypoint);
+
 
         /////////// Fine Localization Phase ///////////////
         std::vector<double> fine(std::vector<double> waypoint);
