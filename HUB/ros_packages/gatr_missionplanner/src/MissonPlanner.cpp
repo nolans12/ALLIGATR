@@ -16,6 +16,8 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     // drone = uas();
     // env = environment();
     phase = "Search";
+    phases = {phase};
+    smootherCount = 0;
     rel_coord_A_sub = gnc_node.subscribe("CV/rel_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
 }
 
@@ -446,6 +448,8 @@ std::vector<double> MissionPlanner::bounds_trace(std::vector<double> waypoint){
         drone.p = (drone.p + 1) % 4;
     }
 
+    waypoint[3] = getYaw(waypoint);
+
     return waypoint;
 }
 
@@ -484,8 +488,8 @@ double MissionPlanner::getYaw(std::vector<double> waypoint) {
      */
 
     //std::vector<double> v = waypoint - drone.state[0];
-    //double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1]);
-    return 0;
+    double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1]);
+    return yaw;
 }
 
 
