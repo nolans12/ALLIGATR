@@ -17,9 +17,13 @@ uas::uas() {
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
+    Phase phaseData;
     epsilon = 10;
     state = {{0., 0., 0., 0.}};
     dest = {0., 0., 0., 0.};
+    phaseData.phase = "STANDBY";
+    phaseData.time = 0.0;
+    phase = {phaseData};
     // pathRoot = new pathStep;
     // pathNow = pathRoot;
     // pathRoot->path[0] = 0.;
@@ -30,7 +34,7 @@ uas::uas() {
 
     // p = 0;
     theta = -1.0f;
-    thetaJoint = 0.0f;
+    //thetaJoint = 0.0f;
     jointTime = 0.0f;
     jointComplete = false;
     // phaseRoot = new phaseStep;

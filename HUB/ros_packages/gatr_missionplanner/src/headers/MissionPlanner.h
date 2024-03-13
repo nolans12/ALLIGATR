@@ -4,7 +4,8 @@
 #include "environment.h"
 #include <vector>
 #include <iomanip>
-#include <math.h>
+#include <iostream>
+#include <Eigen>
 
 class MissionPlanner {
     public:
@@ -20,21 +21,38 @@ class MissionPlanner {
         // Directly flies to an RGV
         std::vector<double> direct_locate(std::vector<double> waypoint);
 
+        /////////// Boundary Control //////////////////////
+        std::vector<double> boundary_control_motion(std::vector<double> waypoint);
+        std::string boundary_control_phase();
+
         /////////// Search Phase //////////////////////////
         std::vector<double> search_motion(std::vector<double> waypoint);
+        std::string search_phase();
 
         /////////// Trail Phase ///////////////////////////
         std::vector<double> trail_motion(std::vector<double> waypoint);
+        std::string trail_phase();
 
-        /////////// Coarse Localization Phase /////////////
+        /////////// Course Localization Phase /////////////
         std::vector<double> coarse_motion(std::vector<double> waypoint);
+        std::string coarse_phase();
 
         /////////// Fine Localization Phase ///////////////
         std::vector<double> fine_motion(std::vector<double> waypoint);
+        std::string fine_phase();
 
         /////////// Joint Localization Phase //////////////
+        std::vector<double> joint_motion(std::vector<double> waypoint);
+        std::string joint_phase();
 
         /////////// Helper Functions //////////////////////
+        double getYaw(std::vector<double> waypoint);
+
+        std::vector<double> cross(std::vector<double> const &a, std::vector<double> const &b);
+
+        double dot(std::vector<double> const &a, std::vector<double> const &b);
+
+        double norm(std::vector<double> const &a);
         
         // Output the current state of the drone
         void output_drone_state();

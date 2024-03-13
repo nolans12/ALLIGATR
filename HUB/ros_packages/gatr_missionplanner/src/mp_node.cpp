@@ -87,12 +87,12 @@ int main(int argc, char** argv)
 		}
 		else if (pattern_name == "search")
 		{
-			curr_waypoint_new = mp.search(curr_waypoint_new);
+			curr_waypoint_new = mp.search_motion(curr_waypoint_new);
 		}
 		else if (pattern_name == "locate")
 		{
 			if (rgvAInView == true){
-				curr_waypoint_new = mp.coarse(curr_waypoint_new);
+				curr_waypoint_new = mp.coarse_motion(curr_waypoint_new);
 			}
 			else{
 				curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
