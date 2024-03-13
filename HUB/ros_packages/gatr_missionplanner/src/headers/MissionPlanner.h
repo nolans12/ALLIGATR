@@ -20,22 +20,22 @@ class MissionPlanner {
         std::vector<double> direct_locate(std::vector<double> waypoint);
 
         /////////// Boundary Control //////////////////////
-        std::vector<double> boundary_control(std::vector<double> waypoint);
+        std::vector<double> boundary_control_motion(std::vector<double> waypoint);
 
         /////////// Search Phase //////////////////////////
-        std::vector<double> search(std::vector<double> waypoint);
+        std::vector<double> search_motion(std::vector<double> waypoint);
 
         /////////// Trail Phase ///////////////////////////
-        std::vector<double> trail(std::vector<double> waypoint);
+        std::vector<double> trail_motion(std::vector<double> waypoint);
 
         /////////// Course Localization Phase /////////////
-        std::vector<double> coarse(std::vector<double> waypoint);
+        std::vector<double> coarse_motion(std::vector<double> waypoint);
 
         /////////// Fine Localization Phase ///////////////
-        std::vector<double> fine(std::vector<double> waypoint);
+        std::vector<double> fine_motion(std::vector<double> waypoint);
 
         /////////// Joint Localization Phase //////////////
-        std::vector<double> joint(std::vector<double> waypoint);
+        std::vector<double> joint_motion(std::vector<double> waypoint);
 
         /////////// Helper Functions //////////////////////
         double getYaw(std::vector<double> waypoint);

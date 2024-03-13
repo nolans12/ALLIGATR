@@ -12,8 +12,13 @@ void MissionPlanner::determine_phase(){
     
 }
 
-std::vector<double> MissionPlanner::boundary_control(std::vector<double> waypoint) {
-    // set waypoint to middle of mission boundary
+std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> waypoint) {
+    /* Set waypoint to middle of mission boundary
+     * Input:
+     *         waypoint - 1x4 double vector of previously commanded point & yaw
+     * Output:
+     *         waypoint - 1x4 double vector of commanded point & yaw
+     */
     waypoint[0] = (env.bounds[0][0]+env.bounds[1][0])/2.0;
     waypoint[1] = (env.bounds[0][1]+env.bounds[1][1])/2.0;
     waypoint[2] = (env.bounds[0][2]+env.bounds[1][2])/2.0;
@@ -21,7 +26,7 @@ std::vector<double> MissionPlanner::boundary_control(std::vector<double> waypoin
     return waypoint;
 }
 
-std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
+std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) {
     /* Follows lawnmower patter around bounds 
      * Input:
      *         waypoint - 1x4 double vector of previously commanded point & yaw
@@ -47,7 +52,7 @@ std::vector<double> MissionPlanner::search(std::vector<double> waypoint) {
     return waypoint;
 }
 
-std::vector<double> MissionPlanner::trail(std::vector<double> waypoint) {
+std::vector<double> MissionPlanner::trail_motion(std::vector<double> waypoint) {
     /* Moves toward/follows an RGV
      * Input:
      *         waypoint - 1x4 double vector of previously commanded point & yaw
@@ -92,7 +97,7 @@ std::vector<double> MissionPlanner::trail(std::vector<double> waypoint) {
     return waypoint;
 }
 
-std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
+std::vector<double> MissionPlanner::coarse_motion(std::vector<double> waypoint) {
     /* Circles around an RGV
      * Input:
      *         waypoint - 1x4 double vector of previously commanded point & yaw
@@ -170,7 +175,7 @@ std::vector<double> MissionPlanner::coarse(std::vector<double> waypoint) {
     return waypoint;
 }
 
-std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
+std::vector<double> MissionPlanner::fine_motion(std::vector<double> waypoint) {
     /* Hovers directly over an RGV
      * Input:
      *         waypoint - 1x4 double vector of previously commanded point & yaw
@@ -208,7 +213,7 @@ std::vector<double> MissionPlanner::fine(std::vector<double> waypoint) {
     return waypoint;
 }
 
-std::vector<double> MissionPlanner::joint(std::vector<double> waypoint) {
+std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     /* Goes to middle point of most recent RGV positions, then flies to either:
      * minimum height to have both RGVs in view, or
      * max height in bounds and slowly spins to find both RGVs
@@ -273,8 +278,16 @@ std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
 }
 
 double MissionPlanner::getYaw(std::vector<double> waypoint) {
-    ///TODO: get the yaw angle to turn the drone towards the given waypoint
-    return 0.0;
+    /* Get the yaw angle to turn the drone towards the given waypoint
+     * Input:
+     *         waypoint - 1x4 double vector of commanded point & yaw
+     * Output:
+     *         yaw - double, yaw angle facing commanded point
+     */
+
+    std::vector<double> v = waypoint - drone.state[0];
+    yaw = atan2(v[1], v[0]);
+    return yaw;
 }
 
 std::vector<double> cross(std::vector<double> const &a, std::vector<double> const &b) {
