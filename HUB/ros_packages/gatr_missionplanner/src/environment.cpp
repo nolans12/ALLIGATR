@@ -9,6 +9,10 @@ environment::environment() {
     //rgvBPosition = {{0.0, 0.0, 0.0, 0.0}};
     rgvAInView = false;
     rgvBInView = false;
+    rgvACoarseComplete = false;
+    rgvBCoarseComplete = false;
+    rgvAFineComplete = false;
+    rgvBFineComplete = false;
 
     slt.x_cell = 0;
     slt.y_cell = 0;

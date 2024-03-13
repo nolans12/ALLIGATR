@@ -24,19 +24,18 @@ public:
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    std::vector<std::vector<double>> state;
+    std::vector<double> state;
     std::vector<double> dest;
     std::vector<Phase> phase;
-    float epsilon, fovNarrow, fovWide, theta, jointTime;
+    float epsilon, fovNarrow, fovWide, theta, jointTime, orbit_radius, theta_step;
+    double trail_altitude, coarse_altitude, fine_altitude;
     bool jointComplete;
     std::string status;
     // pathStep* pathRoot;
     // pathStep* pathNow;
     // phaseStep* phaseRoot;
     // phaseStep* phaseNow;
-    // unsigned short int p;
-
-
+    unsigned short int p; //Used only in the bounds trace mode
 
     uas(); //Default Constructor
 

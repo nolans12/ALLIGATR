@@ -4,14 +4,14 @@
 bool rgvAInView;
 
 // Callback function to be updated when the RGV is detected
-void rgv_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
 {
 	// Display coords
 	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
 
 	// Check if the RGV is in view
     if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
-		ROS_INFO("Coarsly localizing...");
+		//ROS_INFO("Coarsly localizing...");
 		rgvAInView = true;
 	}
 	else{
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	std::vector<double> curr_waypoint_prev(4);
 
 	// Create subscriber to rel_coord topic
-	ros::Subscriber rel_coord_sub = gnc_node.subscribe("rel_coord", 10, rgv_detected_callback);
+	ros::Subscriber rel_coord_sub = gnc_node.subscribe("rel_coord_A", 1, rgvA_detected_callback);
 
   	// wait for FCU connection
 	wait4connect();
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 
 		//Update the drone's position
 		mp.update_drone_state(curr_waypoint_new);
-		mp.output_drone_state();
+		//mp.output_drone_state();
 
 		// Save the previous waypoint
 		curr_waypoint_prev = curr_waypoint_new;
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 				curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
 			}
 		}
-		else
+		else if (pattern_name == "full mission")
 		{
 			//////////// MAIN LOOP HERE ////////////
 			
@@ -109,12 +109,20 @@ int main(int argc, char** argv)
 			curr_waypoint_new = mp.determine_motion(curr_waypoint_new);
 
 			// IF the phase is in ABORT, land the drone and exit the program
-			if (mp.phase == "ABORT") {
+			if (mp.getPhase() == "ABORT") {
 				land();
+				while(ros::ok()){
+					ros::spinOnce();
+					rate.sleep();
+				};
 				return 0;
 			}
 			
 			//////////////////////////////////////////
+		}
+		else{
+			ROS_WARN("Mission pattern not recognized! Aborting mission...");
+			continue;
 		}
 
 		
