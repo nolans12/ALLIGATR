@@ -21,17 +21,16 @@ class MissionPlanner {
         std::vector<double> direct_locate(std::vector<double> waypoint);
 
         /////////// Search Phase //////////////////////////
-        std::vector<double> search(std::vector<double> waypoint);
+        std::vector<double> search_motion(std::vector<double> waypoint);
 
         /////////// Trail Phase ///////////////////////////
-        std::vector<double> trail(std::vector<double> waypoint);
+        std::vector<double> trail_motion(std::vector<double> waypoint);
 
         /////////// Coarse Localization Phase /////////////
-        std::vector<double> coarse(std::vector<double> waypoint);
-
+        std::vector<double> coarse_motion(std::vector<double> waypoint);
 
         /////////// Fine Localization Phase ///////////////
-        std::vector<double> fine(std::vector<double> waypoint);
+        std::vector<double> fine_motion(std::vector<double> waypoint);
 
         /////////// Joint Localization Phase //////////////
 
