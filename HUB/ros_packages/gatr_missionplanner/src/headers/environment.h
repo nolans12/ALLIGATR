@@ -12,9 +12,9 @@ class environment {
         // Bounds defined as [ [Xmin, Ymin, Zmin], [Xmax, Ymax, Zmax]]
         std::vector<std::vector<float>> bounds;
 
-        // RGV positions defined as [ [Xn, Yn, Zn, tn], ..., [X1, Y1, Z1, t1], [X0, Y0, Z0, t0] ]
-        std::vector<std::vector<double>> rgvAPosition;
-        std::vector<std::vector<double>> rgvBPosition;
+        // RGV positions defined as [ X0, Y0, Z0, t0 ]
+        std::vector<double> rgvAPosition;
+        std::vector<double> rgvBPosition;
         bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete;
 
         // Return the current search destination

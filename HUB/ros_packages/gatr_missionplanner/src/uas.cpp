@@ -19,7 +19,7 @@ uas::uas() {
      */
     Phase phaseData;
     epsilon = 10;
-    state = {{0., 0., 0., 0.}};
+    state = {0., 0., 0., 0.};
     dest = {0., 0., 0., 0.};
     phaseData.phase = "STANDBY";
     phaseData.time = 0.0;
@@ -32,8 +32,15 @@ uas::uas() {
     fovNarrow = 67;
     fovWide = 102;
 
-    // p = 0;
+    // Can change this to be anything in bounds
+    trail_altitude = 35.0 * 0.3048; // 35 ft to m
+    coarse_altitude = 35.0 * 0.3048; // 35 ft to m
+    fine_altitude = 35.0 * 0.3048; // 35 ft to m
+
+    p = 0;
     theta = -1.0f;
+    theta_step = 6 * M_PI/180; // 6 degrees // change in circle angle over time step [rad]
+    orbit_radius = 10.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
     jointTime = 0.0f;
     jointComplete = false;
