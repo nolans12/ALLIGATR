@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include "phase.h"
 //#include "phaseStep.h"
 //#include "pathStep.h"
 
@@ -25,7 +26,8 @@ public:
      */
     std::vector<std::vector<double>> state;
     std::vector<double> dest;
-    float epsilon, fovNarrow, fovWide, theta, thetaJoint, jointTime;
+    std::vector<Phase> phase;
+    float epsilon, fovNarrow, fovWide, theta, jointTime;
     bool jointComplete;
     std::string status;
     // pathStep* pathRoot;
@@ -33,6 +35,8 @@ public:
     // phaseStep* phaseRoot;
     // phaseStep* phaseNow;
     // unsigned short int p;
+
+
 
     uas(); //Default Constructor
 
