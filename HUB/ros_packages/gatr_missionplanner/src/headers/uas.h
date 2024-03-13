@@ -9,32 +9,24 @@
 
 class uas {
 public:
-    /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  nx4 array containing current uas position [ft] and heading
-     *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
-     *  pathNow       -  points to the most recent entry of the pathStep linked list
+    /*  state         -  1x4 double vector containing current uas position [ft] and yaw
+     *  phase         -  1x5 string vector containing the last 5 output phases from the mission planner
+     *  epsilon       -  allowable positional error, used in reachedPoint [ft]
      *  fovNarrow     -  narrow FOV of the camera [deg]
      *  fovWide       -  wide FOV of the camera [deg]
-     *  p             -  keeps track of search iteration, used in SearchPath
      *  theta         -  keeps track of orbiting flight path iteration, used in coarsePath [deg]
      *  thetaJoint    -  keeps track of angle for joint phase
+     *  courseATime   -  tracks how much time has been spent collecting data on RGV-A in coarse phase [s]
+     *  courseBTime   -  tracks how much time has been spent collecting data on RGV-B in coarse phase [s]
+     *  fineATime     -  tracks how much time has been spent collecting data on RGV-A in fine phase [s]
+     *  fineBTime     -  tracks how much time has been spent collecting data on RGV-B in fine phase [s]
      *  jointTime     -  tracks how much time has been spent collecting data in joint phase [s]
-     *  jointComplete -  boolean holding whether the joint phase has been completed or not
-     *  phaseRoot     -  points to the root of phaseStep linked list where each node has the time [s] and a string of the phase
-     *  phaseNow      -  points to the most recent entry of the phaseStep linked list
-     *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
+     *  status        -  holds the current phase of the mission string (may be redundant with phase - track in further implementation)
      */
-    std::vector<std::vector<double>> state;
-    std::vector<double> dest;
+    std::vector<double> state, dest;
     std::vector<std::string> phase;
-    float epsilon, fovNarrow, fovWide, theta, jointTime;
-    bool jointComplete;
+    double epsilon, fovNarrow, fovWide, theta, thetaJoint, coarseATime, coarseBTime, fineATime, fineBTime, jointTime;
     std::string status;
-    // pathStep* pathRoot;
-    // pathStep* pathNow;
-    // phaseStep* phaseRoot;
-    // phaseStep* phaseNow;
-    // unsigned short int p;
 
     uas(); //Default Constructor
 
