@@ -10,7 +10,6 @@
 class uas {
 public:
     /*  state         -  1x4 double vector containing current uas position [ft] and yaw
-     *  phase         -  1x5 string vector containing the last 5 output phases from the mission planner
      *  epsilon       -  allowable positional error, used in reachedPoint [ft]
      *  fovNarrow     -  narrow FOV of the camera [deg]
      *  fovWide       -  wide FOV of the camera [deg]
@@ -25,7 +24,6 @@ public:
      */
     std::vector<double> state;
     std::vector<double> dest;
-    std::vector<std::string> phase;
     double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step, trail_altitude, coarse_altitude, fine_altitude;
     bool jointComplete;
     std::string status;
