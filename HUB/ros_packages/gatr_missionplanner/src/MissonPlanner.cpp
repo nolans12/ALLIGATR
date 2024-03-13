@@ -7,6 +7,8 @@ MissionPlanner::MissionPlanner() {
     // drone = uas();
     // env = environment();
     phase = "Search";
+    phases = {phase};
+    smootherCount = 0;
 }
 
 MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
