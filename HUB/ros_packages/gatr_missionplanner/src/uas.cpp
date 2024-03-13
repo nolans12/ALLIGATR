@@ -17,13 +17,12 @@ uas::uas() {
      *  phaseNow      -  points to the most recent entry of the phaseStep linked list
      *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
      */
-    Phase phaseData;
+    /// TODO: update comments, add coarse + fine time doubles
     epsilon = 10;
     state = {{0., 0., 0., 0.}};
     dest = {0., 0., 0., 0.};
-    phaseData.phase = "STANDBY";
-    phaseData.time = 0.0;
-    phase = {phaseData};
+    status = "STANDBY";
+    phase = {status};
     // pathRoot = new pathStep;
     // pathNow = pathRoot;
     // pathRoot->path[0] = 0.;
@@ -41,7 +40,6 @@ uas::uas() {
     // phaseNow = phaseRoot;
     // phaseRoot->time = 0.;
     // phaseRoot->phase = "Takeoff";
-    status = "STANDBY";
 }
 
 /// @brief Gets the dimensions of the field of view of the camera when projected onto the ground
