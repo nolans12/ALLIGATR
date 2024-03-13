@@ -9,7 +9,21 @@ MissionPlanner::MissionPlanner() {
 }
 
 void MissionPlanner::determine_phase(){
-    
+    switch (phase){
+        case "Boundary Control":
+
+        case "Search":
+
+        case "Trail":
+
+        case "Coarse":
+
+        case "Fine":
+
+        case "Joint":
+            break;
+    }
+
 }
 
 std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> waypoint) {
