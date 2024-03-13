@@ -1,24 +1,24 @@
 #include "headers/mp_node_headers.h"
 
-// Global variable to hold the RGV detection status
-bool rgvAInView;
+// // Global variable to hold the RGV detection status
+// bool rgvAInView;
 
-// Callback function to be updated when the RGV is detected
-void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
-{
-	// Display coords
-	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
+// // Callback function to be updated when the RGV is detected
+// void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+// {
+// 	// Display coords
+// 	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
 
-	// Check if the RGV is in view
-    if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
-		//ROS_INFO("Coarsly localizing...");
-		rgvAInView = true;
-	}
-	else{
-		rgvAInView = false;
-	}
+// 	// Check if the RGV is in view
+//     if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
+// 		//ROS_INFO("Coarsly localizing...");
+// 		rgvAInView = true;
+// 	}
+// 	else{
+// 		rgvAInView = false;
+// 	}
     
-}
+// }
 
 int main(int argc, char** argv)
 {
@@ -44,13 +44,14 @@ int main(int argc, char** argv)
 	//initialize control publisher/subscribers
 	init_publisher_subscriber(gnc_node);
 
+	// Create subscriber to rel_coord topic
+	//ros::Subscriber rel_coord_sub = gnc_node.subscribe("CV/rel_coord_A", 10, rgvA_detected_callback);
+
 	//initialize the uas and environment objects
-	MissionPlanner mp;
+	MissionPlanner mp(gnc_node);
+	//rgvAInView = false;
 	std::vector<double> curr_waypoint_new(4);
 	std::vector<double> curr_waypoint_prev(4);
-
-	// Create subscriber to rel_coord topic
-	ros::Subscriber rel_coord_sub = gnc_node.subscribe("rel_coord_A", 1, rgvA_detected_callback);
 
   	// wait for FCU connection
 	wait4connect();
@@ -91,12 +92,12 @@ int main(int argc, char** argv)
 		}
 		else if (pattern_name == "locate")
 		{
-			if (rgvAInView == true){
-				curr_waypoint_new = mp.coarse_motion(curr_waypoint_new);
-			}
-			else{
-				curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
-			}
+			// if (rgvAInView == true){
+			// 	curr_waypoint_new = mp.coarse_motion(curr_waypoint_new);
+			// }
+			// else{
+			// 	curr_waypoint_new = mp.direct_locate(curr_waypoint_new);
+			// }
 		}
 		else if (pattern_name == "full mission")
 		{

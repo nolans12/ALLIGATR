@@ -99,9 +99,9 @@ run_node gatr_computer_vision localize_node.py Localization_Node
 
 #Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
 if [ -z "$1" ]; then
-    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
+    xterm -hold -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
 else
-    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
+    xterm -hold -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
 fi
 sleep 3
 

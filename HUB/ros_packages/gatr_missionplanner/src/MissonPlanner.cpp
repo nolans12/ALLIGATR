@@ -9,6 +9,14 @@ MissionPlanner::MissionPlanner() {
     phase = "Search";
 }
 
+MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
+    // Constructor
+    // drone = uas();
+    // env = environment();
+    phase = "Search";
+    rel_coord_A_sub = gnc_node.subscribe("CV/rel_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+}
+
 ///////////// Phases //////////////////////
 void MissionPlanner::determine_phase(){
     if (phase == "Boundary Control") {
@@ -129,19 +137,19 @@ void MissionPlanner::search_phase(){
 }
 
 void MissionPlanner::trail_phase(){
-
+    return;
 }
 
 void MissionPlanner::coarse_phase(){
-
+    return;
 }
 
 void MissionPlanner::fine_phase(){
-
+    return;
 }
 
 void MissionPlanner::joint_phase(){
-
+    return;
 }
 
 ///////////// Motions //////////////////////
@@ -443,6 +451,23 @@ std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
     // Directly flies to an RGV
     waypoint = {14, 9, 9.144, 0};
     return waypoint;
+}
+
+///////////// Computer Vision + ROS ///////////////////
+// Callback function to be updated when the RGV is detected
+void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+{
+	// Display coords
+	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
+
+	// Check if the RGV is in view
+    if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
+		env.rgvAInView = true;
+	}
+	else{
+		env.rgvAInView = false;
+	}
+    
 }
 
 

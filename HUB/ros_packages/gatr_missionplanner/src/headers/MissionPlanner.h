@@ -9,6 +9,7 @@
 class MissionPlanner {
     public:
         MissionPlanner();
+        MissionPlanner(ros::NodeHandle gnc_node);
 
         // Deteremines the phase
         void determine_phase();
@@ -45,6 +46,9 @@ class MissionPlanner {
         std::vector<double> joint_motion(std::vector<double> waypoint);
         void joint_phase();
 
+        /////////// Computer Vision + ROS ///////////////////
+        void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
+
         /////////// Helper Functions //////////////////////
         double getYaw(std::vector<double> waypoint);
         
@@ -69,5 +73,6 @@ class MissionPlanner {
         std::string phase;
         uas drone;
         environment env;
+        ros::Subscriber rel_coord_A_sub;
 
 };
