@@ -62,7 +62,8 @@ while not camera_found:
         # Create video writer object
         writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, size) 
         
-        break            
+        break
+
     camera_index += 1
 
     if camera_index > 10:
@@ -72,8 +73,7 @@ while not camera_found:
 
 
 # Begin the main loop that consistently outputs AR tag corners when running
-frames = []
-while cap.isOpened():
+while True:
 
     boolCapture = 1
     try:
@@ -81,11 +81,8 @@ while cap.isOpened():
         ret, img = cap.read()
 
         # Locate the Aruco tag
-        #corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
-        #image = aruco_display(corners, ids, rejected, img)
-
-        # Update frames
-        #frames.append(image)
+        # corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+        # image = aruco_display(corners, ids, rejected, img)
 
         # Save the frame every other frame (30 fps)
         if boolCapture:
