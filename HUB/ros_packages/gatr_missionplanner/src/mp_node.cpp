@@ -104,15 +104,16 @@ int main(int argc, char** argv)
 			
 			// Determine the phase of the mission at the given timestep
 			mp.determine_phase();
-			
-			
-			
-			
-			
-			
-			land();
 
+			// Execute the phase
+			curr_waypoint_new = mp.determine_motion(curr_waypoint_new);
 
+			// IF the phase is in ABORT, land the drone and exit the program
+			if (mp.phase == "ABORT") {
+				land();
+				return 0;
+			}
+			
 			//////////////////////////////////////////
 		}
 
@@ -129,8 +130,7 @@ int main(int argc, char** argv)
 			}
 
 			// Set the new waypoint
-			float heading_angle = 0; //Nolan can you make this the same as the LTL planner?
-			set_destination(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], heading_angle);
+			set_destination(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], curr_waypoint_new[3]);
 		}
 
 	}

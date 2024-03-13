@@ -13,6 +13,7 @@ class MissionPlanner {
 
         // Deteremines the phase
         void determine_phase();
+        std::vector<double> determine_motion(std::vector<double> waypoint);
 
         /////////// Testing Modes /////////////////////////
         // Makes the drone fly in a square pattern around the environment bounds
@@ -67,6 +68,8 @@ class MissionPlanner {
         bool RGV_detected();
 
         bool isRGVAClosest();
+
+        std::string getPhase();
         
     private:
         std::string phase;

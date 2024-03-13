@@ -8,22 +8,77 @@ MissionPlanner::MissionPlanner() {
     // env = environment();
 }
 
+///////////// Phases //////////////////////
 void MissionPlanner::determine_phase(){
     switch (phase){
         case "Boundary Control":
+            boundary_control_phase();
+            break;
 
         case "Search":
+            search_phase();
+            break;
 
         case "Trail":
+            trail_phase();
+            break;
 
         case "Coarse":
+            coarse_phase();
+            break;
 
         case "Fine":
+            fine_phase();
+            break;
 
         case "Joint":
+            joint_phase();
+            break;
+
+        default:
+            ROS_ERROR("!!! ABORTING MISSION !!! - Invalid phase passed to motion planner!");
+            phase = "ABORT";
             break;
     }
 
+}
+
+///////////// Motions //////////////////////
+std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoint){
+    switch (phase){
+        case "Boundary Control":
+            return boundary_control_motion(waypoint);
+            break;
+
+        case "Search":
+            return search_motion(waypoint);
+            break;
+
+        case "Trail":
+            return trail_motion(waypoint);
+            break;
+
+        case "Coarse":
+            return coarse_motion(waypoint);
+            break;
+
+        case "Fine":
+            return fine_motion(waypoint);
+            break;
+
+        case "Joint":
+            return joint_motion(waypoint);
+            break;
+
+        case "ABORT":
+            land();
+            break;
+
+        default:
+            ROS_ERROR("!!! ABORTING MISSION !!! - Invalid phase passed to motion planner!");
+            phase = "ABORT";
+            break;
+    }
 }
 
 std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> waypoint) {
@@ -291,6 +346,8 @@ std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
     return waypoint;
 }
 
+
+///////////// Helper Functions //////////////////////
 double MissionPlanner::getYaw(std::vector<double> waypoint) {
     /* Get the yaw angle to turn the drone towards the given waypoint
      * Input:

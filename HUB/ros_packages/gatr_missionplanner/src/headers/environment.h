@@ -6,7 +6,8 @@
 
 class environment {
     public:
-        //float time, timeStep;
+        environment();
+        environment(std::vector<std::vector<float>> boundsIn);
 
         // Bounds defined as [ [Xmin, Ymin, Zmin], [Xmax, Ymax, Zmax]]
         std::vector<std::vector<float>> bounds;
@@ -14,10 +15,7 @@ class environment {
         // RGV positions defined as [ [Xn, Yn, Zn, tn], ..., [X1, Y1, Z1, t1], [X0, Y0, Z0, t0] ]
         std::vector<std::vector<double>> rgvAPosition;
         std::vector<std::vector<double>> rgvBPosition;
-        bool rgvAInView, rgvBInView;
-
-        environment();
-        environment(std::vector<std::vector<float>> boundsIn);
+        bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete;
 
         // Return the current search destination
         std::vector<double> get_searchpoint();

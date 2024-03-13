@@ -36,6 +36,8 @@ public:
     // phaseStep* phaseNow;
     // unsigned short int p;
 
+
+
     uas(); //Default Constructor
 
     /// @brief Gets the dimensions of the field of view of the camera when projected onto the ground
