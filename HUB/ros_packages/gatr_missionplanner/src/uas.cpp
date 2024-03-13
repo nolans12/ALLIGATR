@@ -3,7 +3,6 @@
 
 uas::uas() {
     /*  state         -  1x4 double vector containing current uas position [ft] and yaw
-     *  phase         -  1x5 string vector containing the last 5 output phases from the mission planner
      *  epsilon       -  allowable positional error, used in reachedPoint [ft]
      *  fovNarrow     -  narrow FOV of the camera [deg]
      *  fovWide       -  wide FOV of the camera [deg]
@@ -19,7 +18,6 @@ uas::uas() {
     epsilon = 10;
     state = {0., 0., 0., 0.};
     dest = {0., 0., 0., 0.};
-    phase = {"STANDBY"};
     fovNarrow = 67;
     fovWide = 102;
 
