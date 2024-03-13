@@ -38,13 +38,13 @@ finalDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
 
 # Try to open the 0 index for the secondary camera
-camera_index = 1   
+camera_index = 0   
 camera_found = False
 
 while not camera_found:
     # Setup the GStreamer Pipeline
     #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-    pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+    pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
     # Create a VideoCapture object with the GStreamer pipeline
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
@@ -53,7 +53,17 @@ while not camera_found:
     if cap.isOpened():
         print("Camera Connected!")
         camera_found = True     # Camera is found
-        break            
+
+        # Get the frame width and height
+        frame_width = int(cap.get(3)) 
+        frame_height = int(cap.get(4)) 
+        size = (frame_width, frame_height) 
+        
+        # Create video writer object
+        writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, size) 
+        
+        break
+
     camera_index += 1
 
     if camera_index > 10:
@@ -63,26 +73,35 @@ while not camera_found:
 
 
 # Begin the main loop that consistently outputs AR tag corners when running
-frames = []
-while cap.isOpened():
+while True:
 
-    # Get the current video feed frame
-    ret, img = cap.read()
+    boolCapture = 1
+    try:
+        # Get the current video feed frame
+        ret, img = cap.read()
 
-    # Locate the Aruco tag
-    corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
-    image = aruco_display(corners, ids, rejected, img)
+        # Locate the Aruco tag
+        # corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+        # image = aruco_display(corners, ids, rejected, img)
 
-    # Update frames
-    frames.append(image)
+        # Save the frame every other frame (30 fps)
+        if boolCapture:
+            writeObj.write(img)
+            boolCapture = not boolCapture
+        
+        # Display the frame
+        #cv2.imshow('frame', image)
+        
+        # Quit
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
     
-	# Display the frame
-    cv2.imshow('frame', image)
-    
-	# Quit
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        break
+    except KeyboardInterrupt:
+        writeObj.release()
+        cv2.destroyAllWindows()         # Close everything and release the camera
+        cap.release()
+
 
 
 # Save images to a file
@@ -94,6 +113,7 @@ while cap.isOpened():
 #    out.write(i)
 #out.release()
     
-
+    
+writeObj.release()
 cv2.destroyAllWindows()         # Close everything and release the camera
 cap.release()
