@@ -60,7 +60,7 @@ while not camera_found:
         size = (frame_width, frame_height) 
         
         # Create video writer object
-        writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, size) 
+        writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
         
         break
 
@@ -75,7 +75,7 @@ while not camera_found:
 # Begin the main loop that consistently outputs AR tag corners when running
 while True:
 
-    boolCapture = 1
+    boolCapture = 0
     try:
         # Get the current video feed frame
         ret, img = cap.read()
@@ -84,10 +84,12 @@ while True:
         # corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
         # image = aruco_display(corners, ids, rejected, img)
 
-        # Save the frame every other frame (30 fps)
-        if boolCapture:
+        # Save the frame every 4 frames (15 fps)
+        if boolCapture >= 3:
             writeObj.write(img)
-            boolCapture = not boolCapture
+            boolCapture = 0
+        else:
+            boolCapture = boolCapture + 1
         
         # Display the frame
         #cv2.imshow('frame', image)
@@ -101,17 +103,7 @@ while True:
         writeObj.release()
         cv2.destroyAllWindows()         # Close everything and release the camera
         cap.release()
-
-
-
-# Save images to a file
-#size = (1920, 1080)    
-#out = cv2.VideoWriter("arDetect.mp4",cv2.VideoWriter_fourcc(*'DIVX'), 30, size)
-
-#Write to ouput video object
-#for i in frames:
-#    out.write(i)
-#out.release()
+        break
     
     
 writeObj.release()
