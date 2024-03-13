@@ -7,10 +7,10 @@
 class environment {
     public:
         environment();
-        environment(std::vector<std::vector<float>> boundsIn);
+        environment(std::vector<std::vector<double>> boundsIn);
 
         // Bounds defined as [ [Xmin, Ymin, Zmin], [Xmax, Ymax, Zmax]]
-        std::vector<std::vector<float>> bounds;
+        std::vector<std::vector<double>> bounds;
 
         // RGV positions defined as [ X0, Y0, Z0, t0 ]
         std::vector<double> rgvAPosition;

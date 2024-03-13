@@ -54,6 +54,7 @@ void MissionPlanner::boundary_control_phase(){
 
 void MissionPlanner::search_phase(){
     if (out_of_bounds(drone.state)){
+        ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
         phase = "Boundary Control";
     }
 
@@ -483,8 +484,8 @@ double MissionPlanner::getYaw(std::vector<double> waypoint) {
      */
 
     //std::vector<double> v = waypoint - drone.state[0];
-    double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1]);
-    return yaw;
+    //double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1]);
+    return 0;
 }
 
 
