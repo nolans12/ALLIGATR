@@ -4,6 +4,7 @@
 #include "environment.h"
 #include <vector>
 #include <iomanip>
+#include <iostream>
 #include <Eigen>
 
 class MissionPlanner {
