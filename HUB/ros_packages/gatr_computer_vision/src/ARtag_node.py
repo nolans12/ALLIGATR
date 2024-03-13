@@ -132,7 +132,7 @@ if __name__ == '__main__': # <- Executable
     while not camera_found and not faux_camera:
         # Setup the GStreamer Pipeline
         #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)3840, height=(int)2160, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
         # Create a VideoCapture object with the GStreamer pipeline
         cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
@@ -177,18 +177,19 @@ if __name__ == '__main__': # <- Executable
         corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
         corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
+        boolTemp = 1
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
 
-            # Save the frame
-            #writeObj.write(img)
+            if boolTemp:
+                boolTemp = not boolTemp
 
-            # Publish image message to image topic
-            pub_image.publish(br.cv2_to_imgmsg(img))
+                # Publish image message to image topic
+                pub_image.publish(br.cv2_to_imgmsg(img))
 
-            # Output message with corners
-            corners_msg_A.data, corners_msg_B.data = processImg(img)
+                # Output message with corners
+                corners_msg_A.data, corners_msg_B.data = processImg(img)
 
         # If the camera is connected through a faux camera in ROS
         elif faux_camera:
