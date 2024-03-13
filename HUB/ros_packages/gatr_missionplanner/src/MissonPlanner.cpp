@@ -40,6 +40,22 @@ std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> 
     return waypoint;
 }
 
+void MissionPlanner::boundary_control_phase() {
+    /* Determine if drone should be in boundary control phase
+     * Sets the status of the drone to BOUNDARY_CONTROL or SEARCH
+    */
+
+    // is the drone in bounds?
+    // no: return boundary control
+    if (out_of_bounds(drone.state.back())) {
+        drone.status = "BOUNDARY_CONTROL";
+    }
+    // yes: return search
+    else {
+        drone.status = "SEARCH";
+    }
+}
+
 std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) {
     /* Follows lawnmower patter around bounds 
      * Input:
@@ -66,6 +82,19 @@ std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) 
     return waypoint;
 }
 
+std::string MissionPlanner::search_phase() {
+    /* Determine if drone should be in search phase
+     * Sets the status of the drone to BOUNDARY_CONTROL, SEARCH, TRAIL, FINE, JOINT
+    */
+
+    if (out_of_bounds(drone.state.back())) {
+        drone.status = "BOUNDARY_CONTROL";
+    }
+    else if (env.rgvAInView) {
+        if 
+    }
+}
+
 std::vector<double> MissionPlanner::trail_motion(std::vector<double> waypoint) {
     /* Moves toward/follows an RGV
      * Input:
@@ -82,7 +111,7 @@ std::vector<double> MissionPlanner::trail_motion(std::vector<double> waypoint) {
 
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, follow closest one
-        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+        if (isRGVAClosest(drone.state, rgvAPos, rgvBPos)) {
             waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
         }
         else {
@@ -134,7 +163,7 @@ std::vector<double> MissionPlanner::coarse_motion(std::vector<double> waypoint) 
 
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, set target to the closest one
-        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+        if (isRGVAClosest(drone.state, rgvAPos, rgvBPos)) {
             target = (rgvAPos.begin(), rgvAPos.end()-1);
         }
         else {
@@ -205,7 +234,7 @@ std::vector<double> MissionPlanner::fine_motion(std::vector<double> waypoint) {
 
     if (env.rgvAInView && env.rgvBInView) {
         // if both RGVs are in view, follow closest one
-        if (isRGVAClosest(dronePos, rgvAPos, rgvBPos)) {
+        if (isRGVAClosest(drone.state, rgvAPos, rgvBPos)) {
             waypoint = (rgvAPos.begin(), rgvAPos.end()-1);
         }
         else {
@@ -299,7 +328,7 @@ double MissionPlanner::getYaw(std::vector<double> waypoint) {
      *         yaw - double, yaw angle facing commanded point
      */
 
-    std::vector<double> v = waypoint - drone.state[0];
+    std::vector<double> v = waypoint - drone.state;
     yaw = atan2(v[1], v[0]);
     return yaw;
 }
@@ -348,10 +377,9 @@ double norm(std::vector<double> const &a) {
 }
 
 void MissionPlanner::output_drone_state(){
-    std::vector<double> dronePos = drone.state.back();
     // Output the current location of the UAS and the next location it is going to
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Current Position: " << dronePos[0] << ", " << dronePos[1] << ", " << dronePos[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
+    std::cout << "Current Position: " << drone.state[0] << ", " << drone.state[1] << ", " << drone.state[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
 
 }
 
@@ -359,11 +387,10 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
     // Update the state of the UAS
     geometry_msgs::Point state = get_current_location();
     std::vector<double> dronePos = {state.x, state.y, state.z, get_current_heading()};
-    /*drone.state[0] = state.x;
+    drone.state[0] = state.x;
     drone.state[1] = state.y;
     drone.state[2] = state.z;
-    drone.state[3] = get_current_heading();*/
-    drone.state.push_back(dronePos);
+    drone.state[3] = get_current_heading();
 
     // Update the destination of the UAS
     drone.dest[0] = waypoint[0];
@@ -373,8 +400,13 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
 }
 
 bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
-    // Check if a waypoint would fall outside of the environment bounds
-    if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
+    /* Check if a point would fall outside of the environment bounds
+     * Input:
+     *         point - 1x[n>2] double vector of commanded point & yaw
+     * Output:
+     *         boolean, true if waypoint is outside of bounds, otherwise false
+     */
+    if (point[0] < env.bounds[0][0] || point[0] > env.bounds[1][0] || point[1] < env.bounds[0][1] || point[1] > env.bounds[1][1] || point[2] < env.bounds[0][2] || point[2] > env.bounds[1][2]){
         return true;
     }
     return false;
