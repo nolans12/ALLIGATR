@@ -7,6 +7,9 @@ from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
+# Global variables
+
+
 # Image callback for received image
 def callback(data):
     # Used to convert between ROS and OpenCV images
@@ -169,6 +172,14 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
         rospy.spin()
 
+    # Phase Smoothing Variables
+    corners_msg_A_last = Int32MultiArray()
+    corners_msg_B_last = Int32MultiArray()
+    corners_msg_A_last.data = [0, 0, 0, 0, 0, 0, 0, 0]
+    corners_msg_B_last.data = [0, 0, 0, 0, 0, 0, 0, 0]
+    phase_max = 10 #Number of frames to smooth out the detection
+    phase_smoother_counter_A = 2*phase_max
+    phase_smoother_counter_B = 2*phase_max
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
@@ -202,8 +213,19 @@ if __name__ == '__main__': # <- Executable
         # Publish to the ROS node
         if corners_msg_A.data[0]:
             pub_corners_A.publish(corners_msg_A)
+            corners_msg_A_last.data = corners_msg_A.data
+            phase_smoother_counter_A = 0
+        elif phase_smoother_counter_A < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
+            phase_smoother_counter_A += 1
+            pub_corners_A.publish(corners_msg_A_last)
+
         if corners_msg_B.data[0]:
             pub_corners_B.publish(corners_msg_B)
+            corners_msg_B_last.data = corners_msg_B.data
+            phase_smoother_counter_B = 0
+        elif phase_smoother_counter_B < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
+            phase_smoother_counter_B += 1
+            pub_corners_B.publish(corners_msg_B_last)
 
         rate.sleep()
 

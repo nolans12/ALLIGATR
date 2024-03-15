@@ -99,7 +99,7 @@ void set_heading(float heading)
   local_desired_heading_g = heading; 
   heading = heading + correction_heading_g + local_offset_g;
   
-  ROS_INFO("Desired Heading %f ", local_desired_heading_g);
+  //ROS_INFO("Desired Heading %f ", local_desired_heading_g);
   float yaw = heading*(M_PI/180);
   float pitch = 0;
   float roll = 0;
@@ -139,7 +139,7 @@ void set_destination(float x, float y, float z, float psi)
 	x = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
 	y = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
 	z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
-	ROS_INFO("Destination set to x: %f y: %f z: %f origin frame", x, y, z);
+	//ROS_INFO("Destination set to x: %f y: %f z: %f origin frame", x, y, z);
 
 	waypoint_g.pose.position.x = x;
 	waypoint_g.pose.position.y = y;

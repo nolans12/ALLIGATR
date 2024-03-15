@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
 		//Update the drone's position
 		mp.update_drone_state(curr_waypoint_new);
-		mp.output_drone_state();
+		//mp.output_drone_state();
 
 		// Save the previous waypoint
 		curr_waypoint_prev = curr_waypoint_new;

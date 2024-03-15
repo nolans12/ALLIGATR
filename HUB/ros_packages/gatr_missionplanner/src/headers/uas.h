@@ -23,7 +23,9 @@ public:
      */
     std::vector<double> state;
     std::vector<double> dest;
-    double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step, trail_altitude, coarse_altitude, fine_altitude;
+    double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step;
+    double trail_altitude, coarse_altitude, fine_altitude;
+    double coarse_duration, fine_duration, joint_duration;
     bool jointComplete;
     std::string status;
 

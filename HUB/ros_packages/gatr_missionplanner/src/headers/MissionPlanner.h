@@ -48,6 +48,7 @@ class MissionPlanner {
 
         /////////// Computer Vision + ROS ///////////////////
         void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
+        void rgvB_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
 
         /////////// Helper Functions //////////////////////
         double getYaw(std::vector<double> waypoint);
@@ -66,6 +67,8 @@ class MissionPlanner {
 
         bool isRGVAClosest();
 
+        std::vector<bool> rgvStopped();
+
         std::string getPhase();
         void setPhase(std::string phaseIn);
         
@@ -76,5 +79,9 @@ class MissionPlanner {
         uas drone;
         environment env;
         ros::Subscriber rel_coord_A_sub;
+        ros::Subscriber rel_coord_B_sub;
+        ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase
+        ros::Time fine_time_engaged; // Time the drone started the fine localization phase
+        ros::Time joint_time_engaged; // Time the drone started the joint localization phase
 
 };

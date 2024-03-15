@@ -19,6 +19,40 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     phases = {phase};
     smootherCount = 0;
     rel_coord_A_sub = gnc_node.subscribe("CV/rel_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    rel_coord_B_sub = gnc_node.subscribe("CV/rel_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+}
+
+///////////// Computer Vision + ROS ///////////////////
+// Callback function to be updated when the RGV is detected
+void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+{
+	// Display coords
+	//ROS_INFO("RGV A Coords: [%f, %f]", coords->data[0], coords->data[1]);
+    env.rgvAInView = true;
+	// // Check if the RGV is in view
+    // if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
+	// 	env.rgvAInView = true;
+	// }
+	// else{
+	// 	env.rgvAInView = false;
+	// }
+    
+}
+
+// Callback function to be updated when the RGV is detected
+void MissionPlanner::rgvB_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
+{
+	// Display coords
+	//ROS_INFO("RGV B Coords: [%f, %f]", coords->data[0], coords->data[1]);
+    env.rgvBInView = true;
+	// // Check if the RGV is in view
+    // if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
+	// 	env.rgvAInView = true;
+	// }
+	// else{
+	// 	env.rgvAInView = false;
+	// }
+    
 }
 
 ///////////// Phases //////////////////////
@@ -60,77 +94,77 @@ void MissionPlanner::search_phase(){
         phase = "Boundary Control";
     }
 
-    // Check to see if the CV algorithm has detected an RGV
-    else if (RGV_detected()){
+    // RGV A is detected
+    else if (env.rgvAInView){
 
-        // RGV A is detected
-        if (env.rgvAInView){
+        // Has RGV A been finely localized?
+        if (env.rgvAFineComplete){
 
-            // Has RGV A been finely localized?
-            if (env.rgvAFineComplete){
-
-                // Has RGV B been finely localized as well?
-                if (env.rgvBFineComplete){
-                    // If both RGVs have been finely localized, move to the joint phase
-                    phase = "Joint";
-                    ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
-                }
-
-                else{
-                    // If RGV A has been finely localized, but RGV B has not, keep looking for RGV B
-                    phase = "Search";
-                    ROS_INFO("RGV A has been localized, but RGV B has not. Continuing search...");
-                }
-
-            }
-
-            else if (env.rgvACoarseComplete){
-                // If RGV A has been coarsely localized, but not finely localized, move to the fine phase
-                phase = "Fine";
-                ROS_INFO("RGV A has been coarsely localized. Moving to fine phase...");
-            }
-
-            else{
-                // If RGV A has been detected but not been coarsely localized, start trailing it
-                phase = "Trail";
-                ROS_INFO("RGV A has been detected but not localized. Starting trail phase...");
-            }   
-        } 
-
-        // RGV B is detected
-        else if (env.rgvBInView){
-
-            // Has RGV B been finely localized?
+            // Has RGV B been finely localized as well?
             if (env.rgvBFineComplete){
-
-                // Has RGV A been finely localized as well?
-                if (env.rgvAFineComplete){
-                    // If both RGVs have been finely localized, move to the joint phase
-                    phase = "Joint";
-                    ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
-                }
-
-                else{
-                    // If RGV B has been finely localized, but RGV A has not, keep looking for RGV A
-                    phase = "Search";
-                    ROS_INFO("RGV B has been localized, but RGV A has not. Continuing search...");
-                }
-
-            }
-
-            else if (env.rgvBCoarseComplete){
-                // If RGV B has been coarsely localized, but not finely localized, move to the fine phase
-                phase = "Fine";
-                ROS_INFO("RGV B has been coarsely localized. Moving to fine phase...");
+                // If both RGVs have been finely localized, move to the joint phase
+                phase = "Joint";
+                joint_time_engaged = ros::Time::now();
+                ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
             }
 
             else{
-                // If RGV B has been detected but not been coarsely localized, start trailing it
-                phase = "Trail";
-                ROS_INFO("RGV B has been detected but not localized. Starting trail phase...");
-            }   
+                // If RGV A has been finely localized, but RGV B has not, keep looking for RGV B
+                phase = "Search";
+                ROS_INFO("RGV A has been localized, but RGV B has not. Continuing search...");
+            }
 
         }
+
+        else if (env.rgvACoarseComplete){
+            // If RGV A has been coarsely localized, but not finely localized, move to the fine phase
+            phase = "Fine";
+            fine_time_engaged = ros::Time::now();
+            ROS_INFO("RGV A has been coarsely localized. Moving to fine phase...");
+        }
+
+        else{
+            // If RGV A has been detected but not been coarsely localized, start trailing it
+            phase = "Trail";
+            ROS_INFO("RGV A has been detected but not localized. Starting trail phase...");
+        }   
+    } 
+
+    // RGV B is detected
+    else if (env.rgvBInView){
+
+        // Has RGV B been finely localized?
+        if (env.rgvBFineComplete){
+
+            // Has RGV A been finely localized as well?
+            if (env.rgvAFineComplete){
+                // If both RGVs have been finely localized, move to the joint phase
+                phase = "Joint";
+                joint_time_engaged = ros::Time::now();
+                ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
+            }
+
+            else{
+                // If RGV B has been finely localized, but RGV A has not, keep looking for RGV A
+                phase = "Search";
+                ROS_INFO("RGV B has been localized, but RGV A has not. Continuing search...");
+            }
+
+        }
+
+        else if (env.rgvBCoarseComplete){
+            // If RGV B has been coarsely localized, but not finely localized, move to the fine phase
+            phase = "Fine";
+            fine_time_engaged = ros::Time::now();
+            ROS_INFO("RGV B has been coarsely localized. Moving to fine phase...");
+        }
+
+        else{
+            // If RGV B has been detected but not been coarsely localized, start trailing it
+            phase = "Trail";
+            ROS_INFO("RGV B has been detected but not localized. Starting trail phase...");
+        }   
+
     }
     
     else{
@@ -142,18 +176,83 @@ void MissionPlanner::search_phase(){
 }
 
 void MissionPlanner::trail_phase(){
-    return;
+    if (out_of_bounds(drone.state)){
+        ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
+        phase = "Boundary Control";
+    }
+
+    // RGV A is detected
+    else if (env.rgvAInView){
+
+        // Is RGV A stopped?
+        if (rgvStopped()[0]) //rgvStopped returns a vector of two bools for [RGVA, RGVB]
+        {
+            // If RGV A is stopped, move to the coarse phase
+            phase = "Coarse";
+            coarse_time_engaged = ros::Time::now();
+            ROS_INFO("RGV A has stopped. Moving to coarse phase...");
+        }
+
+        else{
+            // If RGV A is not stopped, keep trailing it
+            //phase = "Trail";
+            ROS_INFO("RGV A has not stopped. Continuing trail phase...");
+        }
+    }
+
+    // RGV B is detected
+    else if(env.rgvBInView){
+
+        // Is RGV B stopped?
+        if (rgvStopped()[1]) //rgvStopped returns a vector of two bools for [RGVA, RGVB]
+        {
+            // If RGV B is stopped, move to the coarse phase
+            phase = "Coarse";
+            coarse_time_engaged = ros::Time::now();
+            ROS_INFO("RGV B has stopped. Moving to coarse phase...");
+        }
+
+        else{
+            // If RGV B is not stopped, keep trailing it
+            //phase = "Trail";
+            ROS_INFO("RGV B has not stopped. Continuing trail phase...");
+        }
+    }
+
 }
 
 void MissionPlanner::coarse_phase(){
+    if (out_of_bounds(drone.state)){
+        ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
+        phase = "Boundary Control";
+    }
+
+    // If rgv A is detected and not finely localized yet
+    else if (env.rgvAInView && !env.rgvAFineComplete){
+        // If the drone has been in the coarse phase for more than X seconds, move to the fine phase
+        if (ros::Time::now() - coarse_time_engaged > ros::Duration(drone.coarse_duration)){
+            phase = "Fine";
+            fine_time_engaged = ros::Time::now();
+            ROS_INFO("RGV A has not been localized in 10 seconds. Moving to fine phase...");
+        }
+
+        else{
+            // If the drone has not been in the coarse phase for more than 10 seconds, keep localizing
+            //phase = "Coarse";
+            ROS_INFO("RGV A has not been localized. Continuing coarse phase...");
+        }
+    }
+    else if ()
     return;
 }
 
 void MissionPlanner::fine_phase(){
+    ROS_INFO("Fine phase has been called...");
     return;
 }
 
 void MissionPlanner::joint_phase(){
+    ROS_INFO("Joint phase has been called...");
     return;
 }
 
@@ -208,7 +307,7 @@ std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) 
     if (check_waypoint_reached(drone.epsilon) == 1){
 
         // Output that the drone has reached the commanded point
-        std::cout << "Destination reached!" << std::endl;
+        //std::cout << "Destination reached!" << std::endl;
 
         // Iterate the search location tracker in the environment object
         waypoint = env.next_searchpoint();
@@ -460,22 +559,7 @@ std::vector<double> MissionPlanner::direct_locate(std::vector<double> waypoint)
     return waypoint;
 }
 
-///////////// Computer Vision + ROS ///////////////////
-// Callback function to be updated when the RGV is detected
-void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords)
-{
-	// Display coords
-	ROS_INFO("RGV Coords: [%f, %f]", coords->data[0], coords->data[1]);
 
-	// Check if the RGV is in view
-    if(coords->data[0]*10000 !=0.0 || coords->data[1]*10000 != 0.0){
-		env.rgvAInView = true;
-	}
-	else{
-		env.rgvAInView = false;
-	}
-    
-}
 
 
 ///////////// Helper Functions //////////////////////
@@ -488,7 +572,7 @@ double MissionPlanner::getYaw(std::vector<double> waypoint) {
      */
 
     //std::vector<double> v = waypoint - drone.state[0];
-    double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1]);
+    double yaw = atan2(waypoint[0] - drone.state[0], waypoint[1] - drone.state[1])*(180/M_PI)+180;
     return yaw;
 }
 
@@ -556,5 +640,19 @@ std::string MissionPlanner::getPhase(){
 
 void MissionPlanner::setPhase(std::string phaseIn){
     phase = phaseIn;
+}
+
+// Returns a vector of a bool for if both RGVs are stopped
+std::vector<bool> MissionPlanner::rgvStopped(){
+    /* Returns a vector of a bool for if both RGVs are stopped
+     * Input:  
+     *         env   - enviornment object
+     * Output: 
+     *         rgvStopped - vector of bools for [RGVA, RGVB]
+     */
+
+    std::vector<bool> rgvStopped = {true, true};
+
+    return rgvStopped;
 }
 
