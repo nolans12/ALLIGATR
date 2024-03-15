@@ -13,6 +13,7 @@ environment::environment() {
     rgvBCoarseComplete = false;
     rgvAFineComplete = false;
     rgvBFineComplete = false;
+    jointComplete = false;
 
     slt.x_cell = 0;
     slt.y_cell = 0;

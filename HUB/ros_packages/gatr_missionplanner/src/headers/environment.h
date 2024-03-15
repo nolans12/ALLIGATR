@@ -15,7 +15,7 @@ class environment {
         // RGV positions defined as [ X0, Y0, Z0, t0 ]
         std::vector<double> rgvAPosition;
         std::vector<double> rgvBPosition;
-        bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete;
+        bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete, jointComplete;
 
         // Return the current search destination
         std::vector<double> get_searchpoint();

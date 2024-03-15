@@ -83,5 +83,7 @@ class MissionPlanner {
         ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase
         ros::Time fine_time_engaged; // Time the drone started the fine localization phase
         ros::Time joint_time_engaged; // Time the drone started the joint localization phase
+        ros::Time last_rgvA_detection; // Time the last RGV-A detection was made
+        ros::Time last_rgvB_detection; // Time the last RGV-B detection was made
 
 };

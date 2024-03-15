@@ -26,16 +26,16 @@ uas::uas() {
     coarse_altitude = 35.0 * 0.3048; // 35 ft to m
     fine_altitude = 35.0 * 0.3048; // 35 ft to m
 
+    coarse_duration = 30.0; // 10 seconds
+    fine_duration = 20.0; // 10 seconds
+    joint_duration = 20.0; // 10 seconds
+    detection_duration = 2.0; // Time before the RGV is considered lost (s)
+
     p = 0;
     theta = -1.0f;
     theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
-    orbit_radius = 10.0f; // radius of the orbital path [m]
+    orbit_radius = 2.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
-    coarseATime = 0.0;
-    coarseBTime = 0.0;
-    fineATime = 0.0;
-    fineBTime = 0.0;
-    jointTime = 0.0f;
     jointComplete = false;
     status = "STANDBY";
 }
