@@ -56,7 +56,7 @@ run_node()
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
-    xterm -geometry 40x10 -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    xterm -geometry 40x10 -e "source ~/.bashrc; WID=\$(xdotool getactivewindow); xdotool windowminimize \$WID; rosrun $PKG_NAME $NODE_NAME; exec bash" &
     sleep 1
 }
 
@@ -76,7 +76,7 @@ Yaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f2)
 #run_node gatr_computer_vision ARtag_node.py
 
 #Start the Gazebo simulation
-xterm -geometry 40x10 -T "Simulation Host" -e "roslaunch gatr_missionplanner multi_rgv_stationary.launch" & 
+xterm -geometry 40x10 -T "Simulation Host" -e "WID=\$(xdotool getactivewindow); xdotool windowminimize \$WID; roslaunch gatr_missionplanner multi_rgv_stationary.launch" & 
 sleep 5
 
 #Start the ArduPilot Plugin for Software in the Loop (SITL)
@@ -84,7 +84,7 @@ xterm -geometry 80x10 -T "COMMAND PLUGIN" -e "cd ~/ardupilot/ArduCopter/ && sim_
 sleep 3
 
 #Start the MAVROS node
-xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
+xterm -geometry 40x10 -T "mavros" -e "WID=\$(xdotool getactivewindow); xdotool windowminimize \$WID; roslaunch iq_sim apm.launch && xdotool windowminimize $(xdotool getactivewindow)" &
 #xterm -e "roslaunch iq_sim apm.launch" &
 sleep 3
 

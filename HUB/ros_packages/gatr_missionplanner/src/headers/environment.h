@@ -32,6 +32,7 @@ class environment {
         struct search_location_tracker{
             int x_cell, y_cell, num_cells_x, num_cells_y, x_iter, y_iter;
             bool recently_transitioned;
+            double yaw;
         };
 
         search_location_tracker slt;

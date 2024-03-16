@@ -47,6 +47,7 @@ std::vector<double> environment::get_searchpoint() {
     searchPoint[0] = bounds[0][0] + (bounds[1][0] - bounds[0][0]) * (double(slt.x_cell) + 0.5) / double(slt.num_cells_x);
     searchPoint[1] = bounds[0][1] + (bounds[1][1] - bounds[0][1]) * (double(slt.y_cell) + 0.5) / double(slt.num_cells_y);
     searchPoint[2] = bounds[0][2]; // This is the lower bound of the z axis
+    searchPoint[3] = slt.yaw; // This is the yaw at which the search point is defined
     return searchPoint;
 }
 
@@ -59,7 +60,9 @@ std::vector<double> environment::next_searchpoint() {
     {
         // Move the y_cell component of the search location tracker
         slt.y_iter += 1;
+        int y_cell_prev = slt.y_cell;
         slt.y_cell = abs((slt.y_iter % (2*(slt.num_cells_y-1)))-(slt.num_cells_y-1));
+        slt.yaw = sign(slt.y_cell-y_cell_prev)*90 - 90;
         slt.recently_transitioned = true;
     } 
 
@@ -68,7 +71,9 @@ std::vector<double> environment::next_searchpoint() {
     {
         // Move the x_cell component of the search location tracker
         slt.x_iter += 1;
+        int x_cell_prev = slt.x_cell;
         slt.x_cell = abs((slt.x_iter % (2*(slt.num_cells_x-1)))-(slt.num_cells_x-1));
+        slt.yaw = -sign(slt.x_cell-x_cell_prev)*90;
         slt.recently_transitioned = false;
     }
 

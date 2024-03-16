@@ -437,7 +437,7 @@ std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) 
         waypoint = env.next_searchpoint();
     }
 
-    waypoint[3] = getYaw(waypoint);
+    //waypoint[3] = getYaw(waypoint);
 
     return waypoint;
 }
