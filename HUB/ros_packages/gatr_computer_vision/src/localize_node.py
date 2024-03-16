@@ -76,7 +76,7 @@ def callbackAR_A(data):
     outData.data = [relX, relY]
     out_str = "AR A"
 
-    rospy.loginfo(out_str)
+    #rospy.loginfo(out_str)
     pubCoord_A.publish(outData)       # Output estimates
     rate.sleep()
 
@@ -90,7 +90,7 @@ def callbackAR_B(data):
     outData.data = [relX, relY]
     out_str = "AR B"
 
-    rospy.loginfo(out_str)
+    #rospy.loginfo(out_str)
     pubCoord_B.publish(outData)       # Output estimates
     rate.sleep()
 
@@ -98,7 +98,7 @@ def callbackAR_B(data):
 def callbackBlob(data):
     # Echo data to the ROS node
     out_str = "Blob Data Received"
-    rospy.loginfo(out_str)
+    #rospy.loginfo(out_str)
     #pubCoord.publish(data)      # Echo data
     rate.sleep()
 

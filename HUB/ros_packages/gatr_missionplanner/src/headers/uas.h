@@ -26,6 +26,7 @@ public:
     double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step;
     double trail_altitude, coarse_altitude, fine_altitude;
     double coarse_duration, fine_duration, joint_duration, detection_duration;
+    double coarse_reset_time, fine_reset_time, joint_reset_time;
     bool jointComplete;
     std::string status;
 

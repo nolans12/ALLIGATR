@@ -26,10 +26,16 @@ uas::uas() {
     coarse_altitude = 35.0 * 0.3048; // 35 ft to m
     fine_altitude = 35.0 * 0.3048; // 35 ft to m
 
+    // Time durations for each phase before moving on to the next phase
     coarse_duration = 30.0; // 10 seconds
     fine_duration = 20.0; // 10 seconds
     joint_duration = 20.0; // 10 seconds
     detection_duration = 2.0; // Time before the RGV is considered lost (s)
+
+    // If there is no detections within these times, reset the phase timer
+    coarse_reset_time = 10.0; // 10 seconds
+    fine_reset_time = 10.0; // 10 seconds
+    joint_reset_time = 10.0; // 10 seconds
 
     p = 0;
     theta = -1.0f;

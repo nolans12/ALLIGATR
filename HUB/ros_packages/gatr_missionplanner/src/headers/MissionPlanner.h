@@ -80,9 +80,14 @@ class MissionPlanner {
         environment env;
         ros::Subscriber rel_coord_A_sub;
         ros::Subscriber rel_coord_B_sub;
+
         ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase
         ros::Time fine_time_engaged; // Time the drone started the fine localization phase
         ros::Time joint_time_engaged; // Time the drone started the joint localization phase
+
+        ros::Duration time_coarsely_localized; // Time the drone has spent in the coarse localization phase if it needs to resume it
+        ros::Duration time_finely_localized; // Time the drone has spent in the fine localization phase if it needs to resume it
+
         ros::Time last_rgvA_detection; // Time the last RGV-A detection was made
         ros::Time last_rgvB_detection; // Time the last RGV-B detection was made
 

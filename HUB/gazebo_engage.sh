@@ -56,7 +56,7 @@ run_node()
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
-    xterm -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    xterm -geometry 40x10 -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
     sleep 1
 }
 
@@ -99,9 +99,9 @@ run_node gatr_computer_vision localize_node.py Localization_Node
 
 #Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
 if [ -z "$1" ]; then
-    xterm -hold -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
 else
-    xterm -hold -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
 fi
 sleep 3
 

@@ -212,7 +212,11 @@ void MissionPlanner::coarse_phase(){
     // If rgv A is detected and not coarsely localized yet
     else if (env.rgvAInView && !env.rgvACoarseComplete){
         // If the drone has been in the coarse phase for more than X seconds, move to the fine phase
-        if (ros::Time::now() - coarse_time_engaged > ros::Duration(drone.coarse_duration)){
+        // The time_coarsely_localized variable only updates after losing the rgv
+        //ros::Time coarse_length = (ros::Time::now() - coarse_time_engaged) + time_coarsely_localized;
+        ros::Duration coarse_length = (ros::Time::now() - coarse_time_engaged) + time_coarsely_localized;
+
+        if (coarse_length > ros::Duration(drone.coarse_duration)){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             env.rgvACoarseComplete = true;
@@ -224,14 +228,16 @@ void MissionPlanner::coarse_phase(){
             //phase = "Coarse";
 
             // Output how long it has been localizing for
-            ROS_INFO("RGV A has been localized for %f seconds...", (ros::Time::now() - coarse_time_engaged).toSec());
+            ROS_INFO("RGV A has been localized for %f seconds...", coarse_length.toSec());
         }
     }
 
     // If rgv B is detected and not finely localized yet
     else if (env.rgvBInView && !env.rgvBCoarseComplete){
         // If the drone has been in the coarse phase for more than X seconds, move to the fine phase
-        if (ros::Time::now() - coarse_time_engaged > ros::Duration(drone.coarse_duration)){
+        //ros::Time coarse_length = (ros::Time::now() - coarse_time_engaged) + time_coarsely_localized;
+        ros::Duration coarse_length = (ros::Time::now() - coarse_time_engaged) + time_coarsely_localized;
+        if (coarse_length > ros::Duration(drone.coarse_duration)){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             env.rgvBCoarseComplete = true;
@@ -243,7 +249,7 @@ void MissionPlanner::coarse_phase(){
             //phase = "Coarse";
 
             // Output how long it has been localizing for
-            ROS_INFO("RGV B has been localized for %f seconds...", (ros::Time::now() - coarse_time_engaged).toSec());
+            ROS_INFO("RGV B has been localized for %f seconds...", coarse_length.toSec());
         }
     }
 
@@ -251,6 +257,15 @@ void MissionPlanner::coarse_phase(){
         // If no RGVs are detected, Search for them
         phase = "Search";
         ROS_INFO("No RGVs detected for localization, returning to search...");
+
+        // Add the duration of the coarse phase to the search phase
+        if (ros::Time::now() - last_rgvA_detection < ros::Time::now() - last_rgvB_detection){
+            time_coarsely_localized = (last_rgvA_detection - coarse_time_engaged) + time_coarsely_localized;
+        }
+        else{
+            time_coarsely_localized = (last_rgvB_detection - coarse_time_engaged) + time_coarsely_localized;
+        }
+        ROS_INFO("Time coarsely localized: %f", time_coarsely_localized.toSec());
     }
     return;
 }
@@ -264,7 +279,8 @@ void MissionPlanner::fine_phase(){
     // If rgv A is detected and not finely localized yet
     else if (env.rgvAInView && !env.rgvAFineComplete){
         // If the drone has been in the fine phase for more than X seconds, check if both have been localized
-        if (ros::Time::now() - fine_time_engaged > ros::Duration(drone.fine_duration)){
+        ros::Duration fine_length = (ros::Time::now() - fine_time_engaged) + time_finely_localized;
+        if (fine_length > ros::Duration(drone.fine_duration)){
             ROS_INFO("RGV A has not been finely localized");
             env.rgvAFineComplete = true;
 
@@ -292,7 +308,8 @@ void MissionPlanner::fine_phase(){
     // If rgv B is detected and not finely localized yet
     else if (env.rgvBInView && !env.rgvBFineComplete){
         // If the drone has been in the fine phase for more than X seconds, check if both have been localized
-        if (ros::Time::now() - fine_time_engaged > ros::Duration(drone.fine_duration)){
+        ros::Duration fine_length = (ros::Time::now() - fine_time_engaged) + time_finely_localized;
+        if (fine_length > ros::Duration(drone.fine_duration)){
             ROS_INFO("RGV B has not been finely localized");
             env.rgvBFineComplete = true;
 
@@ -321,6 +338,15 @@ void MissionPlanner::fine_phase(){
         // If no RGVs are detected, Search for them
         phase = "Search";
         ROS_INFO("No RGVs detected for localization, returning to search...");
+                // Add the duration of the coarse phase to the search phase
+
+        // Add the duration of the fine phase to the counter
+        if (ros::Time::now() - last_rgvA_detection < ros::Time::now() - last_rgvB_detection){
+            time_finely_localized = (last_rgvA_detection - fine_time_engaged) + time_finely_localized;
+        }
+        else{
+            time_finely_localized = (last_rgvB_detection - fine_time_engaged) + time_finely_localized;
+        }
     }
     return;
 }
@@ -331,6 +357,10 @@ void MissionPlanner::joint_phase(){
         phase = "Boundary Control";
     }
 
+    else if (!env.rgvAInView || !env.rgvBInView){
+        // If either rgvs are not in view, reset the joint phase timer
+        joint_time_engaged = ros::Time::now();
+    }
     // If the drone has been in the joint phase for more than X seconds, return to home
     else if (ros::Time::now() - joint_time_engaged > ros::Duration(drone.joint_duration)){
         env.jointComplete = true;
@@ -338,15 +368,15 @@ void MissionPlanner::joint_phase(){
         ROS_INFO("Joint phase has been completed. Returning to home...");
     }
 
-    else{
-        // If the drone lost one or both of the RGVs, return to the search phase
-        if (!env.rgvAInView || !env.rgvBInView){
-            phase = "Search";
-            ROS_INFO("One or both RGVs have been lost. Returning to search...");
-        }
-            // Output how long it has been in the joint phase
-            ROS_INFO("Joint phase has been engaged for %f seconds...", (ros::Time::now() - joint_time_engaged).toSec());
-    }
+    // else{
+    //     // If the drone lost one or both of the RGVs, return to the search phase
+    //     if (!env.rgvAInView || !env.rgvBInView){
+    //         phase = "Search";
+    //         ROS_INFO("One or both RGVs have been lost. Returning to search...");
+    //     }
+    //         // Output how long it has been in the joint phase
+    //         ROS_INFO("Joint phase has been engaged for %f seconds...", (ros::Time::now() - joint_time_engaged).toSec());
+    // }
     return;
 }
 
@@ -602,28 +632,44 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     double midpoint[2] = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2};
     double width, desiredHeight, yaw;
 
-    if (env.rgvAInView && env.rgvBInView) {
-        // if both RGVs are in view, optimize z height
-        width = norm((rgvAPos.begin(), rgvAPos.end()-1) - (rgvBPos.begin(), rgvBPos.end()-1)) / 2.0 + drone.fovWide*0.1;
-        desiredHeight = width / tan(drone.fovWide*M_PI/360.0);
-        if (desiredHeight < env.bounds[1][2]) {
-            desiredHeight = env.bounds[1][2];
-        }
+    // if both RGVs are in view, optimize z height
+    width = norm({rgvAPos[0] - rgvBPos[0], rgvAPos[1] - rgvBPos[1]}) / 2.0 + drone.fovWide*0.1;
+    desiredHeight = width / tan(drone.fovWide*M_PI/360.0);
+    if (desiredHeight < env.bounds[1][2]) {
+        desiredHeight = env.bounds[1][2];
+    }
 
-        if (rgvAPos[1] < rgvBPos[1]) {
-            v1 = {rgvAPos[0]-rgvBPos[0], rgvAPos[1]-rgvBPos[1], 0};
-        }
-        else {
-            v1 = {rgvBPos[0]-rgvAPos[0], rgvBPos[1]-rgvAPos[1], 0};
-        }
-        v2 = {1, 0, 0};
-        yaw = atan2(norm(cross(v1,v2)), dot(v1,v2)) - M_PI;
-
-        waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, desiredHeight, yaw};
+    if (rgvAPos[1] < rgvBPos[1]) {
+        v1 = {rgvAPos[0]-rgvBPos[0], rgvAPos[1]-rgvBPos[1], 0};
     }
     else {
-        waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, env.bounds[1][2], waypoint[3]};
+        v1 = {rgvBPos[0]-rgvAPos[0], rgvBPos[1]-rgvAPos[1], 0};
     }
+    v2 = {1, 0, 0};
+    yaw = (atan2(norm(cross(v1,v2)), dot(v1,v2)) - M_PI)*(180/M_PI);
+    waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, desiredHeight, yaw};
+
+    // if (env.rgvAInView && env.rgvBInView) {
+    //     // if both RGVs are in view, optimize z height
+    //     width = norm((rgvAPos.begin(), rgvAPos.end()-1) - (rgvBPos.begin(), rgvBPos.end()-1)) / 2.0 + drone.fovWide*0.1;
+    //     desiredHeight = width / tan(drone.fovWide*M_PI/360.0);
+    //     if (desiredHeight < env.bounds[1][2]) {
+    //         desiredHeight = env.bounds[1][2];
+    //     }
+
+    //     if (rgvAPos[1] < rgvBPos[1]) {
+    //         v1 = {rgvAPos[0]-rgvBPos[0], rgvAPos[1]-rgvBPos[1], 0};
+    //     }
+    //     else {
+    //         v1 = {rgvBPos[0]-rgvAPos[0], rgvBPos[1]-rgvAPos[1], 0};
+    //     }
+    //     v2 = {1, 0, 0};
+    //     yaw = (atan2(norm(cross(v1,v2)), dot(v1,v2)) - M_PI)*(180/M_PI);
+    //     waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, desiredHeight, yaw};
+    // }
+    // else {
+    //     waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, env.bounds[1][2], waypoint[3]};
+    // }
 
     return waypoint;
 }
@@ -710,6 +756,14 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
     {
         if (ros::Time::now() - last_rgvB_detection > ros::Duration(drone.detection_duration)){
             env.rgvBInView = false;
+        }
+    }
+
+    // Reset the time in localization timers if it has been too long since an RGV was seen
+    if (time_coarsely_localized > ros::Duration(0.0)) {
+        // check if the time since the last RGV was seen is greater than the coarse duration
+        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.coarse_reset_time) && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.fine_reset_time)){
+            time_coarsely_localized = ros::Duration(0.0);
         }
     }
 }
