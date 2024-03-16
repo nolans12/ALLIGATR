@@ -55,24 +55,6 @@ fi
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
 
-run_node()
-{
-    PKG_NAME=$1
-    NODE_NAME=$2
-    NODE_TITLE=$3
-
-    # Make sure the node being ran is an executable
-    cd ${CURRENT_DIR}/ros_packages/${PKG_NAME}
-    chmod +x scripts/${NODE_NAME}
-    chmod +x src/${NODE_NAME}
-    cd ${CURRENT_DIR}
-
-    # Launch the XTERM terminal and run the ROS node
-    # Make copies of this line of code for any additional nodes
-    xterm -T $NODE_TITLE -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
-    sleep 1
-}
-
 #Opens a roscore terminal. If one already exists, it will close itself
 # xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
 # sleep 2
@@ -83,16 +65,16 @@ if [ -z "$1" ]; then
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     
 else
-
     # Define the remote ROS master URI
-    REMOTE_ROS_MASTER_URI="http://$1:11311"
+    REMOTE_ROS_MASTER_URI="http://$1:11311/"
+    echo "ATTEMPTING TO CONNECT TO REMOTE ROSCORE AT $REMOTE_ROS_MASTER_URI"
 
     # Export the remote ROS master URI
     export ROS_MASTER_URI=$REMOTE_ROS_MASTER_URI
 
     # Attempt to connect to the remote ROS master
     # Here we use rostopic list as a method to check connectivity. Adjust the timeout as needed.
-    if timeout 3 rostopic list -v; then
+    if timeout 6 rostopic list -v; then
         echo "Successfully connected to the remote ROS master at $ROS_MASTER_URI."
     else
         echo "Failed to connect to the remote ROS master. Starting a local roscore."
@@ -117,6 +99,24 @@ else
     fi
 fi
 
+run_node()
+{
+    PKG_NAME=$1
+    NODE_NAME=$2
+    NODE_TITLE=$3
+
+    # Make sure the node being ran is an executable
+    cd ${CURRENT_DIR}/ros_packages/${PKG_NAME}
+    chmod +x scripts/${NODE_NAME}
+    chmod +x src/${NODE_NAME}
+    cd ${CURRENT_DIR}
+
+    # Launch the XTERM terminal and run the ROS node
+    # Make copies of this line of code for any additional nodes
+    xterm -T $NODE_TITLE -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    sleep 1
+}
+
 
 ################### ADD PROCESSES HERE ######################
 # Goes in the form of run_node <package_name> <node_name> <node_title>
@@ -125,13 +125,13 @@ fi
 #run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
 
 # AR Detection Node
-#run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
+run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
 # Localization Node
-#run_node gatr_computer_vision localize_node.py Localize_Node
+run_node gatr_computer_vision localize_node.py Localize_Node
 
 # Mision Planner Node
-run_node gatr_missionplanner mp_node Mission_Planner_Node
+#run_node gatr_missionplanner mp_node Mission_Planner_Node
 
 # Start the MAVLINK connection to cube, opening on ttyTHS1 port
 #xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  

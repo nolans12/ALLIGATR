@@ -6,18 +6,16 @@
 
 class environment {
     public:
-        //float time, timeStep;
+        environment();
+        environment(std::vector<std::vector<double>> boundsIn);
 
         // Bounds defined as [ [Xmin, Ymin, Zmin], [Xmax, Ymax, Zmax]]
-        std::vector<std::vector<float>> bounds;
+        std::vector<std::vector<double>> bounds;
 
-        // RGV positions defined as [X, Y, Z]
+        // RGV positions defined as [ X0, Y0, Z0, t0 ]
         std::vector<double> rgvAPosition;
         std::vector<double> rgvBPosition;
-        bool rgvAInView, rgvBInView;
-
-        environment();
-        environment(std::vector<std::vector<float>> boundsIn);
+        bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete, jointComplete;
 
         // Return the current search destination
         std::vector<double> get_searchpoint();
@@ -37,4 +35,6 @@ class environment {
         };
 
         search_location_tracker slt;
+
+        
 };

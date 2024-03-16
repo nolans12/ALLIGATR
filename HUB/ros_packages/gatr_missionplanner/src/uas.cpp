@@ -2,41 +2,47 @@
 //#include "headers/pathStep.h"
 
 uas::uas() {
-    /*  epsilon       -  allowable positional error, used in reachedPoint [ft]
-     *  state         -  1x4 array containing current uas position and heading[ft]
-     *  pathRoot      -  points to the root of pathStep linked list where each node has a 1x3 array of the commanded point [ft]
-     *  pathNow       -  points to the most recent entry of the pathStep linked list
+    /*  state         -  1x4 double vector containing current uas position [ft] and yaw
+     *  epsilon       -  allowable positional error, used in reachedPoint [ft]
      *  fovNarrow     -  narrow FOV of the camera [deg]
      *  fovWide       -  wide FOV of the camera [deg]
-     *  p             -  keeps track of search iteration, used in SearchPath
      *  theta         -  keeps track of orbiting flight path iteration, used in coarsePath [deg]
      *  thetaJoint    -  keeps track of angle for joint phase
+     *  courseATime   -  tracks how much time has been spent collecting data on RGV-A in coarse phase [s]
+     *  courseBTime   -  tracks how much time has been spent collecting data on RGV-B in coarse phase [s]
+     *  fineATime     -  tracks how much time has been spent collecting data on RGV-A in fine phase [s]
+     *  fineBTime     -  tracks how much time has been spent collecting data on RGV-B in fine phase [s]
      *  jointTime     -  tracks how much time has been spent collecting data in joint phase [s]
-     *  jointComplete -  boolean holding whether the joint phase has been completed or not
-     *  phaseRoot     -  points to the root of phaseStep linked list where each node has the time [s] and a string of the phase
-     *  phaseNow      -  points to the most recent entry of the phaseStep linked list
-     *  status        -  holds the current phase of the mission string (may be redundant with phaseNow - track in further implementation)
+     *  status        -  holds the current phase of the mission string (may be redundant with phase - track in further implementation)
      */
-    epsilon = 3;
+    epsilon = 10;
     state = {0., 0., 0., 0.};
     dest = {0., 0., 0., 0.};
-    // pathRoot = new pathStep;
-    // pathNow = pathRoot;
-    // pathRoot->path[0] = 0.;
-    // pathRoot->path[1] = 0.;
-    // pathRoot->path[2] = 0.;
     fovNarrow = 67;
     fovWide = 102;
 
+    // Can change this to be anything in bounds
+    trail_altitude = 35.0 * 0.3048; // 35 ft to m
+    coarse_altitude = 35.0 * 0.3048; // 35 ft to m
+    fine_altitude = 35.0 * 0.3048; // 35 ft to m
+
+    // Time durations for each phase before moving on to the next phase
+    coarse_duration = 30.0; // 10 seconds
+    fine_duration = 20.0; // 10 seconds
+    joint_duration = 20.0; // 10 seconds
+    detection_duration = 2.0; // Time before the RGV is considered lost (s)
+
+    // If there is no detections within these times, reset the phase timer
+    coarse_reset_time = 10.0; // 10 seconds
+    fine_reset_time = 10.0; // 10 seconds
+    joint_reset_time = 10.0; // 10 seconds
+
     p = 0;
     theta = -1.0f;
-    thetaJoint = 0.0f;
-    jointTime = 0.0f;
+    theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
+    orbit_radius = 2.0f; // radius of the orbital path [m]
+    //thetaJoint = 0.0f;
     jointComplete = false;
-    // phaseRoot = new phaseStep;
-    // phaseNow = phaseRoot;
-    // phaseRoot->time = 0.;
-    // phaseRoot->phase = "Takeoff";
     status = "STANDBY";
 }
 

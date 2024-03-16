@@ -16,6 +16,7 @@
 #include <math.h>
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/String.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>

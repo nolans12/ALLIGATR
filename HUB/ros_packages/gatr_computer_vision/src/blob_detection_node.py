@@ -7,13 +7,18 @@ from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 import numpy as np
 
+# Import libraries to publish ROS image
+from sensor_msgs.msg import Image       # Image is the message type
+from cv_bridge import CvBridge          # Package to convert between ROS and OpenCV Images
+
 # Meta data
-BUFFERSIZE = 5      # 5 Frames for the image buffer
+BUFFERSIZE = 5      # 5 Frames for the image buffer, blob every 5 frames
 
 # Clear the buffer in the video stream object
 def clearBuffer(cap, bufferSize):
     for i in range(bufferSize):
         cap.read()
+        # Save the image here
 
 # A function to fix HSV range
 def fixHSVRange(h, s, v):

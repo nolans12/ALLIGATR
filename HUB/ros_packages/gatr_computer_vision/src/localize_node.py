@@ -3,32 +3,38 @@
 # This node will pull AR tag estimates and the altitude of the drone and return the relative localization measurements in meters
 import rospy
 import numpy as np
-from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Float32MultiArray
 
 # Global current state variables
-AR_CORNERS = [0, 0, 0, 0, 0, 0, 0, 0]
+AR_CORNERS_A = Int32MultiArray()
+AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
+
+AR_CORNERS_B = Int32MultiArray()
+AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
+
 BLOB_CENTROID = [0, 0]
 THETA = 0
 PHI = 0
-ALTITUDE = 30                           # Assume we localize at 30 ft
+ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
 
-# Global Meta Data
-AR_LENGTH = 0.15875                     # AR Tag length in meters
+# Global Data
+#AR_LENGTH = 0.15875                     # AR Tag length in meters
+AR_LENGTH = 0.2496                       # Gazebo sim value
 XPIXELS = 1920
 YPIXELS = 1080
 
 # Localization function
-def localize():
+def localize(ARCorners):
     # Define the center of the image
     cx = XPIXELS / 2
     cy = YPIXELS / 2
 
     # Get the centroid coordinates of the AR tag and the corners
-    topLeft = AR_CORNERS[0:1]
-    topRight = AR_CORNERS[2:3]
-    bottomRight = AR_CORNERS[4:5]
-    bottomLeft = AR_CORNERS[6:7]
+    topLeft = (ARCorners.data[0], ARCorners.data[1])
+    topRight = (ARCorners.data[2], ARCorners.data[3])
+    bottomRight = (ARCorners.data[4], ARCorners.data[5])
+    bottomLeft = (ARCorners.data[6], ARCorners.data[7])
 
     # Centroid
     xf = (topLeft[0] + bottomRight[0]) / 2
@@ -61,18 +67,39 @@ def localize():
     return relX, relY
 
 # Callback function that will execute whenever data is received
-def callbackAR(data):
+def callbackAR_A(data):
     # Echo data to the ROS node
-    out_str = "AR Data Received"
-    rospy.loginfo(out_str)
-    pubCoord.publish(data)      # Echo data
+    outData = Float32MultiArray()
+    AR_CORNERS_A = data               # Update AR Tag corner estimate
+
+    relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
+    outData.data = [relX, relY]
+    out_str = "AR A"
+
+    #rospy.loginfo(out_str)
+    pubCoord_A.publish(outData)       # Output estimates
     rate.sleep()
+
+# RGV B callback
+def callbackAR_B(data):
+    # Echo data to the ROS node
+    outData = Float32MultiArray()
+    AR_CORNERS_B = data               # Update AR Tag corner estimate
+
+    relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
+    outData.data = [relX, relY]
+    out_str = "AR B"
+
+    #rospy.loginfo(out_str)
+    pubCoord_B.publish(outData)       # Output estimates
+    rate.sleep()
+
 
 def callbackBlob(data):
     # Echo data to the ROS node
     out_str = "Blob Data Received"
-    rospy.loginfo(out_str)
-    pubCoord.publish(data)      # Echo data
+    #rospy.loginfo(out_str)
+    #pubCoord.publish(data)      # Echo data
     rate.sleep()
 
 
@@ -86,11 +113,13 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord = rospy.Publisher('rel_coord', Int32MultiArray, queue_size=10)
+    pubCoord_A = rospy.Publisher('CV/rel_coord_A', Float32MultiArray, queue_size=1)
+    pubCoord_B = rospy.Publisher('CV/rel_coord_B', Float32MultiArray, queue_size=1)
 
     ################## Subscriber Definitions ###########################
-    subCorners = rospy.Subscriber('AR_corners', Int32MultiArray, callbackAR)
-    subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
+    subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
+    subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
+    #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     #subIMU = rospy.Subscriber('MAVROS/Something, Int32MultiArray, callbackIMU)
 
     ####################################################################

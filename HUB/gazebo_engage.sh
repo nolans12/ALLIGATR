@@ -34,6 +34,12 @@ cd ~/catkin_ws
 # catkin_make
 catkin build
 
+# If the build failed, exit the script
+if [ $? -ne 0 ]; then
+    echo "Build failed!"
+    exit 1
+fi
+
 source devel/setup.bash
 cd ${CURRENT_DIR} #Go back to the build directory
 
@@ -50,7 +56,7 @@ run_node()
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
-    xterm -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    xterm -geometry 40x10 -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
     sleep 1
 }
 
@@ -83,15 +89,19 @@ xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
 sleep 3
 
 #Start the Camera Viewer node
-xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_view image:=/webcam/image_raw/compressed" &
+#xterm -geometry 40x10 -T "Camera Viewer" -e "rosrun rqt_image_view rqt_image_view image:=/webcam/image_raw/compressed" &
 #xterm -e "roslaunch iq_sim apm.launch" &
-sleep 3
+#sleep 3
+
+run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
+
+run_node gatr_computer_vision localize_node.py Localization_Node
 
 #Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
 if [ -z "$1" ]; then
-    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &
 else
-    xterm -geometry 80x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node $1" &
 fi
 sleep 3
 
