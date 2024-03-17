@@ -51,6 +51,7 @@ class MissionPlanner {
 
         /////////// Return to Ground Station //////////////
         std::vector<double> go_home_motion(std::vector<double> waypoint);
+        void go_home_phase();
 
         /////////// Computer Vision + ROS ///////////////////
         void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
