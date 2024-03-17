@@ -25,10 +25,13 @@ public:
     std::vector<double> dest;
     double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step;
     double trail_altitude, coarse_altitude, fine_altitude;
-    double coarse_duration, fine_duration, joint_duration, detection_duration;
+    double coarse_duration, fine_duration, joint_duration, detection_duration, boundary_duration, search_point_duration;
     double coarse_reset_time, fine_reset_time, joint_reset_time;
     bool jointComplete;
     std::string status;
+
+    int time_history_average; // Number of time steps to average for RGV position
+    double estimate_std; // Standard deviation of the RGV position estimate to accept stationary RGV condition
 
     unsigned short int p; //Used only in the bounds trace mode
 

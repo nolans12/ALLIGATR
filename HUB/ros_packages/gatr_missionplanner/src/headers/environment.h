@@ -17,6 +17,17 @@ class environment {
         std::vector<double> rgvBPosition;
         bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete, jointComplete;
 
+        // Sampling averager to determine if the RGV is stopped and get average position
+        struct history{
+            std::vector<double> x_pos;
+            std::vector<double> y_pos;
+            std::vector<double> time;
+        };
+
+        history rgvAHistory;
+        history rgvBHistory;
+
+
         // Return the current search destination
         std::vector<double> get_searchpoint();
 

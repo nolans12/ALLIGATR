@@ -82,3 +82,13 @@ double norm(std::vector<double> const &a) {
     }
     return pow(sum, 0.5);
 }
+
+double standard_deviation(const std::vector<double>& v) {
+    double sum = std::accumulate(v.begin(), v.end(), 0.0);
+    double mean = sum / v.size();
+
+    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
+    double std_dev = std::sqrt(sq_sum / v.size() - mean * mean);
+
+    return std_dev;
+}

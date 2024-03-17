@@ -95,7 +95,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name="jackal">
+    <!-- <model name="jackal">
       <include>
         <uri>model://jackal</uri>
       </include>
@@ -107,7 +107,7 @@
         <uri>model://jackal_2</uri>
       </include>
       <pose> 35 -27 0 0 0 30</pose>
-    </model>
+    </model> -->
 
     <model name="gatr_drone">
       <include>

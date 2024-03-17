@@ -4,6 +4,7 @@
 #include <math.h>
 #include <cmath>
 #include <vector>
+#include <numeric>
 //#include <eigen3/Eigen/Dense>
 
 // Helper functions
@@ -22,3 +23,5 @@ std::vector<double> cross(std::vector<double> const &a, std::vector<double> cons
 double dot(std::vector<double> const &a, std::vector<double> const &b);
 
 double norm(std::vector<double> const &a);
+
+double standard_deviation(std::vector<double> const &a);

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="jackal">
-    <static>true</static>
+    <static>false</static>
     <link name="link">
       <inertial>
         <pose>0 0 0.0714375 0 0 0</pose>
@@ -16,6 +16,13 @@
           <izz>0.1248075</izz>
         </inertia>
       </inertial>
+      <collision name='collision'>
+        <geometry>
+          <box>
+            <size>.4 .2 .1</size>
+          </box>
+        </geometry>
+      </collision>
       <visual name="visual">
         <geometry>
           <mesh>

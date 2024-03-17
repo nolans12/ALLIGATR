@@ -6,11 +6,13 @@
 #include <iomanip>
 #include <math.h>
 #include <iostream>
+#include <fstream>
 
 class MissionPlanner {
     public:
         MissionPlanner();
         MissionPlanner(ros::NodeHandle gnc_node);
+        ~MissionPlanner();
 
         // Deteremines the phase
         void determine_phase();
@@ -85,11 +87,18 @@ class MissionPlanner {
         ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase
         ros::Time fine_time_engaged; // Time the drone started the fine localization phase
         ros::Time joint_time_engaged; // Time the drone started the joint localization phase
+        ros::Time out_of_bounds_time; // Time the drone went out of bounds
+        ros::Time search_point_time; // Time the drone started a given target in the search phase. Used to remove an error where the drone would get stuck at a search point
 
         ros::Duration time_coarsely_localized; // Time the drone has spent in the coarse localization phase if it needs to resume it
         ros::Duration time_finely_localized; // Time the drone has spent in the fine localization phase if it needs to resume it
+        ros::Duration time_joint_localized; // Time the drone has spent in the joint localization phase if it needs to resume it
 
         ros::Time last_rgvA_detection; // Time the last RGV-A detection was made
         ros::Time last_rgvB_detection; // Time the last RGV-B detection was made
 
+        // CSV file to store RGV positions
+        std::ofstream rgvA_csv;
+        std::ofstream rgvB_csv;
 };
+
