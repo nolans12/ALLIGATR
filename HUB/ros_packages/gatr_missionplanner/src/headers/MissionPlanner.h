@@ -49,6 +49,9 @@ class MissionPlanner {
         std::vector<double> joint_motion(std::vector<double> waypoint);
         void joint_phase();
 
+        /////////// Return to Ground Station //////////////
+        std::vector<double> go_home_motion(std::vector<double> waypoint);
+
         /////////// Computer Vision + ROS ///////////////////
         void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
         void rgvB_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
