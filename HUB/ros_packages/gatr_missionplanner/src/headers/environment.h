@@ -15,6 +15,8 @@ class environment {
         // RGV positions defined as [ X0, Y0, Z0, t0 ]
         std::vector<double> rgvAPosition;
         std::vector<double> rgvBPosition;
+        // homePosition is ground station location [X, Y]
+        std::vector<double> homePosition;
         bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete, jointComplete;
 
         // Sampling averager to determine if the RGV is stopped and get average position
