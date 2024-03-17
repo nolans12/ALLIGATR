@@ -105,6 +105,8 @@ void MissionPlanner::determine_phase(){
         fine_phase();
     } else if (phase == "Joint") {
         joint_phase();
+    } else if (phase == "Go Home") {
+        go_home_phase();
     } else if (phase == "ABORT") {
         ROS_INFO("Landing drone...");
     }
@@ -449,7 +451,7 @@ void MissionPlanner::joint_phase(){
     // If the drone has been in the joint phase for more than X seconds, return to home
     else if (joint_length > ros::Duration(drone.joint_duration)){
         env.jointComplete = true;
-        phase = "ABORT";
+        phase = "Go Home";
         ROS_INFO("Joint phase has been completed. Returning to home...");
     }
 
@@ -470,6 +472,12 @@ void MissionPlanner::joint_phase(){
     return;
 }
 
+void MissionPlanner::go_home_phase() {
+    if (check_waypoint_reached(drone.epsilon)) {
+        phase = "ABORT";
+    }
+}
+
 ///////////// Motions //////////////////////
 std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoint){
     if (phase == "Boundary Control") {
@@ -484,6 +492,8 @@ std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoin
         return fine_motion(waypoint);
     } else if (phase == "Joint") {
         return joint_motion(waypoint);
+    } else if (phase == "Go Home") {
+        return go_home_motion(waypoint);
     } else if (phase == "ABORT") {
         ROS_INFO("Landing drone...");
         land();
@@ -763,6 +773,18 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     //     waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, env.bounds[1][2], waypoint[3]};
     // }
 
+    return waypoint;
+}
+
+std::vector<double> go_home_motion(std::vector<double> waypoint) {
+    /* Goes to x,y position of ground station with z level of minimum bound height
+     * Input:
+     *         waypoint - 1x4 double vector of previously commanded point & yaw
+     * Output:
+     *         waypoint - 1x4 double vector of commanded point & yaw
+     */
+    waypoint = {env.homePosition[0], env.homePosition[1], env.bounds[0][2]+5.0, waypoint[3]};
+    waypoint[3] = getYaw(waypoint);
     return waypoint;
 }
 
