@@ -5,6 +5,7 @@ import rospy
 import numpy as np
 from std_msgs.msg import Int32MultiArray
 from std_msgs.msg import Float32MultiArray
+from geometry_msgs.msg import PoseStamped
 
 # Global current state variables
 AR_CORNERS_A = Int32MultiArray()
@@ -13,16 +14,36 @@ AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
 AR_CORNERS_B = Int32MultiArray()
 AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
-BLOB_CENTROID = [0, 0]
+# Drone State
 THETA = 0
 PHI = 0
+PSI = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
+EDRONE = 0
+NDRONE = 0
 
 # Global Data
 #AR_LENGTH = 0.15875                     # AR Tag length in meters
 AR_LENGTH = 0.2496                       # Gazebo sim value
 XPIXELS = 1920
 YPIXELS = 1080
+
+
+def inertLocalize(relX, relY):
+    # Set the bearing
+    p = PSI
+
+    # Rotate the relative measurements into the ENU frame
+    Erel = np.cos(p) * relX + np.sin(p) * relY
+    Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
+
+    # Calculate the RGV inertial position in the ENU frame
+    ERGV = EDRONE + Erel
+    NRGV = NDRONE + Nrel
+
+    return ERGV, NRGV
+
+
 
 # Localization function
 def localize(ARCorners):
@@ -73,7 +94,8 @@ def callbackAR_A(data):
     AR_CORNERS_A = data               # Update AR Tag corner estimate
 
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
-    outData.data = [relX, relY]
+    RGVX, RGVY = inertLocalize(relX, relY)
+    outData.data = [RGVX, RGVY]
     out_str = "AR A"
 
     #rospy.loginfo(out_str)
@@ -87,7 +109,8 @@ def callbackAR_B(data):
     AR_CORNERS_B = data               # Update AR Tag corner estimate
 
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
-    outData.data = [relX, relY]
+    RGVX, RGVY = inertLocalize(relX, relY)
+    outData.data = [RGVX, RGVY]
     out_str = "AR B"
 
     #rospy.loginfo(out_str)
@@ -101,6 +124,16 @@ def callbackBlob(data):
     #rospy.loginfo(out_str)
     #pubCoord.publish(data)      # Echo data
     rate.sleep()
+
+
+def pose_callback(data):
+    # Get the pose data
+    x = data.pose.position.x
+    y = data.pose.position.y
+    z = data.pose.position.z
+
+    
+    rospy.loginfo("Position - x: {}, y: {}, z: {}".format(x, y, z))
 
 
 if __name__ == '__main__': # <- Executable 
@@ -120,7 +153,7 @@ if __name__ == '__main__': # <- Executable
     subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
     subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
     #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
-    #subIMU = rospy.Subscriber('MAVROS/Something, Int32MultiArray, callbackIMU)
+    subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
