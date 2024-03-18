@@ -49,6 +49,10 @@ class MissionPlanner {
         std::vector<double> joint_motion(std::vector<double> waypoint);
         void joint_phase();
 
+        /////////// Return Home ////////////////////////
+        std::vector<double> return_home_motion(std::vector<double> waypoint);
+        void return_home_phase();
+
         /////////// Computer Vision + ROS ///////////////////
         void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
         void rgvB_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
@@ -70,7 +74,9 @@ class MissionPlanner {
 
         bool isRGVAClosest();
 
-        std::vector<bool> rgvStopped();
+        // Check if the drone has stopped moving
+        bool rgvAStopped();
+        bool rgvBStopped();
 
         std::string getPhase();
         void setPhase(std::string phaseIn);
@@ -89,6 +95,7 @@ class MissionPlanner {
         ros::Time joint_time_engaged; // Time the drone started the joint localization phase
         ros::Time out_of_bounds_time; // Time the drone went out of bounds
         ros::Time search_point_time; // Time the drone started a given target in the search phase. Used to remove an error where the drone would get stuck at a search point
+        ros::Time joint_last_detection; // Time the last RGV detection was made in the joint phase
 
         ros::Duration time_coarsely_localized; // Time the drone has spent in the coarse localization phase if it needs to resume it
         ros::Duration time_finely_localized; // Time the drone has spent in the fine localization phase if it needs to resume it
@@ -100,5 +107,8 @@ class MissionPlanner {
         // CSV file to store RGV positions
         std::ofstream rgvA_csv;
         std::ofstream rgvB_csv;
+        std::ofstream uas_csv;
+        std::ofstream uas_csv_rgvA;
+        std::ofstream uas_csv_rgvB;
 };
 

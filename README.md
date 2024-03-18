@@ -13,6 +13,7 @@ Repo for code that will run on the Jetson Nano
 -Ubuntu 18.04, 
 
 -Xterm, Install with `sudo apt update` then `sudo apt-get install xterm`. This is used to open up new kernals that will run the ROS packages seperately.
+-xdtools, `sudo apt-get install xdotool` This is used for minimizing windows in development.
 
 -ArduPilot and MavProxy, https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/Installing_Ardupilot.md
 

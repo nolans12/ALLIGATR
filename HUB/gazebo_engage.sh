@@ -95,7 +95,7 @@ sleep 3
 
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
-run_node gatr_computer_vision localize_node_perfect.py Localization_Node
+run_node gatr_computer_vision localize_node.py Localization_Node
 
 run_node gatr_missionplanner move_jackals_node.py Move_Jackals_Node
 

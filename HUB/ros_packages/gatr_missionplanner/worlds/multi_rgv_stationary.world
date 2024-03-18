@@ -4,6 +4,7 @@
     <gui>
       <camera name="user_camera">
         <pose>22.68 -22.68 80 0 1.57 0</pose>
+        <projection_type>orthographic</projection_type>
       </camera>
     </gui>
     <physics type="ode">
@@ -24,7 +25,7 @@
       <max_step_size>0.0010</max_step_size>
     </physics>
 
-    <scene>
+    <!-- <scene>
       <sky>
         <clouds>
           <speed>12</speed>
@@ -32,7 +33,7 @@
       </sky>
       <ambient>0.4 0.4 0.4 1</ambient>
       <background>0.25 0.25 0.25 1</background>
-    </scene>
+    </scene> -->
 
 
     <model name="ground_plane">

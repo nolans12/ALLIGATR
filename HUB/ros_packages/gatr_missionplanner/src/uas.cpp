@@ -18,6 +18,7 @@ uas::uas() {
     epsilon = 10;
     state = {0., 0., 0., 0.};
     dest = {0., 0., 0., 0.};
+    home = {0.0, 0.0};
 
     // Camera field of view
     fovNarrow = 47;
@@ -25,7 +26,7 @@ uas::uas() {
 
     // Averaging parameters for estimating RGV position
     time_history_average = 10;
-    estimate_std = 0.5;
+    stopped_threshold = 0.1;
 
     // Can change this to be anything in bounds
     trail_altitude = 35.0 * 0.3048; // 35 ft to m
@@ -39,6 +40,7 @@ uas::uas() {
     detection_duration = 2.0; // Time before the RGV is considered lost (s)
     boundary_duration = 5.0; // Time before the UAS aborts when out of bounds (s)
     search_point_duration = 30.0; // Time before the UAS moves on from a search point if it still hasn't reached it(s)
+    joint_detection_duration = 15.0; // Time before the UAS aborts when the RGVs are lost in the joint phase (s)
 
     // If there is no detections within these times, reset the phase timer
     coarse_reset_time = 10.0; // 10 seconds

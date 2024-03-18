@@ -26,7 +26,13 @@ def callback(data):
     # Display image
     outImage = aruco_display(corners_msg_A, img)
     outImage = aruco_display(corners_msg_B, outImage)
-    cv2.imshow("camera", outImage)    # Comment this line out for headless detection
+    # Resize the image
+    scale_percent = 50  # percent of original size
+    width = int(outImage.shape[1] * scale_percent / 100)
+    height = int(outImage.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    resized = cv2.resize(outImage, dim, interpolation = cv2.INTER_AREA)
+    cv2.imshow("camera", resized)    # Comment this line out for headless detection
 
     # Publish if they are detected
     if corners_msg_A.data[0]:
