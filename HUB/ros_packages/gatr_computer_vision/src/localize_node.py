@@ -97,7 +97,7 @@ def callbackAR_A(data):
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
     RGVX, RGVY = inertLocalize(relX, relY)
     outData.data = [RGVX, RGVY]
-    out_str = "AR A"
+    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_A.publish(outData)       # Output estimates
@@ -112,7 +112,7 @@ def callbackAR_B(data):
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
     RGVX, RGVY = inertLocalize(relX, relY)
     outData.data = [RGVX, RGVY]
-    out_str = "AR B"
+    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_B.publish(outData)       # Output estimates
@@ -145,7 +145,7 @@ def pose_callback(data):
     ALTITUDE = z
 
     # Output the x, y, z position
-    rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}, Pitch: {}, Roll: {}".format(x, y, z, YAW, PITCH, ROLL))
+    #rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}, Pitch: {}, Roll: {}".format(x, y, z, YAW, PITCH, ROLL))
 
 
 if __name__ == '__main__': # <- Executable 
@@ -158,8 +158,8 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord_A = rospy.Publisher('CV/rel_coord_A', Float32MultiArray, queue_size=1)
-    pubCoord_B = rospy.Publisher('CV/rel_coord_B', Float32MultiArray, queue_size=1)
+    pubCoord_A = rospy.Publisher('CV/inert_coord_A', Float32MultiArray, queue_size=1)
+    pubCoord_B = rospy.Publisher('CV/inert_coord_B', Float32MultiArray, queue_size=1)
 
     ################## Subscriber Definitions ###########################
     subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
