@@ -47,7 +47,7 @@ def inertLocalize(relX, relY):
     XRGV = DRONEX + Erel
     YRGV = DRONEY + Nrel
 
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, ALTITUDE, XRGV, YRGV))
+    #rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, ALTITUDE, XRGV, YRGV))
 
     return XRGV, YRGV
 
@@ -89,10 +89,10 @@ def localize(ARCorners):
     beta = np.arctan(yc * s / ALTITUDE)
 
     # Relative coordinates in meters
-    # relX = ALTITUDE * np.tan(alpha + PITCH)
-    # relY = ALTITUDE * np.tan(beta + ROLL)
-    relX = ALTITUDE * np.tan(alpha)
-    relY = ALTITUDE * np.tan(beta)
+    relX = ALTITUDE * np.tan(alpha + PITCH)
+    relY = ALTITUDE * np.tan(beta + ROLL)
+    # relX = ALTITUDE * np.tan(alpha)
+    # relY = ALTITUDE * np.tan(beta)
 
     return relX, relY
 
@@ -105,7 +105,7 @@ def callbackAR_A(data):
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
     RGVX, RGVY = inertLocalize(relX, relY)
     outData.data = [RGVX, RGVY]
-    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_A.publish(outData)       # Output estimates
@@ -120,7 +120,7 @@ def callbackAR_B(data):
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
     RGVX, RGVY = inertLocalize(relX, relY)
     outData.data = [RGVX, RGVY]
-    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_B.publish(outData)       # Output estimates
