@@ -125,14 +125,14 @@ def callbackBlob(data):
     #pubCoord.publish(data)      # Echo data
     rate.sleep()
 
-
+# Subscribe to get position data of the drone relative to its instantiated inertial local frame
 def pose_callback(data):
     # Get the pose data
     x = data.pose.position.x
     y = data.pose.position.y
     z = data.pose.position.z
 
-    
+    # Output the x, y, z position
     rospy.loginfo("Position - x: {}, y: {}, z: {}".format(x, y, z))
 
 
