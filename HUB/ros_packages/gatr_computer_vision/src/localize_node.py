@@ -36,8 +36,11 @@ def inertLocalize(relX, relY):
     p = YAW
 
     # Rotate the relative measurements into the ENU frame
-    Erel = np.cos(p) * relX + np.sin(p) * relY
-    Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
+    # Erel = np.cos(p) * relX + np.sin(p) * relY
+    # Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
+
+    Erel = np.cos(p) * relY + np.sin(p) * relX
+    Nrel = -1*np.cos(p) * relX + np.sin(p) * relY
 
     # Calculate the RGV inertial position in the ENU frame
     XRGV = DRONEX + Erel
@@ -83,8 +86,10 @@ def localize(ARCorners):
     beta = np.arctan(yc * s / ALTITUDE)
 
     # Relative coordinates in meters
-    relX = ALTITUDE * np.tan(alpha + PITCH)
-    relY = ALTITUDE * np.tan(beta + ROLL)
+    # relX = ALTITUDE * np.tan(alpha + PITCH)
+    # relY = ALTITUDE * np.tan(beta + ROLL)
+    relX = ALTITUDE * np.tan(alpha)
+    relY = ALTITUDE * np.tan(beta)
 
     return relX, relY
 
