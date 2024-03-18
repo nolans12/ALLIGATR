@@ -46,7 +46,7 @@ def inertLocalize(relX, relY):
     XRGV = DRONEX + Erel
     YRGV = DRONEY + Nrel
 
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, XRGV, YRGV))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, ALTITUDE, XRGV, YRGV))
 
     return XRGV, YRGV
 
