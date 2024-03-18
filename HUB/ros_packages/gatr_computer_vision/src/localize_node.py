@@ -85,6 +85,9 @@ def localize(ARCorners):
     relX = ALTITUDE * np.tan(alpha + THETA)
     relY = ALTITUDE * np.tan(beta + PHI)
 
+    # Display the relative coordinates
+    rospy.loginfo("Relative Coordinates - x: {}, y: {}".format(relX, relY))
+
     return relX, relY
 
 # Callback function that will execute whenever data is received
@@ -133,7 +136,7 @@ def pose_callback(data):
     z = data.pose.position.z
 
     # Output the x, y, z position
-    rospy.loginfo("Position - x: {}, y: {}, z: {}".format(x, y, z))
+    #rospy.loginfo("Position - x: {}, y: {}, z: {}".format(x, y, z))
 
 
 if __name__ == '__main__': # <- Executable 
