@@ -29,6 +29,7 @@ XPIXELS = 1920
 YPIXELS = 1080
 
 
+# Inertially Localize given relative estimates
 def inertLocalize(relX, relY):
     # Set the bearing
     p = PSI
@@ -42,7 +43,6 @@ def inertLocalize(relX, relY):
     NRGV = NDRONE + Nrel
 
     return ERGV, NRGV
-
 
 
 # Localization function
