@@ -6,6 +6,7 @@ import numpy as np
 from std_msgs.msg import Int32MultiArray
 from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
+from tf.transformations import euler_from_quaternion
 
 # Global current state variables
 AR_CORNERS_A = Int32MultiArray()
@@ -15,12 +16,12 @@ AR_CORNERS_B = Int32MultiArray()
 AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # Drone State
-THETA = 0
-PHI = 0
-PSI = 0
+PITCH = 0
+ROLL = 0
+YAW = 0
+DRONEX = 0
+DRONEY = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
-EDRONE = 0
-NDRONE = 0
 
 # Global Data
 #AR_LENGTH = 0.15875                     # AR Tag length in meters
@@ -32,17 +33,17 @@ YPIXELS = 1080
 # Inertially Localize given relative estimates
 def inertLocalize(relX, relY):
     # Set the bearing
-    p = PSI
+    p = YAW
 
     # Rotate the relative measurements into the ENU frame
     Erel = np.cos(p) * relX + np.sin(p) * relY
     Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
 
     # Calculate the RGV inertial position in the ENU frame
-    ERGV = EDRONE + Erel
-    NRGV = NDRONE + Nrel
+    XRGV = DRONEX + Erel
+    YRGV = DRONEY + Nrel
 
-    return ERGV, NRGV
+    return XRGV, YRGV
 
 
 # Localization function
@@ -82,8 +83,8 @@ def localize(ARCorners):
     beta = np.arctan(yc * s / ALTITUDE)
 
     # Relative coordinates in meters
-    relX = ALTITUDE * np.tan(alpha + THETA)
-    relY = ALTITUDE * np.tan(beta + PHI)
+    relX = ALTITUDE * np.tan(alpha + PITCH)
+    relY = ALTITUDE * np.tan(beta + ROLL)
 
     return relX, relY
 
@@ -132,8 +133,19 @@ def pose_callback(data):
     y = data.pose.position.y
     z = data.pose.position.z
 
+    # Extract quaternion orientation from the message
+    orientation_q = data.pose.orientation
+
+    # Convert quaternion to Euler angles (roll, pitch, yaw)
+    (ROLL, PITCH, YAW) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
+
+    # Set the global variables
+    DRONEX = x
+    DRONEY = y
+    ALTITUDE = z
+
     # Output the x, y, z position
-    rospy.loginfo("Position - x: {}, y: {}, z: {}".format(x, y, z))
+    rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}, Pitch: {}, Roll: {}".format(x, y, z, YAW, PITCH, ROLL))
 
 
 if __name__ == '__main__': # <- Executable 
