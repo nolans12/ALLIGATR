@@ -19,7 +19,7 @@ environment::environment() {
     slt.x_cell = 0;
     slt.y_cell = 0;
     
-    slt.num_cells_x = 6;
+    slt.num_cells_x = 2;
     slt.num_cells_y = 5;
 
     //This line starts the search off at the 1,1 cell
@@ -49,6 +49,14 @@ std::vector<double> environment::get_searchpoint() {
     searchPoint[1] = bounds[0][1] + (bounds[1][1] - bounds[0][1]) * (double(slt.y_cell) + 0.5) / double(slt.num_cells_y);
     searchPoint[2] = bounds[0][2]; // This is the lower bound of the z axis
     searchPoint[3] = slt.yaw; // This is the yaw at which the search point is defined
+
+    // If only two points in the x axis, then the search point is the bounds of the x axis
+    if (slt.num_cells_x == 2)
+    {
+        double edge = 0.5;
+        searchPoint[0] = edge + bounds[0][0] + (bounds[1][0] - bounds[0][0] - 2*edge) * (double(slt.x_cell)) / double(slt.num_cells_x);
+    }
+
     return searchPoint;
 }
 

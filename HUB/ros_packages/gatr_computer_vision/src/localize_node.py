@@ -15,7 +15,8 @@ AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
 AR_CORNERS_B = Int32MultiArray()
 AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
-# Drone State
+# Global Drone State
+global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE
 PITCH = 0
 ROLL = 0
 YAW = 0
@@ -135,6 +136,8 @@ def callbackBlob(data):
 
 # Subscribe to get position data of the drone relative to its instantiated inertial local frame
 def pose_callback(data):
+    global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW
+
     # Get the pose data
     x = data.pose.position.x
     y = data.pose.position.y
