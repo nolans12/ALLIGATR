@@ -136,6 +136,7 @@ int main(int argc, char** argv)
 				ROS_WARN("Waypoint out of bounds! Aborting mission...");
 				//land();
 				//return 0;
+				mp.setPhase("ABORT");
 			}
 
 			// Set the new waypoint

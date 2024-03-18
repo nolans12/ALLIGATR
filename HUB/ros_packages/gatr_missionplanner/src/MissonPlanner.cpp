@@ -20,8 +20,8 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     search_point_time = ros::Time::now();
     phases = {phase};
     smootherCount = 0;
-    rel_coord_A_sub = gnc_node.subscribe("CV/rel_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
-    rel_coord_B_sub = gnc_node.subscribe("CV/rel_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    rel_coord_A_sub = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    rel_coord_B_sub = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
 
     // Open CSV file for writing
     rgvA_csv.open("rgvA_positions.csv");
