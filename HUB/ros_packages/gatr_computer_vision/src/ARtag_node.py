@@ -260,7 +260,7 @@ if __name__ == '__main__': # <- Executable
             phase_smoother_counter_B += 1
             pub_corners_B.publish(corners_msg_B_last)
 
-        rate.sleep()
+        #rate.sleep()
 
     writeObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera

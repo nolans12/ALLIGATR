@@ -228,7 +228,7 @@ if __name__ == '__main__': # <- Executable
         # Publish to the ROS node
         #rospy.loginfo(out_str)
         #pub.publish(rosOut)
-        rate.sleep()
+        #rate.sleep()
 
     cv2.destroyAllWindows()                         # Close everything and release the camera
     cap.release()                                   # Release the capture object
