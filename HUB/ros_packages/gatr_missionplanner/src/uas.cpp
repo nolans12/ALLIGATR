@@ -26,7 +26,7 @@ uas::uas() {
 
     // Averaging parameters for estimating RGV position
     time_history_average = 10;
-    stopped_threshold = 0.1;
+    stopped_threshold = 0.5;
 
     // Can change this to be anything in bounds
     trail_altitude = 35.0 * 0.3048; // 35 ft to m
@@ -50,7 +50,7 @@ uas::uas() {
     p = 0;
     theta = -1.0f;
     theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
-    orbit_radius = 4.0f; // radius of the orbital path [m]
+    orbit_radius = 3.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
     jointComplete = false;
     status = "STANDBY";

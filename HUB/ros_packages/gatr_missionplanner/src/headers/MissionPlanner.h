@@ -48,6 +48,7 @@ class MissionPlanner {
         /////////// Joint Localization Phase //////////////
         std::vector<double> joint_motion(std::vector<double> waypoint);
         void joint_phase();
+        void joint_search_phase();
 
         /////////// Return Home ////////////////////////
         std::vector<double> return_home_motion(std::vector<double> waypoint);

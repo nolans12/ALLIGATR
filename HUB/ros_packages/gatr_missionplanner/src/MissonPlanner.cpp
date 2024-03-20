@@ -62,8 +62,8 @@ void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::C
     last_rgvA_detection = ros::Time::now();
     double x = coords->data[0];
     double y = coords->data[1];
-    env.rgvAPosition[0] = x;
-    env.rgvAPosition[1] = y;
+    // env.rgvAPosition[0] = x;
+    // env.rgvAPosition[1] = y;
 
     // Update the history of RGV A positions
     env.rgvAHistory.x_pos.push_back(x);
@@ -77,10 +77,14 @@ void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::C
         env.rgvAHistory.time.erase(env.rgvAHistory.time.begin());
     }
 
+    // set env.rgvAPosition to the average of all the positions in the history
+    env.rgvAPosition[0] = std::accumulate(env.rgvAHistory.x_pos.begin(), env.rgvAHistory.x_pos.end(), 0.0) / env.rgvAHistory.x_pos.size();
+    env.rgvAPosition[1] = std::accumulate(env.rgvAHistory.y_pos.begin(), env.rgvAHistory.y_pos.end(), 0.0) / env.rgvAHistory.y_pos.size();
+
     // Write RGV A position to CSV file
-    rgvA_csv << x << "," << y << "," << last_rgvA_detection.toSec() << ", " << phase << std::endl;
-    uas_csv_rgvA << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << std::endl;
-    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << std::endl;   
+    rgvA_csv << x << "," << y << "," << last_rgvA_detection.toSec() << ", " << phase << ", " << last_rgvA_detection << std::endl;
+    uas_csv_rgvA << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection << std::endl;
+    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection  << std::endl;   
 }
 
 // Callback function to be updated when the RGV is detected
@@ -105,10 +109,14 @@ void MissionPlanner::rgvB_detected_callback(const std_msgs::Float32MultiArray::C
         env.rgvBHistory.time.erase(env.rgvBHistory.time.begin());
     }
 
+    // set env.rgvBPosition to the average of all the positions in the history
+    env.rgvBPosition[0] = std::accumulate(env.rgvBHistory.x_pos.begin(), env.rgvBHistory.x_pos.end(), 0.0) / env.rgvBHistory.x_pos.size();
+    env.rgvBPosition[1] = std::accumulate(env.rgvBHistory.y_pos.begin(), env.rgvBHistory.y_pos.end(), 0.0) / env.rgvBHistory.y_pos.size();
+
     // Write RGV B position to CSV file
-    rgvB_csv << x << "," << y << "," << last_rgvB_detection.toSec() << ", " << phase << std::endl;
-    uas_csv_rgvB << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << std::endl;
-    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << std::endl;
+    rgvB_csv << x << "," << y << "," << last_rgvB_detection.toSec() << ", " << phase << ", " << last_rgvB_detection  << std::endl;
+    uas_csv_rgvB << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase  << ", " << last_rgvB_detection << std::endl;
+    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvB_detection  << std::endl;
 }
 
 ///////////// Phases //////////////////////
@@ -125,6 +133,8 @@ void MissionPlanner::determine_phase(){
         fine_phase();
     } else if (phase == "Joint") {
         joint_phase();
+    } else if (phase == "Joint Search") {
+        joint_search_phase();
     } else if (phase == "Return Home") {
         return_home_phase();
     } else if (phase == "ABORT") {
@@ -553,6 +563,33 @@ void MissionPlanner::joint_phase(){
     return;
 }
 
+void MissionPlanner::joint_search_phase(){
+    // If the drone is out of bounds, move to the boundary control phase
+    if (out_of_bounds(drone.state)){
+        ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
+        phase = "Boundary Control";
+        out_of_bounds_time = ros::Time::now();
+    }
+
+    // Stays in the search phase until both RGVs are found at least once
+    if (env.rgvAInView && !env.JS_rgvA_detected){
+        env.JS_rgvA_detected = true;
+        ROS_INFO("RGV A has been detected. Continuing joint search...");
+    }
+
+    if (env.rgvBInView && !env.JS_rgvB_detected){
+        env.JS_rgvB_detected = true;
+        ROS_INFO("RGV B has been detected. Continuing joint search...");
+    }
+
+    if (env.JS_rgvA_detected && env.JS_rgvB_detected){
+        phase = "Joint";
+        joint_time_engaged = ros::Time::now();
+        joint_last_detection = ros::Time::now();
+        ROS_INFO("Both RGVs have been detected. Moving to joint phase...");
+    }
+}
+
 
 ///////////// Motions //////////////////////
 std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoint){
@@ -568,6 +605,8 @@ std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoin
         return fine_motion(waypoint);
     } else if (phase == "Joint") {
         return joint_motion(waypoint);
+    } else if (phase == "Joint Search") {
+        return search_motion(waypoint);
     } else if (phase == "Return Home") {
         return return_home_motion(waypoint);
     } else if (phase == "ABORT") {
@@ -992,6 +1031,11 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
     {
         if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.detection_duration)){
             env.rgvAInView = false;
+
+            // Clear the history of the RGV's position
+            env.rgvAHistory.x_pos.clear();
+            env.rgvAHistory.y_pos.clear();
+            env.rgvAHistory.time.clear();
         }
     }
 
@@ -999,6 +1043,11 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
     {
         if (ros::Time::now() - last_rgvB_detection > ros::Duration(drone.detection_duration)){
             env.rgvBInView = false;
+
+            // Clear the history of the RGV's position
+            env.rgvBHistory.x_pos.clear();
+            env.rgvBHistory.y_pos.clear();
+            env.rgvBHistory.time.clear();
         }
     }
 

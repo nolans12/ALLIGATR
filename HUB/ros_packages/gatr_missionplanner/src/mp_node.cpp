@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 	initialize_local_frame();
 
 	//request takeoff
-	takeoff(3);
+	takeoff(10);
 
 	//specify control loop rate. We recommend a low frequency to not over load the FCU with messages. Too many messages will cause the drone to be sluggish
 	ros::Rate rate(2.0);

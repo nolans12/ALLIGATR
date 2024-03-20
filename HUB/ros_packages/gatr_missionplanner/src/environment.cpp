@@ -53,8 +53,15 @@ std::vector<double> environment::get_searchpoint() {
     // If only two points in the x axis, then the search point is the bounds of the x axis
     if (slt.num_cells_x == 2)
     {
-        double edge = 0.5;
-        searchPoint[0] = edge + bounds[0][0] + (bounds[1][0] - bounds[0][0] - 2*edge) * (double(slt.x_cell)) / double(slt.num_cells_x);
+        double edge = 4;
+        if (slt.x_iter % 2 != 0)
+        {
+            searchPoint[0] = bounds[0][0] + edge;
+        }
+        else
+        {
+            searchPoint[0] = bounds[1][0] - edge;
+        }
     }
 
     return searchPoint;

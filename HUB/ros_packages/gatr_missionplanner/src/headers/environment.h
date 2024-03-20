@@ -18,6 +18,7 @@ class environment {
         // homePosition is ground station location [X, Y]
         std::vector<double> homePosition;
         bool rgvAInView, rgvBInView, rgvACoarseComplete, rgvBCoarseComplete, rgvAFineComplete, rgvBFineComplete, jointComplete;
+        bool JS_rgvA_detected, JS_rgvB_detected; // Joint Search RGV detection flags
 
         // Sampling averager to determine if the RGV is stopped and get average position
         struct history{
