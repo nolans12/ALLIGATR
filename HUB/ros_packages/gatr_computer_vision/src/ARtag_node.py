@@ -2,12 +2,37 @@
 # <- This is the shebang line which tells the OS which interpreter to use
 import rospy
 import cv2
+import csv
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-# Global variables
+## Global variables
+csv_filename = "output_AR.csv"
+# Initialize CSV file and writer
+#with open(csv_filename, mode='w') as csv_file:
+#    fieldnames = ['timestamp']  # Define the fields of the CSV file
+#    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+#    writer.writeheader()
+
+# Try to open the 0 index for the secondary camera
+camera_index = 0
+
+# Camera FPS
+camFPS = 60
+
+# Save image frequency
+saveFPS = 2
+
+# Publish image frequency
+pubFPS = 1
+
+# Process image frequency
+processFPS = 30
+
+# Frame count
+frameCount = 0
 
 
 # Image callback for received image
@@ -133,10 +158,7 @@ if __name__ == '__main__': # <- Executable
     # Search for camera, if not found open faux camera
     camera_found = False
     faux_camera = False
-    attempts = 0
-
-    # Try to open the 0 index for the secondary camera
-    camera_index = 0   
+    attempts = 0   
 
     # Phase Smoothing Variables
     corners_msg_A_last = Int32MultiArray()
@@ -146,21 +168,6 @@ if __name__ == '__main__': # <- Executable
     phase_max = 10 #Number of frames to smooth out the detection
     phase_smoother_counter_A = 2*phase_max
     phase_smoother_counter_B = 2*phase_max
-
-    # Camera FPS
-    camFPS = 60
-
-    # Save image frequency
-    saveFPS = 2
-
-    # Publish image frequency
-    pubFPS = 1
-
-    # Process image frequency
-    processFPS = 30
-
-    # Frame count
-    frameCount = 0
 
     # Initialize the Camera and Savings
     while not camera_found and not faux_camera:
@@ -205,7 +212,7 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
         rospy.spin()
 
-    # Begin the main loop that consistently outputs AR tag corners when running
+# Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -224,6 +231,9 @@ if __name__ == '__main__': # <- Executable
                 # Save image to video file
                 writeObj.write(img)
 
+                #timestamp = rospy.Time.now()
+                #writer.writerow({'timestamp': timestamp})
+
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
                 # Publish image message to image topic
@@ -233,6 +243,7 @@ if __name__ == '__main__': # <- Executable
             if frameCount % (camFPS // processFPS) == 0:                
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
+                
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count

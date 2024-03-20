@@ -3,6 +3,7 @@
 # Be aware that the tutorial said to use python2, however we built it for py3 I believe
 import rospy
 import cv2
+import csv
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 import numpy as np
@@ -10,6 +11,27 @@ import numpy as np
 # Import libraries to publish ROS image
 from sensor_msgs.msg import Image       # Image is the message type
 from cv_bridge import CvBridge          # Package to convert between ROS and OpenCV Images
+
+## Global Variables:
+csv_filename = "output_Blob.csv"
+
+# Try to open the 1 index for the primary camera
+camera_index = 1   
+
+# Camera FPS
+camFPS = 60
+
+# Save image frequency
+saveFPS = 2
+
+# Publish image frequency
+pubFPS = 1
+
+# Process image frequency
+processFPS = 30
+
+# Frame count
+frameCount = 0
 
 # Meta data
 BUFFERSIZE = 5      # 5 Frames for the image buffer, blob every 5 frames
@@ -118,24 +140,6 @@ if __name__ == '__main__': # <- Executable
     camera_found = False
     attempts = 0
 
-    # Try to open the 1 index for the primary camera
-    camera_index = 1   
-
-    # Camera FPS
-    camFPS = 60
-
-    # Save image frequency
-    saveFPS = 2
-
-    # Publish image frequency
-    pubFPS = 1
-
-    # Process image frequency
-    processFPS = 30
-
-    # Frame count
-    frameCount = 0
-
     # Initialize the Camera and Savings
     while not camera_found:
         # Setup the GStreamer Pipeline
@@ -170,6 +174,11 @@ if __name__ == '__main__': # <- Executable
             rospy.logfatal("Camera not found after 10 attempts.")
             camera_found = True
 
+    # Initialize CSV file and writer
+    #with open(csv_filename, mode='w') as csv_file:
+    #    fieldnames = ['timestamp']  # Define the fields of the CSV file
+    #    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #    writer.writeheader()
 
     # Begin the main loop that consistently outputs blob centroids when running
     while not rospy.is_shutdown():
@@ -196,6 +205,9 @@ if __name__ == '__main__': # <- Executable
             if frameCount % (camFPS // saveFPS) == 0:
                 # Save image to video file
                 writeObj.write(img)
+
+                # timestamp = rospy.Time.now()
+                # writer.writerow({'timestamp': timestamp})
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
@@ -234,3 +246,4 @@ if __name__ == '__main__': # <- Executable
     cv2.destroyAllWindows()                         # Close everything and release the camera
     cap.release()                                   # Release the capture object
     rospy.loginfo("End of blob detection program")  # This will output to the terminal
+
