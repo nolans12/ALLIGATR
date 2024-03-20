@@ -195,19 +195,44 @@ if __name__ == '__main__': # <- Executable
         corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
         corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
+        # Camera FPS
+        camFPS = 60
+
+        # Save image frequency
+        saveFPS = 2
+
+        # Publish image frequency
+        pubFPS = 1
+
+        # Process image frequency
+        processFPS = 30
+
+        # Frame count
+        frameCount = 0
+
         boolTemp = 1
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
+            frameCount += 1                         # Update the frame count
 
-            if boolTemp:
-                boolTemp = not boolTemp
+            # Save to a file
+            if frameCount % (camFPS // saveFPS) == 0:
+                # Save image to video file
+                writeObj.write(img)
 
+            # Publish to ROS
+            if frameCount % (camFPS // pubFPS) == 0:
                 # Publish image message to image topic
                 pub_image.publish(br.cv2_to_imgmsg(img))
 
+            # Process Image
+            if frameCount % (camFPS // processFPS) == 0:                
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
+
+            if frameCount == 60:
+                frameCount = 0  # Reset frame count
 
         # If the camera is connected through a faux camera in ROS
         elif faux_camera:
