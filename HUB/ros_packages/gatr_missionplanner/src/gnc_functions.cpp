@@ -57,6 +57,48 @@ geometry_msgs::Point enu_2_local(nav_msgs::Odometry current_pose_enu)
 
   //ROS_INFO("Local position %f %f %f",X, Y, Z);
 }
+
+std::vector<double> enu_2_local(std::vector<double> current_pose_enu)
+{
+	float x = static_cast<float>(current_pose_enu[0]);
+	float y = static_cast<float>(current_pose_enu[1]);
+	float z = static_cast<float>(current_pose_enu[2]);
+	float deg2rad = (M_PI/180);
+	std::vector<double> current_pos_local(3); // Initialize current_pos_local vector with size 3
+	current_pos_local[0] = double(x*cos((local_offset_g - 90)*deg2rad) - y*sin((local_offset_g - 90)*deg2rad));
+	current_pos_local[1] = double(x*sin((local_offset_g - 90)*deg2rad) + y*cos((local_offset_g - 90)*deg2rad));
+	current_pos_local[2] = double(z);
+
+	return current_pos_local;
+
+	//ROS_INFO("Local position %f %f %f",X, Y, Z);
+}
+
+std::vector<double> local_2_enu(std::vector<double> current_pos_local)
+{
+	double x = current_pos_local[0];
+	double y = current_pos_local[1];
+	double z = current_pos_local[2];
+
+	double deg2rad = (M_PI/180);
+	double correction_heading_g_double = static_cast<double>(correction_heading_g);
+	double local_offset_g_double = static_cast<double>(local_offset_g);
+
+	double Xlocal = x*cos((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad) - y*sin((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad);
+	double Ylocal = x*sin((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad) + y*cos((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad);
+	double Zlocal = z;
+
+	std::vector<double> current_pos_g;
+
+	current_pos_g[0] = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
+	current_pos_g[1] = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
+	current_pos_g[2] = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
+
+	return current_pos_g;
+
+	//ROS_INFO("Local position %f %f %f",X, Y, Z);
+}
+
 //get current position of drone
 void pose_cb(const nav_msgs::Odometry::ConstPtr& msg)
 {
@@ -78,6 +120,7 @@ geometry_msgs::Point get_current_location()
 {
 	geometry_msgs::Point current_pos_local;
 	current_pos_local = enu_2_local(current_pose_g);
+
 	return current_pos_local;
 
 }
@@ -144,6 +187,8 @@ void set_destination(float x, float y, float z, float psi)
 	waypoint_g.pose.position.x = x;
 	waypoint_g.pose.position.y = y;
 	waypoint_g.pose.position.z = z;
+
+	ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
 
 	local_pos_pub.publish(waypoint_g);
 	

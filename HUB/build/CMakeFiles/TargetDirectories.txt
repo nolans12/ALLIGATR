@@ -1,3 +1,0 @@
-/home/jetson/ALLIGATR/HUB/build/CMakeFiles/rebuild_cache.dir
-/home/jetson/ALLIGATR/HUB/build/CMakeFiles/main.dir
-/home/jetson/ALLIGATR/HUB/build/CMakeFiles/edit_cache.dir

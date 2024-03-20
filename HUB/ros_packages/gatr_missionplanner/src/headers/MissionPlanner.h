@@ -81,6 +81,8 @@ class MissionPlanner {
 
         std::string getPhase();
         void setPhase(std::string phaseIn);
+
+        void get_current_location_mav(const geometry_msgs::PoseStamped::ConstPtr& msg);
         
     private:
         std::string phase;
@@ -90,6 +92,7 @@ class MissionPlanner {
         environment env;
         ros::Subscriber rel_coord_A_sub;
         ros::Subscriber rel_coord_B_sub;
+        ros::Subscriber uas_state_sub;
         ros::Publisher phase_pub;
 
         ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase

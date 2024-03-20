@@ -9,7 +9,6 @@
 
 // Custom headers
 #include "HUB.h"
-#include "WIFI.h"
 #include "CameraObject.h"
 #include "pathStep.h"
 #include "phaseStep.h"

@@ -28,8 +28,7 @@ int main(int argc, char** argv){
     // $$$$$$$$$$$$$ PRECHECK LIST $$$$$$$$$$$$$$$$
         //WIFI CONNECTION
         std::cout << std::endl << "Checking WiFi connection..." << std::endl;
-        WIFI wifi;
-        int ping = wifi.ping_all();
+        // Send a 
 
         //MANUAL CONTROLLER CONNECTION
 

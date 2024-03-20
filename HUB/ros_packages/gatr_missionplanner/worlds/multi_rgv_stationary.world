@@ -114,7 +114,7 @@
       <include>
         <uri>model://gatr_drone</uri>
       </include>
-      <pose> 0 0 0 0 0 45</pose>
+      <pose> 0 0 0 0 0 .4</pose>
     </model>
   </world>
 </sdf>

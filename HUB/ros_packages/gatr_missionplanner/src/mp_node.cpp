@@ -137,6 +137,8 @@ int main(int argc, char** argv)
 			}
 
 			// Set the new waypoint
+			ROS_INFO("");
+			mp.output_drone_state();
 			set_destination(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], curr_waypoint_new[3]);
 		}
 
