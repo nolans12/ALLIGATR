@@ -187,6 +187,21 @@ if __name__ == '__main__': # <- Executable
     phase_smoother_counter_A = 2*phase_max
     phase_smoother_counter_B = 2*phase_max
 
+    # Camera FPS
+    camFPS = 60
+
+    # Save image frequency
+    saveFPS = 2
+
+    # Publish image frequency
+    pubFPS = 1
+
+    # Process image frequency
+    processFPS = 30
+
+    # Frame count
+    frameCount = 0
+
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
         # Output messages
@@ -195,22 +210,7 @@ if __name__ == '__main__': # <- Executable
         corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
         corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
-        # Camera FPS
-        camFPS = 60
 
-        # Save image frequency
-        saveFPS = 2
-
-        # Publish image frequency
-        pubFPS = 1
-
-        # Process image frequency
-        processFPS = 30
-
-        # Frame count
-        frameCount = 0
-
-        boolTemp = 1
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
