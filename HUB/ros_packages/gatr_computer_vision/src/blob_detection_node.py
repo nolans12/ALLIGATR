@@ -121,6 +121,22 @@ if __name__ == '__main__': # <- Executable
     # Try to open the 1 index for the primary camera
     camera_index = 1   
 
+    # Camera FPS
+    camFPS = 60
+
+    # Save image frequency
+    saveFPS = 2
+
+    # Publish image frequency
+    pubFPS = 1
+
+    # Process image frequency
+    processFPS = 30
+
+    # Frame count
+    frameCount = 0
+
+    # Initialize the Camera and Savings
     while not camera_found:
         # Setup the GStreamer Pipeline
         pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
@@ -141,7 +157,7 @@ if __name__ == '__main__': # <- Executable
             # Create video writer object
             # Get the time and create video object with the time of the beginning of the recording
             vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
-            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
+            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
         rospy.sleep(3.0) # Sleep for 3 seconds
@@ -154,21 +170,6 @@ if __name__ == '__main__': # <- Executable
             rospy.logfatal("Camera not found after 10 attempts.")
             camera_found = True
 
-
-    # Camera FPS
-    camFPS = 60
-
-    # Save image frequency
-    saveFPS = 2
-
-    # Publish image frequency
-    pubFPS = 1
-
-    # Process image frequency
-    processFPS = 30
-
-    # Frame count
-    frameCount = 0
 
     # Begin the main loop that consistently outputs blob centroids when running
     while not rospy.is_shutdown():

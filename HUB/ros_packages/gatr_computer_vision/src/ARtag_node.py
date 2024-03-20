@@ -138,48 +138,6 @@ if __name__ == '__main__': # <- Executable
     # Try to open the 0 index for the secondary camera
     camera_index = 0   
 
-    while not camera_found and not faux_camera:
-        # Setup the GStreamer Pipeline
-        #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-        #pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! capsfilter caps="video/x-raw, width=(int)1920, height=(int)1080, framerate=(fraction)30/1" ! autovideosink ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-
-        # Create a VideoCapture object with the GStreamer pipeline
-        cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
-
-        # Check if the camera opened successfully
-        if cap.isOpened():
-            camera_found = True     # Camera is found
-            rospy.loginfo("Camera " + str(camera_index) + " Connected!")
-
-            # Get the frame width and height
-            frame_width = int(cap.get(3)) 
-            frame_height = int(cap.get(4)) 
-            size = (frame_width, frame_height) 
-            
-            # Create video writer object
-            # Get the time and create video object with the time of the beginning of the recording
-            vidFilename = "secondaryVideo_%s.avi" % rospy.get_time()
-            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
-            break            
-
-        rospy.sleep(1.0) # Sleep for 1 second
-
-        # If camera is not found, output an error message
-        rospy.logwarn("Camera not found. Trying again...")
-        attempts += 1
-
-        # Camera wasn't found after multiple attempts. 
-        if attempts > 5:
-            rospy.logfatal("Camera not found after 10 attempts. Connecting to faux camera.")
-            faux_camera = True
-            camera_found = False
-
-    if faux_camera:
-        # Verify that there is a connection to the webcam/image_raw topic
-        sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
-        rospy.spin()
-
     # Phase Smoothing Variables
     corners_msg_A_last = Int32MultiArray()
     corners_msg_B_last = Int32MultiArray()
@@ -203,6 +161,49 @@ if __name__ == '__main__': # <- Executable
 
     # Frame count
     frameCount = 0
+
+    # Initialize the Camera and Savings
+    while not camera_found and not faux_camera:
+        # Setup the GStreamer Pipeline
+        #pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+        #pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! capsfilter caps="video/x-raw, width=(int)1920, height=(int)1080, framerate=(fraction)30/1" ! autovideosink ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+
+        # Create a VideoCapture object with the GStreamer pipeline
+        cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+
+        # Check if the camera opened successfully
+        if cap.isOpened():
+            camera_found = True     # Camera is found
+            rospy.loginfo("Camera " + str(camera_index) + " Connected!")
+
+            # Get the frame width and height
+            frame_width = int(cap.get(3)) 
+            frame_height = int(cap.get(4)) 
+            size = (frame_width, frame_height) 
+            
+            # Create video writer object
+            # Get the time and create video object with the time of the beginning of the recording
+            vidFilename = "secondaryVideo_%s.avi" % rospy.get_time()
+            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
+            break            
+
+        rospy.sleep(1.0) # Sleep for 1 second
+
+        # If camera is not found, output an error message
+        rospy.logwarn("Camera not found. Trying again...")
+        attempts += 1
+
+        # Camera wasn't found after multiple attempts. 
+        if attempts > 5:
+            rospy.logfatal("Camera not found after 10 attempts. Connecting to faux camera.")
+            faux_camera = True
+            camera_found = False
+
+    if faux_camera:
+        # Verify that there is a connection to the webcam/image_raw topic
+        sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
+        rospy.spin()
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
