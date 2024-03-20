@@ -44,9 +44,6 @@ int main(int argc, char** argv)
 	//initialize control publisher/subscribers
 	init_publisher_subscriber(gnc_node);
 
-	// Create subscriber to rel_coord topic
-	//ros::Subscriber rel_coord_sub = gnc_node.subscribe("CV/rel_coord_A", 10, rgvA_detected_callback);
-
 	//initialize the uas and environment objects
 	MissionPlanner mp(gnc_node);
 	//rgvAInView = false;

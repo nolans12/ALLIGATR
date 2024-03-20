@@ -22,6 +22,7 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     smootherCount = 0;
     rel_coord_A_sub = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
     rel_coord_B_sub = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
 
     // Open CSV file for writing
     rgvA_csv.open("rgvA_positions.csv");
@@ -118,6 +119,78 @@ void MissionPlanner::rgvB_detected_callback(const std_msgs::Float32MultiArray::C
     uas_csv_rgvB << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase  << ", " << last_rgvB_detection << std::endl;
     uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvB_detection  << std::endl;
 }
+
+void MissionPlanner::update_drone_state(std::vector<double> waypoint){
+    // Update the state of the UAS
+    geometry_msgs::Point state = get_current_location();
+    std::vector<double> dronePos = {state.x, state.y, state.z, get_current_heading()};
+    drone.state[0] = state.x;
+    drone.state[1] = state.y;
+    drone.state[2] = state.z;
+    drone.state[3] = get_current_heading();
+    //drone.state.push_back(dronePos);
+
+    // Update the destination of the UAS
+    drone.dest[0] = waypoint[0];
+    drone.dest[1] = waypoint[1];
+    drone.dest[2] = waypoint[2];
+    drone.dest[3] = waypoint[3];
+
+    // Publish the phase of the UAS
+    std_msgs::String phase_msg;
+    phase_msg.data = phase;
+    phase_pub.publish(phase_msg);
+
+    // Check when the last time the rgvs were seen and if they are still in view
+    if (env.rgvAInView)
+    {
+        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.detection_duration)){
+            env.rgvAInView = false;
+
+            // Clear the history of the RGV's position
+            env.rgvAHistory.x_pos.clear();
+            env.rgvAHistory.y_pos.clear();
+            env.rgvAHistory.time.clear();
+        }
+    }
+
+    if (env.rgvBInView)
+    {
+        if (ros::Time::now() - last_rgvB_detection > ros::Duration(drone.detection_duration)){
+            env.rgvBInView = false;
+
+            // Clear the history of the RGV's position
+            env.rgvBHistory.x_pos.clear();
+            env.rgvBHistory.y_pos.clear();
+            env.rgvBHistory.time.clear();
+        }
+    }
+
+    // Reset the time in coarse localization timers if it has been too long since an RGV was seen
+    if (time_coarsely_localized > ros::Duration(0.0)) {
+        // check if the time since the last RGV was seen is greater than the coarse duration
+        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.coarse_reset_time) && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.coarse_reset_time)){
+            time_coarsely_localized = ros::Duration(0.0);
+        }
+    }
+
+    // Reset the time in fine localization timers if it has been too long since an RGV was seen
+    if (time_finely_localized > ros::Duration(0.0)) {
+        // check if the time since the last RGV was seen is greater than the fine duration
+        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.fine_reset_time) && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.fine_reset_time)){
+            time_finely_localized = ros::Duration(0.0);
+        }
+    }
+
+    // Reset the time in joint localization timers if it has been too long since an RGV was seen
+    if (time_joint_localized > ros::Duration(0.0)) {
+        // check if the time since the last RGV was seen is greater than the joint duration
+        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.joint_reset_time) || ros::Time::now() - last_rgvB_detection > ros::Duration(drone.joint_reset_time)){
+            time_joint_localized = ros::Duration(0.0);
+        }
+    }
+}
+
 
 ///////////// Phases //////////////////////
 void MissionPlanner::determine_phase(){
@@ -1010,71 +1083,7 @@ void MissionPlanner::output_drone_state(){
 
 }
 
-void MissionPlanner::update_drone_state(std::vector<double> waypoint){
-    // Update the state of the UAS
-    geometry_msgs::Point state = get_current_location();
-    std::vector<double> dronePos = {state.x, state.y, state.z, get_current_heading()};
-    drone.state[0] = state.x;
-    drone.state[1] = state.y;
-    drone.state[2] = state.z;
-    drone.state[3] = get_current_heading();
-    //drone.state.push_back(dronePos);
 
-    // Update the destination of the UAS
-    drone.dest[0] = waypoint[0];
-    drone.dest[1] = waypoint[1];
-    drone.dest[2] = waypoint[2];
-    drone.dest[3] = waypoint[3];
-
-    // Check when the last time the rgvs were seen and if they are still in view
-    if (env.rgvAInView)
-    {
-        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.detection_duration)){
-            env.rgvAInView = false;
-
-            // Clear the history of the RGV's position
-            env.rgvAHistory.x_pos.clear();
-            env.rgvAHistory.y_pos.clear();
-            env.rgvAHistory.time.clear();
-        }
-    }
-
-    if (env.rgvBInView)
-    {
-        if (ros::Time::now() - last_rgvB_detection > ros::Duration(drone.detection_duration)){
-            env.rgvBInView = false;
-
-            // Clear the history of the RGV's position
-            env.rgvBHistory.x_pos.clear();
-            env.rgvBHistory.y_pos.clear();
-            env.rgvBHistory.time.clear();
-        }
-    }
-
-    // Reset the time in coarse localization timers if it has been too long since an RGV was seen
-    if (time_coarsely_localized > ros::Duration(0.0)) {
-        // check if the time since the last RGV was seen is greater than the coarse duration
-        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.coarse_reset_time) && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.coarse_reset_time)){
-            time_coarsely_localized = ros::Duration(0.0);
-        }
-    }
-
-    // Reset the time in fine localization timers if it has been too long since an RGV was seen
-    if (time_finely_localized > ros::Duration(0.0)) {
-        // check if the time since the last RGV was seen is greater than the fine duration
-        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.fine_reset_time) && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.fine_reset_time)){
-            time_finely_localized = ros::Duration(0.0);
-        }
-    }
-
-    // Reset the time in joint localization timers if it has been too long since an RGV was seen
-    if (time_joint_localized > ros::Duration(0.0)) {
-        // check if the time since the last RGV was seen is greater than the joint duration
-        if (ros::Time::now() - last_rgvA_detection > ros::Duration(drone.joint_reset_time) || ros::Time::now() - last_rgvB_detection > ros::Duration(drone.joint_reset_time)){
-            time_joint_localized = ros::Duration(0.0);
-        }
-    }
-}
 
 bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     // Check if a waypoint would fall outside of the environment bounds
