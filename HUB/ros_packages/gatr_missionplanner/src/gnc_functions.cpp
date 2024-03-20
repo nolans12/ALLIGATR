@@ -60,20 +60,24 @@ geometry_msgs::Point enu_2_local(nav_msgs::Odometry current_pose_enu)
 
 std::vector<double> enu_2_local(std::vector<double> current_pose_enu)
 {
-	float x = static_cast<float>(current_pose_enu[0]);
-	float y = static_cast<float>(current_pose_enu[1]);
-	float z = static_cast<float>(current_pose_enu[2]);
-	float deg2rad = (M_PI/180);
-	std::vector<double> current_pos_local(3); // Initialize current_pos_local vector with size 3
-	current_pos_local[0] = double(x*cos((local_offset_g - 90)*deg2rad) - y*sin((local_offset_g - 90)*deg2rad));
-	current_pos_local[1] = double(x*sin((local_offset_g - 90)*deg2rad) + y*cos((local_offset_g - 90)*deg2rad));
-	current_pos_local[2] = double(z);
+	try{
+		float x = static_cast<float>(current_pose_enu[0]);
+		float y = static_cast<float>(current_pose_enu[1]);
+		float z = static_cast<float>(current_pose_enu[2]);
+		float deg2rad = (M_PI/180);
+		std::vector<double> current_pos_local(3); // Initialize current_pos_local vector with size 3
+		current_pos_local[0] = double(x*cos((local_offset_g - 90)*deg2rad) - y*sin((local_offset_g - 90)*deg2rad));
+		current_pos_local[1] = double(x*sin((local_offset_g - 90)*deg2rad) + y*cos((local_offset_g - 90)*deg2rad));
+		current_pos_local[2] = double(z);
+		ROS_INFO("ENU pos: %f %f %f Local pos: %f %f %f", x, y, z, current_pos_local[0], current_pos_local[1], current_pos_local[2]);
+		return current_pos_local;
+	}
+	catch (const std::exception& e){
+		ROS_INFO("Error in enu_2_local: %s", e.what());
+		return std::vector<double>(3, 0.0);
+	}
 
-	return current_pos_local;
-
-	//ROS_INFO("Local position %f %f %f",X, Y, Z);
 }
-
 std::vector<double> local_2_enu(std::vector<double> current_pos_local)
 {
 	double x = current_pos_local[0];

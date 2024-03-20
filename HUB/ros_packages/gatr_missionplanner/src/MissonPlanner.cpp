@@ -1092,6 +1092,7 @@ void MissionPlanner::output_drone_state(){
     // Output the current location of the UAS and the next location it is going to
     std::cout << std::fixed << std::setprecision(2);
     std::cout << "Current Position: " << dronePos[0] << ", " << dronePos[1] << ", " << dronePos[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
+    enu_2_local(dronePos);
 
 }
 
