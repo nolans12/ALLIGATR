@@ -231,7 +231,7 @@ if __name__ == '__main__': # <- Executable
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
 
-            if frameCount == 60:
+            if frameCount >= 60:
                 frameCount = 0  # Reset frame count
 
         # If the camera is connected through a faux camera in ROS
