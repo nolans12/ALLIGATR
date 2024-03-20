@@ -104,6 +104,7 @@ run_node()
     PKG_NAME=$1
     NODE_NAME=$2
     NODE_TITLE=$3
+    AGRS=$4
 
     # Make sure the node being ran is an executable
     cd ${CURRENT_DIR}/ros_packages/${PKG_NAME}
@@ -113,7 +114,7 @@ run_node()
 
     # Launch the XTERM terminal and run the ROS node
     # Make copies of this line of code for any additional nodes
-    xterm -T $NODE_TITLE -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME; exec bash" &
+    xterm -T $NODE_TITLE -e "source ~/.bashrc; rosrun $PKG_NAME $NODE_NAME $ARGS; exec bash" &
     sleep 1
 }
 
@@ -131,7 +132,7 @@ run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 run_node gatr_computer_vision localize_node.py Localize_Node
 
 # Mision Planner Node
-#run_node gatr_missionplanner mp_node Mission_Planner_Node
+run_node gatr_missionplanner mp_node Mission_Planner_Node $2
 
 # Start the MAVLINK connection to cube, opening on ttyTHS1 port
 #xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
