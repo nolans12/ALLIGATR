@@ -3,6 +3,7 @@
 # Be aware that the tutorial said to use python2, however we built it for py3 I believe
 import rospy
 import cv2
+import csv
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 import numpy as np
@@ -10,6 +11,27 @@ import numpy as np
 # Import libraries to publish ROS image
 from sensor_msgs.msg import Image       # Image is the message type
 from cv_bridge import CvBridge          # Package to convert between ROS and OpenCV Images
+
+## Global Variables:
+csv_filename = "output_Blob.csv"
+
+# Try to open the 1 index for the primary camera
+camera_index = 1   
+
+# Camera FPS
+camFPS = 60
+
+# Save image frequency
+saveFPS = 2
+
+# Publish image frequency
+pubFPS = 1
+
+# Process image frequency
+processFPS = 30
+
+# Frame count
+frameCount = 0
 
 # Meta data
 BUFFERSIZE = 5      # 5 Frames for the image buffer, blob every 5 frames
@@ -118,22 +140,28 @@ if __name__ == '__main__': # <- Executable
     camera_found = False
     attempts = 0
 
-    # Try to open the 0 index for the primary camera
-    camera_index = 1   
-
+    # Initialize the Camera and Savings
     while not camera_found:
         # Setup the GStreamer Pipeline
-        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+        pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
 
         # Create a VideoCapture object with the GStreamer pipeline
         cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
         # Check if the camera opened successfully
         if cap.isOpened():
-            cap.set(cv2.CAP_PROP_BUFFERSIZE, BUFFERSIZE);                   # Set the buffer size so it doesn't go beyond 5 frames
-            cap.set(cv2.CAP_PROP_FPS, 15)                                   # Set the FPS to 15               
-            camera_found = True                                             # Camera is found
+            camera_found = True     # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
+
+            # Get the frame width and height
+            frame_width = int(cap.get(3)) 
+            frame_height = int(cap.get(4)) 
+            size = (frame_width, frame_height) 
+            
+            # Create video writer object
+            # Get the time and create video object with the time of the beginning of the recording
+            vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
+            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
         rospy.sleep(3.0) # Sleep for 3 seconds
@@ -146,6 +174,11 @@ if __name__ == '__main__': # <- Executable
             rospy.logfatal("Camera not found after 10 attempts.")
             camera_found = True
 
+    # Initialize CSV file and writer
+    #with open(csv_filename, mode='w') as csv_file:
+    #    fieldnames = ['timestamp']  # Define the fields of the CSV file
+    #    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #    writer.writeheader()
 
     # Begin the main loop that consistently outputs blob centroids when running
     while not rospy.is_shutdown():
@@ -157,39 +190,60 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
 
-            # ROS message
-            rosOut = Int32MultiArray()
-
             # Check if the image is empty, failed to get image
             if img is None:
                 out_str = "Camera Connection Lost %s" % rospy.get_time()
-                rosOut.data = [0, 0, 0, 0]
-            else:
-                # Call blob detection
-                centroid = detectBlob(img)
 
-                # Output detection
-                if centroid == -1:                                      # Not Detected
-                    out_str = "Blob Not Detected %s" % rospy.get_time()
-                    centOut = -1
-                    rosOut.data = [0, 0, 0, 0]
-                else:                                                   # Detected, format as array
-                    out_str = "Blob Detected %s" % rospy.get_time()
-                    centOut = []
-                    for i in centroid:
-                        centOut.append(i[0])
-                        centOut.append(i[1])
-                    rosOut.data = centOut
+            # ROS message
+            rosOut = Int32MultiArray()
+
+            # Get the current video feed frame
+            ret, img = cap.read()
+            frameCount += 1                         # Update the frame count
+
+            # Save to a file
+            if frameCount % (camFPS // saveFPS) == 0:
+                # Save image to video file
+                writeObj.write(img)
+
+                # timestamp = rospy.Time.now()
+                # writer.writerow({'timestamp': timestamp})
+
+            if frameCount >= 60:
+                frameCount = 0  # Reset frame count
+
+
+            # Check if the image is empty, failed to get image
+            # if img is None:
+            #     out_str = "Camera Connection Lost %s" % rospy.get_time()
+            #     rosOut.data = [0, 0, 0, 0]
+            # else:
+            #     # Call blob detection
+            #     centroid = detectBlob(img)
+
+            #     # Output detection
+            #     if centroid == -1:                                      # Not Detected
+            #         out_str = "Blob Not Detected %s" % rospy.get_time()
+            #         centOut = -1
+            #         rosOut.data = [0, 0, 0, 0]
+            #     else:                                                   # Detected, format as array
+            #         out_str = "Blob Detected %s" % rospy.get_time()
+            #         centOut = []
+            #         for i in centroid:
+            #             centOut.append(i[0])
+            #             centOut.append(i[1])
+            #         rosOut.data = centOut
 
         else:
             out_str = ("Camera Connection Lost %s" % rospy.get_time())
             rosOut.data = [0, 0, 0, 0]
             
         # Publish to the ROS node
-        rospy.loginfo(out_str)
-        pub.publish(rosOut)
-        rate.sleep()
+        #rospy.loginfo(out_str)
+        #pub.publish(rosOut)
+        #rate.sleep()
 
     cv2.destroyAllWindows()                         # Close everything and release the camera
     cap.release()                                   # Release the capture object
     rospy.loginfo("End of blob detection program")  # This will output to the terminal
+
