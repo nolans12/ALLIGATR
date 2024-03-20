@@ -158,7 +158,9 @@ if __name__ == '__main__': # <- Executable
             size = (frame_width, frame_height) 
             
             # Create video writer object
-            writeObj = cv2.VideoWriter('capturedVideo.avi', cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
+            # Get the time and create video object with the time of the beginning of the recording
+            vidFilename = "secondaryVideo_%s.avi" % rospy.get_time()
+            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), 15, size) 
             break            
 
         rospy.sleep(1.0) # Sleep for 1 second
