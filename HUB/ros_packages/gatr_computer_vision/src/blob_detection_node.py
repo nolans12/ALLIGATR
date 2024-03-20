@@ -88,6 +88,12 @@ def detectBlob(im):
 
     return zip(centroids_x,centroids_y)
 
+# Write to a csv file
+def write_csv(filename, data):
+    with open(filename, mode='a') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([data])
+
 
 if __name__ == '__main__': # <- Executable 
 
@@ -178,11 +184,13 @@ if __name__ == '__main__': # <- Executable
     #with open(csv_filename, mode='w') as csv_file:
     #    fieldnames = ['timestamp']  # Define the fields of the CSV file
     #    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    #    writer.writeheader()
+     #   writer.writeheader()
+
+     # CSV File
+    filename = "primaryTime_%s.csv" % rospy.get_time()
 
     # Begin the main loop that consistently outputs blob centroids when running
     while not rospy.is_shutdown():
-
         if cap.isOpened():                      # Capture image while camera is opened
             # Clear the buffer
             clearBuffer(cap, BUFFERSIZE)
@@ -206,8 +214,9 @@ if __name__ == '__main__': # <- Executable
                 # Save image to video file
                 writeObj.write(img)
 
-                # timestamp = rospy.Time.now()
-                # writer.writerow({'timestamp': timestamp})
+                # Write to a file
+                timestamp = rospy.Time.now()
+                write_csv(filename, timestamp)
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count

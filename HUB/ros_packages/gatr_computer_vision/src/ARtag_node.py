@@ -11,10 +11,10 @@ from cv_bridge import CvBridge
 ## Global variables
 csv_filename = "output_AR.csv"
 # Initialize CSV file and writer
-#with open(csv_filename, mode='w') as csv_file:
-#    fieldnames = ['timestamp']  # Define the fields of the CSV file
-#    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-#    writer.writeheader()
+with open(csv_filename, mode='w') as csv_file:
+    fieldnames = ['timestamp']  # Define the fields of the CSV file
+    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    writer.writeheader()
 
 # Try to open the 0 index for the secondary camera
 camera_index = 0
@@ -119,6 +119,13 @@ def aruco_display(corners, image):
     return image
 
 
+# Write to a csv file
+def write_csv(filename, data):
+    with open(filename, mode='a') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([data])
+
+
 if __name__ == '__main__': # <- Executable 
     # ArUco dictionary
     ARUCO_DICT = {
@@ -212,7 +219,11 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback)
         rospy.spin()
 
-# Begin the main loop that consistently outputs AR tag corners when running
+
+    # CSV File
+    filename = "secondaryTime_%s.csv" % rospy.get_time()
+
+    # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -231,8 +242,8 @@ if __name__ == '__main__': # <- Executable
                 # Save image to video file
                 writeObj.write(img)
 
-                #timestamp = rospy.Time.now()
-                #writer.writerow({'timestamp': timestamp})
+                timestamp = rospy.Time.now()
+                write_csv(filename, timestamp)
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:

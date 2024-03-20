@@ -1087,9 +1087,9 @@ void MissionPlanner::output_drone_state(){
 
 bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     // Check if a waypoint would fall outside of the environment bounds
-    if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
-        return true;
-    }
+    //if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
+    //    return true;
+    //}
     return false;
 }
 
