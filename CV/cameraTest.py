@@ -49,7 +49,7 @@ testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 # %% Video Capture With Camera
 
 # Set the camera index to 0 for the primary camera
-camera_index = 0
+camera_index = 1
 
 # Define the GStreamer pipeline string
 # pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'

@@ -1099,6 +1099,12 @@ void MissionPlanner::output_drone_state(){
 
 
 bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
+<<<<<<< HEAD
+    // Check if a waypoint would fall outside of the environment bounds
+    //if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
+    //    return true;
+    //}
+=======
     // // Check if a waypoint would fall outside of the environment bounds
     // std::vector<std::vector<double>> bounds_g = {local_2_enu(env.bounds[0]), local_2_enu(env.bounds[1])};
 
@@ -1107,6 +1113,7 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", bounds_g[0][0], bounds_g[1][0], bounds_g[0][1], bounds_g[1][1]);
     //     return true;
     // }
+>>>>>>> 57a79be14da903f374484a4e28b3d40b08ff02f8
     return false;
 }
 
