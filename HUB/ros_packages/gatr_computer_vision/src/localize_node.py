@@ -51,6 +51,11 @@ def inertLocalize(relX, relY):
 
     return XRGV, YRGV
 
+def relativeLocalize(relX, relY):
+    XRGV = DRONEX + relX
+    YRGV = DRONEY + relY
+
+    return XRGV, YRGV
 
 # Localization function
 def localize(ARCorners):
@@ -103,9 +108,15 @@ def callbackAR_A(data):
     AR_CORNERS_A = data               # Update AR Tag corner estimate
 
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
-    RGVX, RGVY = inertLocalize(relX, relY)
-    outData.data = [RGVX, RGVY]
-    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
+    RGVX_rel, RGVY_rel = relativeLocalize(relX, relY)
+
+    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("RGV Relative - RGVA_x: {}, RGVA_y: {}".format(RGVX_rel, RGVY_rel))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}".format(DRONEX, DRONEY, ALTITUDE))
+
+    outData.data = [RGVX_rel, RGVY_rel]
+    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_A.publish(outData)       # Output estimates
@@ -118,9 +129,16 @@ def callbackAR_B(data):
     AR_CORNERS_B = data               # Update AR Tag corner estimate
 
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
-    RGVX, RGVY = inertLocalize(relX, relY)
-    outData.data = [RGVX, RGVY]
-    rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
+    RGVX_rel, RGVY_rel = relativeLocalize(relX, relY)
+
+    rospy.loginfo("")
+    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("RGV Relative - RGVA_x: {}, RGVA_y: {}".format(RGVX_rel, RGVY_rel))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}".format(DRONEX, DRONEY, ALTITUDE))
+
+    outData.data = [RGVX_rel, RGVY_rel]
+    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
 
     #rospy.loginfo(out_str)
     pubCoord_B.publish(outData)       # Output estimates

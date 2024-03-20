@@ -38,6 +38,8 @@ struct gnc_api_waypoint{
 void state_cb(const mavros_msgs::State::ConstPtr& msg);
 
 geometry_msgs::Point enu_2_local(nav_msgs::Odometry current_pose_enu);
+std::vector<double > enu_2_local(std::vector<double> current_pose_enu);
+std::vector<double> local_2_enu(std::vector<double> current_pose_local);
 
 //get current position of drone
 void pose_cb(const nav_msgs::Odometry::ConstPtr& msg);

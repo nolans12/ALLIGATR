@@ -84,7 +84,7 @@ xterm -geometry 80x10 -T "COMMAND PLUGIN" -e "cd ~/ardupilot/ArduCopter/ && sim_
 sleep 3
 
 #Start the MAVROS node
-xterm -geometry 40x10 -T "mavros" -e "WID=\$(xdotool getactivewindow); xdotool windowminimize \$WID; roslaunch iq_sim apm.launch && xdotool windowminimize $(xdotool getactivewindow)" &
+xterm -geometry 40x10 -T "mavros" -e "roslaunch iq_sim apm.launch" &
 #xterm -e "roslaunch iq_sim apm.launch" &
 sleep 3
 

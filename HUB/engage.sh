@@ -4,13 +4,18 @@
 # Build flag is used to determine if the ROS packages should be built before execution. Use if changes to ros_packages are made
 BUILD_FLAG=0
 
+# MP_ARGS is used to specify the mission planner special mode
+MP_ARGS=""
+
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
-# Parse command line arguments. This will check if the -b command line input is set
-while getopts "b" opt; do
+# Parse command line arguments. This will check if the -b and -mp command line inputs are set
+while getopts "b:mp:" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
+        ;;
+    mp) MP_ARGS="$OPTARG"
         ;;
     esac
 done
@@ -132,7 +137,8 @@ run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 run_node gatr_computer_vision localize_node.py Localize_Node
 
 # Mision Planner Node
-run_node gatr_missionplanner mp_node Mission_Planner_Node $2
+# run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
+xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
 
 # Start the MAVLINK connection to cube, opening on ttyTHS1 port
 #xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
