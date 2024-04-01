@@ -16,7 +16,7 @@ AR_CORNERS_B = Int32MultiArray()
 AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # Global Drone State
-global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE
+global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE, AR_LENGTH, XPIXELS, YPIXELS
 PITCH = 0
 ROLL = 0
 YAW = 0
@@ -24,9 +24,8 @@ DRONEX = 0
 DRONEY = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
 
-# Global Data
-#AR_LENGTH = 0.15875                     # AR Tag length in meters
-AR_LENGTH = 0.2496                       # Gazebo sim value
+# Global AR Tag and Camera Data
+AR_LENGTH = 0.615                           # 61.5 cm AR tag side length for the large AR tag
 XPIXELS = 1920
 YPIXELS = 1080
 
@@ -40,16 +39,17 @@ def inertLocalize(relX, relY):
     # Erel = np.cos(p) * relX + np.sin(p) * relY
     # Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
 
+    # Rotate into the local inertial frame
     Erel = np.cos(p) * relY + np.sin(p) * relX
     Nrel = -1*np.cos(p) * relX + np.sin(p) * relY
 
-    # Calculate the RGV inertial position in the ENU frame
+    # Calculate the RGV inertial position in the local inertial frame frame
     XRGV = DRONEX + Erel
     YRGV = DRONEY + Nrel
 
     #rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, ALTITUDE, XRGV, YRGV))
-
     return XRGV, YRGV
+
 
 def relativeLocalize(relX, relY):
     XRGV = DRONEX + relX
@@ -57,7 +57,7 @@ def relativeLocalize(relX, relY):
 
     return XRGV, YRGV
 
-# Localization function
+
 def localize(ARCorners):
     # Define the center of the image
     cx = XPIXELS / 2
@@ -192,19 +192,16 @@ if __name__ == '__main__': # <- Executable
     ################## Subscriber Definitions ###########################
     subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
     subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
-    #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
     rospy.sleep(1.0)
     
-
     # Begin the main loop that consistently outputs Localization estimates
     while not rospy.is_shutdown():
         # Spin so the script keeps looking for messages
         rospy.spin()
             
-
 
     rospy.loginfo("End of localization program") # This will output to the terminal

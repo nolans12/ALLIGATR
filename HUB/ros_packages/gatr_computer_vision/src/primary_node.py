@@ -16,8 +16,8 @@ with open(csv_filename, mode='w') as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     writer.writeheader()
 
-# Try to open the 0 index for the secondary camera
-camera_index = 0
+# Try to open the 1 index for the primary camera
+camera_index = 1
 
 # Camera FPS
 camFPS = 60
@@ -33,7 +33,6 @@ processFPS = 30
 
 # Frame count
 frameCount = 0
-
 
 # Image callback for received image
 def callback_GAZEBO(data):
@@ -66,6 +65,7 @@ def callback_GAZEBO(data):
         pub_corners_B.publish(corners_msg_B)
     
     cv2.waitKey(1)
+
 
 # Function that checks a given image for an AR tag and returns corners if its found
 def processImg(img):
@@ -118,7 +118,6 @@ def aruco_display(corners, image):
         cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
     return image
 
-
 # Write to a csv file
 def write_csv(filename, data):
     with open(filename, mode='a') as csvfile:
@@ -146,7 +145,7 @@ if __name__ == '__main__': # <- Executable
     ################## Publisher Definitions ###########################
     pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
     pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
-    pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=1)
+    pub_image = rospy.Publisher('CV/Primary_Video', Image, queue_size=1)
 
     ####################################################################
 
@@ -198,7 +197,7 @@ if __name__ == '__main__': # <- Executable
             
             # Create video writer object
             # Get the time and create video object with the time of the beginning of the recording
-            vidFilename = "secondaryVideo_%s.avi" % rospy.get_time()
+            vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
             writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
@@ -219,9 +218,8 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback_GAZEBO)
         rospy.spin()
 
-
     # CSV File
-    filename = "secondaryTime_%s.csv" % rospy.get_time()
+    filename = "primaryTime_%s.csv" % rospy.get_time()
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
@@ -283,9 +281,8 @@ if __name__ == '__main__': # <- Executable
             phase_smoother_counter_B += 1
             pub_corners_B.publish(corners_msg_B_last)
 
-        #rate.sleep()
 
     writeObj.release()
-    cv2.destroyAllWindows()         # Close everything and release the camera
+    cv2.destroyAllWindows()         
     cap.release()
-    rospy.loginfo("End of program") # This will output to the terminal
+    rospy.loginfo("End of program") 
