@@ -128,7 +128,10 @@ run_node()
 # Goes in the form of run_node <package_name> <node_name> <node_title>
 
 # Blob Detection Node
-run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
+# run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
+
+# Primary sensor node, running AR tag detection
+run_node gatr_computer_vision primary_node.py Primary_Detection_Node
 
 # AR Detection Node
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
