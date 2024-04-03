@@ -96,7 +96,7 @@ if __name__ == '__main__':
     spawn_model('jackal_2', model_xml)
 
     # Jackal movement speed
-    speed = 0.05
+    speed = 0.005
     speedA = speed
     speedB = speed
 

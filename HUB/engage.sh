@@ -139,6 +139,9 @@ run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 # Localization Node
 run_node gatr_computer_vision localize_node.py Localize_Node
 
+# Data Logger
+run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
+
 # Mision Planner Node
 # run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
 xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &

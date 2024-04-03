@@ -99,6 +99,8 @@ run_node gatr_computer_vision localize_node.py Localization_Node
 
 run_node gatr_missionplanner move_jackals_node.py Move_Jackals_Node
 
+run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
+
 #Start the Mission Planner ($1 is a command line argument for the mission pattern to load)
 if [ -z "$1" ]; then
     xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "rosrun gatr_missionplanner mp_node" &

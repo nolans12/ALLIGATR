@@ -69,7 +69,7 @@ std::vector<double> enu_2_local(std::vector<double> current_pose_enu)
 		current_pos_local[0] = double(x*cos((local_offset_g - 90)*deg2rad) - y*sin((local_offset_g - 90)*deg2rad));
 		current_pos_local[1] = double(x*sin((local_offset_g - 90)*deg2rad) + y*cos((local_offset_g - 90)*deg2rad));
 		current_pos_local[2] = double(z);
-		ROS_INFO("ENU pos: %f %f %f Local pos: %f %f %f", x, y, z, current_pos_local[0], current_pos_local[1], current_pos_local[2]);
+		//ROS_INFO("ENU pos: %f %f %f Local pos: %f %f %f", x, y, z, current_pos_local[0], current_pos_local[1], current_pos_local[2]);
 		return current_pos_local;
 	}
 	catch (const std::exception& e){
@@ -223,7 +223,7 @@ void set_destination(float x, float y, float z, float psi)
 	waypoint_g.pose.position.y = y;
 	waypoint_g.pose.position.z = z;
 
-	ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
+	//ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
 
 	local_pos_pub.publish(waypoint_g);
 	
@@ -247,7 +247,7 @@ void set_destination_enu(float x, float y, float z, float psi)
 	waypoint_g.pose.position.y = y;
 	waypoint_g.pose.position.z = z;
 
-	ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
+	//ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
 
 	local_pos_pub.publish(waypoint_g);
 	
