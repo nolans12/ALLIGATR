@@ -89,20 +89,8 @@ else
         # Unset the ROS_MASTER_URI to avoid conflicts
         unset ROS_MASTER_URI
 
-        # Start a local roscore
-        # It's recommended to run roscore in the background or in a separate terminal/session
-        # because it does not exit until manually stopped.
-        xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
-
-        # Capture the PID of the last background process (roscore)
-        ROSCORE_PID=$!
-
-        echo "Local roscore started with PID $ROSCORE_PID."
-
-        # Optional: wait or perform additional tasks here
-
-        # If you need to stop the local roscore at the end of this script, use:
-        # kill $ROSCORE_PID
+        #Kill the program 
+        exit 1
     fi
 fi
 

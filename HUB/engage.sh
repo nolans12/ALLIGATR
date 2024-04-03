@@ -69,6 +69,7 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
+    export ROS_MASTER_URI=http://$(hostname -I | awk '{print $1}'):11311
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     
 else
