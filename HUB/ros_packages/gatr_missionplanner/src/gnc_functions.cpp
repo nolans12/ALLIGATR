@@ -80,23 +80,25 @@ std::vector<double> enu_2_local(std::vector<double> current_pose_enu)
 }
 std::vector<double> local_2_enu(std::vector<double> current_pos_local)
 {
-	double x = current_pos_local[0];
-	double y = current_pos_local[1];
-	double z = current_pos_local[2];
 
-	double deg2rad = (M_PI/180);
-	double correction_heading_g_double = static_cast<double>(correction_heading_g);
-	double local_offset_g_double = static_cast<double>(local_offset_g);
+	float x = static_cast<float>(current_pos_local[0]);
+	float y = static_cast<float>(current_pos_local[1]);
+	float z = static_cast<float>(current_pos_local[2]);
 
-	double Xlocal = x*cos((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad) - y*sin((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad);
-	double Ylocal = x*sin((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad) + y*cos((correction_heading_g_double + local_offset_g_double - 90.0)*deg2rad);
-	double Zlocal = z;
+	float deg2rad = (M_PI/180);
+	float Xlocal = x*cos((correction_heading_g + local_offset_g - 90)*deg2rad) - y*sin((correction_heading_g + local_offset_g - 90)*deg2rad);
+	float Ylocal = x*sin((correction_heading_g + local_offset_g - 90)*deg2rad) + y*cos((correction_heading_g + local_offset_g - 90)*deg2rad);
+	float Zlocal = z;
 
-	std::vector<double> current_pos_g;
+	x = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
+	y = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
+	z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
 
-	current_pos_g[0] = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
-	current_pos_g[1] = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
-	current_pos_g[2] = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
+	std::vector<double> current_pos_g(4);
+	current_pos_g[0] = x;
+	current_pos_g[1] = y;
+	current_pos_g[2] = z;
+	current_pos_g[3] = current_pos_local[3];
 
 	return current_pos_g;
 
@@ -168,6 +170,35 @@ void set_heading(float heading)
   waypoint_g.pose.orientation.y = qy;
   waypoint_g.pose.orientation.z = qz;
 }
+
+void set_heading_enu(float heading)
+{
+  local_desired_heading_g = heading; 
+  heading = heading + correction_heading_g;
+  
+  //ROS_INFO("Desired Heading %f ", local_desired_heading_g);
+  float yaw = heading*(M_PI/180);
+  float pitch = 0;
+  float roll = 0;
+
+  float cy = cos(yaw * 0.5);
+  float sy = sin(yaw * 0.5);
+  float cr = cos(roll * 0.5);
+  float sr = sin(roll * 0.5);
+  float cp = cos(pitch * 0.5);
+  float sp = sin(pitch * 0.5);
+
+  float qw = cy * cr * cp + sy * sr * sp;
+  float qx = cy * sr * cp - sy * cr * sp;
+  float qy = cy * cr * sp + sy * sr * cp;
+  float qz = sy * cr * cp - cy * sr * sp;
+
+  waypoint_g.pose.orientation.w = qw;
+  waypoint_g.pose.orientation.x = qx;
+  waypoint_g.pose.orientation.y = qy;
+  waypoint_g.pose.orientation.z = qz;
+}
+
 // set position to fly to in the local frame
 /**
 \ingroup control_functions
@@ -197,6 +228,31 @@ void set_destination(float x, float y, float z, float psi)
 	local_pos_pub.publish(waypoint_g);
 	
 }
+
+void set_destination_enu(float x, float y, float z, float psi)
+{
+	set_heading(psi);
+	// //transform map to local
+	// float deg2rad = (M_PI/180);
+	// float Xlocal = x*cos((correction_heading_g + local_offset_g - 90)*deg2rad) - y*sin((correction_heading_g + local_offset_g - 90)*deg2rad);
+	// float Ylocal = x*sin((correction_heading_g + local_offset_g - 90)*deg2rad) + y*cos((correction_heading_g + local_offset_g - 90)*deg2rad);
+	// float Zlocal = z;
+
+	// x = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
+	// y = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
+	// z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
+	//ROS_INFO("Destination set to x: %f y: %f z: %f origin frame", x, y, z);
+
+	waypoint_g.pose.position.x = x;
+	waypoint_g.pose.position.y = y;
+	waypoint_g.pose.position.z = z;
+
+	ROS_INFO("Destination set to x: %f y: %f z: %f in ENU frame", x, y, z);
+
+	local_pos_pub.publish(waypoint_g);
+	
+}
+
 void set_destination_lla(float lat, float lon, float alt, float heading)
 {
 	geographic_msgs::GeoPoseStamped lla_msg;

@@ -25,7 +25,8 @@ DRONEY = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
 
 # Global AR Tag and Camera Data
-AR_LENGTH = 0.615                           # 61.5 cm AR tag side length for the large AR tag
+AR_LENGTH = 0.2496                          # 24.96 cm AR tag side length for the Gazebo AR tag
+#AR_LENGTH = 0.615                           # 61.5 cm AR tag side length for the large AR tag
 XPIXELS = 1920
 YPIXELS = 1080
 

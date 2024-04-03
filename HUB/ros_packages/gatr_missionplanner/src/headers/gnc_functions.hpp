@@ -56,6 +56,7 @@ This function is used to specify the drone’s heading in the local reference fr
 @returns n/a
 */
 void set_heading(float heading);
+void set_heading_enu(float heading);
 // set position to fly to in the local frame
 /**
 \ingroup control_functions
@@ -63,6 +64,7 @@ This function is used to command the drone to fly to a waypoint. These waypoints
 @returns n/a
 */
 void set_destination(float x, float y, float z, float psi);
+void set_destination_enu(float x, float y, float z, float psi);
 void set_destination_lla(float lat, float lon, float alt, float heading);
 void set_destination_lla_raw(float lat, float lon, float alt, float heading);
 /**

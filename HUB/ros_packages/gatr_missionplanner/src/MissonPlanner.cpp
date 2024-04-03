@@ -25,24 +25,39 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     uas_state_sub = gnc_node.subscribe("mavros/local_position/pose", 3, &MissionPlanner::get_current_location_mav, this);
     phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
 
+    // Check if the files already exist
+    std::string base_filename = "rgvA_positions";
+    std::string extension = ".csv";
+    int counter = 0;
+
+    // Create the initial filename
+    std::string fileend = extension;
+
+    // // Check if the file exists
+    // while (std::filesystem::exists(base_filename + fileend)) {
+    //     // If the file exists, increment the counter and append it to the filename
+    //     counter++;
+    //     fileend = "_" + std::to_string(counter) + extension;
+    // }
+
     // Open CSV file for writing
-    rgvA_csv.open("rgvA_positions.csv");
+    rgvA_csv.open("rgvA_positions" + fileend);
     rgvA_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
 
     // Open CSV file for writing
-    rgvB_csv.open("rgvB_positions.csv");
+    rgvB_csv.open("rgvB_positions" + fileend);
     rgvB_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
 
     // Open CSV file for writing
-    uas_csv.open("uas_positions.csv");
+    uas_csv.open("uas_positions" + fileend);
     uas_csv << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 
     // Open CSV file for writing
-    uas_csv_rgvA.open("uas_positions_rgvA.csv");
+    uas_csv_rgvA.open("uas_positions_rgvA" + fileend);
     uas_csv_rgvA << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 
     // Open CSV file for writing
-    uas_csv_rgvB.open("uas_positions_rgvB.csv");
+    uas_csv_rgvB.open("uas_positions_rgvB" + fileend);
     uas_csv_rgvB << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 }
 
@@ -753,6 +768,9 @@ std::vector<double> MissionPlanner::search_motion(std::vector<double> waypoint) 
         waypoint = env.next_searchpoint();
     }
 
+    // Convert the waypoint to ENU coordinates
+    waypoint = local_2_enu(waypoint);
+
     //waypoint[3] = getYaw(waypoint);
 
     return waypoint;
@@ -1099,12 +1117,6 @@ void MissionPlanner::output_drone_state(){
 
 
 bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
-<<<<<<< HEAD
-    // Check if a waypoint would fall outside of the environment bounds
-    //if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1]){
-    //    return true;
-    //}
-=======
     // // Check if a waypoint would fall outside of the environment bounds
     // std::vector<std::vector<double>> bounds_g = {local_2_enu(env.bounds[0]), local_2_enu(env.bounds[1])};
 
@@ -1113,7 +1125,6 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", bounds_g[0][0], bounds_g[1][0], bounds_g[0][1], bounds_g[1][1]);
     //     return true;
     // }
->>>>>>> 57a79be14da903f374484a4e28b3d40b08ff02f8
     return false;
 }
 

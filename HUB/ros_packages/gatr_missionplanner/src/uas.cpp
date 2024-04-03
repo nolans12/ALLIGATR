@@ -39,7 +39,7 @@ uas::uas() {
     joint_duration = 20.0; // 10 seconds
     detection_duration = 2.0; // Time before the RGV is considered lost (s)
     boundary_duration = 5.0; // Time before the UAS aborts when out of bounds (s)
-    search_point_duration = 30.0; // Time before the UAS moves on from a search point if it still hasn't reached it(s)
+    search_point_duration = 15.0; // Time before the UAS moves on from a search point if it still hasn't reached it(s)
     joint_detection_duration = 15.0; // Time before the UAS aborts when the RGVs are lost in the joint phase (s)
 
     // If there is no detections within these times, reset the phase timer
