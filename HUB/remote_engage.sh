@@ -69,7 +69,8 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
-    xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+    # xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
+    exit 1
     
 else
     # Define the remote ROS master URI
