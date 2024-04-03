@@ -29,7 +29,6 @@ AR_LENGTH = 0.615                           # 61.5 cm AR tag side length for the
 XPIXELS = 1920
 YPIXELS = 1080
 
-
 # Inertially Localize given relative estimates
 def inertLocalize(relX, relY):
     # Set the bearing
@@ -39,7 +38,7 @@ def inertLocalize(relX, relY):
     # Erel = np.cos(p) * relX + np.sin(p) * relY
     # Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
 
-    # Rotate into the local inertial frame
+    # Rotate into the ENU frame using the yaw angle DOUBLE CHECK THIS IS THE CORRECT YAW ANGLE MEASURED FROM EAST
     Erel = np.cos(p) * relY + np.sin(p) * relX
     Nrel = -1*np.cos(p) * relX + np.sin(p) * relY
 

@@ -101,7 +101,7 @@ def processImg(img):
             out_str = "No AR Tag %s" % rospy.get_time()
 
         #rospy.loginfo(out_str)
-        return corners_A, corners_B
+    return corners_A, corners_B
     
 # Highlight the detected markers
 def aruco_display(corners, image):
@@ -218,7 +218,7 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback_GAZEBO)
         rospy.spin()
 
-    # CSV File
+    # CSV File with time log
     filename = "primaryTime_%s.csv" % rospy.get_time()
 
     # Begin the main loop that consistently outputs AR tag corners when running
@@ -252,7 +252,6 @@ if __name__ == '__main__': # <- Executable
             if frameCount % (camFPS // processFPS) == 0:                
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
-                
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
