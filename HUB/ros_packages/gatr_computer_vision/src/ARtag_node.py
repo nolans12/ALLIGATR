@@ -8,22 +8,12 @@ from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-## Global variables
-csv_filename = "output_AR.csv"
-# Initialize CSV file and writer
-with open(csv_filename, mode='w') as csv_file:
-    fieldnames = ['timestamp']  # Define the fields of the CSV file
-    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    writer.writeheader()
 
 # Try to open the 0 index for the secondary camera
 camera_index = 0
 
 # Camera FPS
 camFPS = 60
-
-# Save image frequency
-saveFPS = 2
 
 # Publish image frequency
 pubFPS = 1
@@ -119,12 +109,6 @@ def aruco_display(corners, image):
     return image
 
 
-# Write to a csv file
-def write_csv(filename, data):
-    with open(filename, mode='a') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([data])
-
 
 if __name__ == '__main__': # <- Executable 
     # ArUco dictionary
@@ -190,16 +174,6 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():
             camera_found = True     # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
-
-            # Get the frame width and height
-            frame_width = int(cap.get(3)) 
-            frame_height = int(cap.get(4)) 
-            size = (frame_width, frame_height) 
-            
-            # Create video writer object
-            # Get the time and create video object with the time of the beginning of the recording
-            vidFilename = "secondaryVideo_%s.avi" % rospy.get_time()
-            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
         rospy.sleep(1.0) # Sleep for 1 second
@@ -220,9 +194,6 @@ if __name__ == '__main__': # <- Executable
         rospy.spin()
 
 
-    # CSV File
-    filename = "secondaryTime_%s.csv" % rospy.get_time()
-
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
         # Output messages
@@ -237,14 +208,6 @@ if __name__ == '__main__': # <- Executable
             ret, img = cap.read()
             frameCount += 1                         # Update the frame count
 
-            # Save to a file
-            if frameCount % (camFPS // saveFPS) == 0:
-                # Save image to video file
-                writeObj.write(img)
-
-                timestamp = rospy.Time.now()
-                write_csv(filename, timestamp)
-
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
                 # Publish image message to image topic
@@ -254,7 +217,6 @@ if __name__ == '__main__': # <- Executable
             if frameCount % (camFPS // processFPS) == 0:                
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
-                
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
@@ -284,8 +246,7 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B_last)
 
         #rate.sleep()
-
-    writeObj.release()
+        
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
