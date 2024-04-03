@@ -194,8 +194,6 @@ if __name__ == '__main__': # <- Executable
         sub_img = rospy.Subscriber('webcam/image_raw', Image, callback_GAZEBO)
         rospy.spin()
 
-    # CSV File with time log
-    filename = "primaryTime_%s.csv" % rospy.get_time()
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():

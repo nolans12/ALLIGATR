@@ -131,7 +131,7 @@ if __name__ == '__main__':
     subrgvA = rospy.Subscriber('CV/inert_coord_A', Float32MultiArray, callbackrgvA)
     subrgvB = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB)
     subphase = rospy.Subscriber('MP/phase', String, callbackphase)
-    sub_img = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
+    #sub_img = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
 
     # Hyperparameters
     save_location = os.path.expanduser("~/ALLIGATR/HUB/data")
@@ -148,10 +148,10 @@ if __name__ == '__main__':
     check_file(rgvB_detections_file)
 
     # Video file
-    video_timestamp_file = open(os.path.join(data_dir, "video_timestamp_file.csv"), 'w')
-    check_file(video_timestamp_file)
-    size = (int(1920), int(1080)) 
-    writeObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+    # video_timestamp_file = open(os.path.join(data_dir, "video_timestamp_file.csv"), 'w')
+    # check_file(video_timestamp_file)
+    # size = (int(1920), int(1080)) 
+    # writeObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
 
     # Write the headers to the files
     drone_writer = csv.writer(drone_state_hist_file)
@@ -163,8 +163,8 @@ if __name__ == '__main__':
     rgvB_writer = csv.writer(rgvB_detections_file)
     rgvB_writer.writerow(["rgvX", "rgvY", "Time"])
 
-    videoTime_writer = csv.writer(video_timestamp_file)
-    videoTime_writer.writerow(["Time"])
+    # videoTime_writer = csv.writer(video_timestamp_file)
+    # videoTime_writer.writerow(["Time"])
 
     # Set ros rate to 10 hz
     rate = rospy.Rate(10)
