@@ -128,8 +128,8 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
-    pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
+    pub_corners_A = rospy.Publisher('CV/Secondary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
+    pub_corners_B = rospy.Publisher('CV/Secondary/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
     pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=1)
 
     ####################################################################
