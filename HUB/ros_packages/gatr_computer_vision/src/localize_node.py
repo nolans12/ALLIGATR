@@ -16,7 +16,7 @@ AR_CORNERS_B = Int32MultiArray()
 AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # Global Drone State
-global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE
+global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE, AR_LENGTH, XPIXELS, YPIXELS
 PITCH = 0
 ROLL = 0
 YAW = 0
@@ -24,12 +24,10 @@ DRONEX = 0
 DRONEY = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
 
-# Global Data
-#AR_LENGTH = 0.15875                     # AR Tag length in meters
-AR_LENGTH = 0.2496                       # Gazebo sim value
+# Global AR Tag and Camera Data
+AR_LENGTH = 0.615                           # 61.5 cm AR tag side length for the large AR tag
 XPIXELS = 1920
 YPIXELS = 1080
-
 
 # Inertially Localize given relative estimates
 def inertLocalize(relX, relY):
@@ -40,24 +38,18 @@ def inertLocalize(relX, relY):
     # Erel = np.cos(p) * relX + np.sin(p) * relY
     # Nrel = -1*np.sin(p) * relX + np.cos(p) * relY
 
+    # Rotate into the ENU frame using the yaw angle DOUBLE CHECK THIS IS THE CORRECT YAW ANGLE MEASURED FROM EAST
     Erel = np.cos(p) * relY + np.sin(p) * relX
     Nrel = -1*np.cos(p) * relX + np.sin(p) * relY
 
-    # Calculate the RGV inertial position in the ENU frame
+    # Calculate the RGV inertial position in the local inertial frame frame
     XRGV = DRONEX + Erel
     YRGV = DRONEY + Nrel
 
     #rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, RGV_x: {}, RGV_y: {}".format(DRONEX, DRONEY, ALTITUDE, XRGV, YRGV))
-
     return XRGV, YRGV
 
-def relativeLocalize(relX, relY):
-    XRGV = DRONEX + relX
-    YRGV = DRONEY + relY
-
-    return XRGV, YRGV
-
-# Localization function
+# Return the relative position of the RGV in the camera frame
 def localize(ARCorners):
     # Define the center of the image
     cx = XPIXELS / 2
@@ -101,7 +93,7 @@ def localize(ARCorners):
 
     return relX, relY
 
-# Callback function that will execute whenever data is received
+# RGV A callback
 def callbackAR_A(data):
     # Echo data to the ROS node
     outData = Float32MultiArray()
@@ -109,16 +101,12 @@ def callbackAR_A(data):
 
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
-    RGVX_rel, RGVY_rel = relativeLocalize(relX, relY)
 
     rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("RGV Relative - RGVA_x: {}, RGVA_y: {}".format(RGVX_rel, RGVY_rel))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}".format(DRONEX, DRONEY, ALTITUDE))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
 
-    outData.data = [RGVX_rel, RGVY_rel]
-    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    outData.data = [RGVX_inert, RGVY_inert]
 
-    #rospy.loginfo(out_str)
     pubCoord_A.publish(outData)       # Output estimates
     rate.sleep()
 
@@ -130,29 +118,17 @@ def callbackAR_B(data):
 
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
-    RGVX_rel, RGVY_rel = relativeLocalize(relX, relY)
 
-    rospy.loginfo("")
-    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("RGV Relative - RGVA_x: {}, RGVA_y: {}".format(RGVX_rel, RGVY_rel))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}".format(DRONEX, DRONEY, ALTITUDE))
+    rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
 
-    outData.data = [RGVX_rel, RGVY_rel]
-    #rospy.loginfo("RGV Position - RGVB_x: {}, RGVB_y: {}".format(RGVX, RGVY))
+    outData.data = [RGVX_inert, RGVY_inert]
 
-    #rospy.loginfo(out_str)
     pubCoord_B.publish(outData)       # Output estimates
     rate.sleep()
 
-
-def callbackBlob(data):
-    # Echo data to the ROS node
-    out_str = "Blob Data Received"
-    #rospy.loginfo(out_str)
-    #pubCoord.publish(data)      # Echo data
-    rate.sleep()
-
-# Subscribe to get position data of the drone relative to its instantiated inertial local frame
+# Subscribe to get position data of the drone relative to its instantiated inertial local frame, this is the ENU frame with the origin
+# at the point of initialization
 def pose_callback(data):
     global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW
 
@@ -173,7 +149,7 @@ def pose_callback(data):
     ALTITUDE = z
 
     # Output the x, y, z position
-    #rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}, Pitch: {}, Roll: {}".format(x, y, z, YAW, PITCH, ROLL))
+    #rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
 
 
 if __name__ == '__main__': # <- Executable 
@@ -192,19 +168,16 @@ if __name__ == '__main__': # <- Executable
     ################## Subscriber Definitions ###########################
     subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
     subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
-    #subBlob = rospy.Subscriber('Blob_Centroid', Int32MultiArray, callbackBlob)
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
     rospy.sleep(1.0)
     
-
     # Begin the main loop that consistently outputs Localization estimates
     while not rospy.is_shutdown():
         # Spin so the script keeps looking for messages
         rospy.spin()
             
-
 
     rospy.loginfo("End of localization program") # This will output to the terminal
