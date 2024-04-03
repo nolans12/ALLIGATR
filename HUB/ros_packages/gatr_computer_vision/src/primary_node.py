@@ -92,7 +92,7 @@ def processImg(img):
         else:
             out_str = "No AR Tag %s" % rospy.get_time()
 
-        #rospy.loginfo(out_str)
+    rospy.loginfo(out_str)
     return corners_A, corners_B
     
 # Highlight the detected markers
