@@ -69,7 +69,6 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
-    export ROS_MASTER_URI=http://$(hostname -I | awk '{print $1}'):11311
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     
 else
@@ -90,20 +89,8 @@ else
         # Unset the ROS_MASTER_URI to avoid conflicts
         unset ROS_MASTER_URI
 
-        # Start a local roscore
-        # It's recommended to run roscore in the background or in a separate terminal/session
-        # because it does not exit until manually stopped.
-        xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
-
-        # Capture the PID of the last background process (roscore)
-        ROSCORE_PID=$!
-
-        echo "Local roscore started with PID $ROSCORE_PID."
-
-        # Optional: wait or perform additional tasks here
-
-        # If you need to stop the local roscore at the end of this script, use:
-        # kill $ROSCORE_PID
+        #Kill the program 
+        exit 1
     fi
 fi
 
@@ -130,33 +117,8 @@ run_node()
 ################### ADD PROCESSES HERE ######################
 # Goes in the form of run_node <package_name> <node_name> <node_title>
 
-# Blob Detection Node
-# run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
-
-# Primary sensor node, running AR tag detection
-run_node gatr_computer_vision primary_node.py Primary_Detection_Node
-
-# AR Detection Node
-run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
-
-# Localization Node
-run_node gatr_computer_vision localize_node.py Localize_Node
-
 # Data Logger
-#run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
-
-# Mision Planner Node
-# run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
-xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
-
-# Start the MAVLINK connection to cube, opening on ttyTHS1 port
-xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
-
-# Wait for space to be pressed
-read -n 1 -s -r -p "Press space to open MAVROS node"
-
-#Start the MAVROS node
-xterm -T "mavros" -e "roslaunch mavros apm.launch fcu_url:=/dev/ttyTHS1:57600@" &
+run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
 
 #############################################################
 
