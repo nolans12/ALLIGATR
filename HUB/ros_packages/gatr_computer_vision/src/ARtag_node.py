@@ -122,7 +122,7 @@ if __name__ == '__main__': # <- Executable
 
     rospy.init_node("ARtag_detection_node") # Initialize the ROS node
 
-    rospy.loginfo("############# ARtag DETECTION NODE #################") # This will output to the terminal
+    rospy.loginfo("############# SECONDARY AR DETECTION NODE #################") # This will output to the terminal
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")

@@ -121,9 +121,9 @@ if __name__ == '__main__': # <- Executable
     aruco_type = "DICT_6X6_250"
     finalDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 
-    rospy.init_node("ARtag_detection_node") # Initialize the ROS node
+    rospy.init_node("Primary_Detection_Node") # Initialize the ROS node
 
-    rospy.loginfo("############# ARtag DETECTION NODE #################") # This will output to the terminal
+    rospy.loginfo("############# PRIMARY AR DETECTION NODE #################") # This will output to the terminal
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
