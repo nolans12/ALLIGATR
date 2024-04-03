@@ -8,14 +8,6 @@ from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-## Global variables
-csv_filename = "output_AR.csv"
-# Initialize CSV file and writer
-with open(csv_filename, mode='w') as csv_file:
-    fieldnames = ['timestamp']  # Define the fields of the CSV file
-    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    writer.writeheader()
-
 # Try to open the 1 index for the primary camera
 camera_index = 1
 
@@ -118,12 +110,6 @@ def aruco_display(corners, image):
         cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
     return image
 
-# Write to a csv file
-def write_csv(filename, data):
-    with open(filename, mode='a') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([data])
-
 
 if __name__ == '__main__': # <- Executable 
     # ArUco dictionary
@@ -189,16 +175,6 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():
             camera_found = True     # Camera is found
             rospy.loginfo("Camera " + str(camera_index) + " Connected!")
-
-            # Get the frame width and height
-            frame_width = int(cap.get(3)) 
-            frame_height = int(cap.get(4)) 
-            size = (frame_width, frame_height) 
-            
-            # Create video writer object
-            # Get the time and create video object with the time of the beginning of the recording
-            vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
-            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
         rospy.sleep(1.0) # Sleep for 1 second
@@ -234,14 +210,6 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
             frameCount += 1                         # Update the frame count
-
-            # Save to a file
-            if frameCount % (camFPS // saveFPS) == 0:
-                # Save image to video file
-                writeObj.write(img)
-
-                timestamp = rospy.Time.now()
-                write_csv(filename, timestamp)
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
@@ -281,7 +249,6 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B_last)
 
 
-    writeObj.release()
     cv2.destroyAllWindows()         
     cap.release()
     rospy.loginfo("End of program") 
