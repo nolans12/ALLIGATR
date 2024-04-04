@@ -41,6 +41,8 @@ int main(int argc, char** argv)
 		ROS_INFO("User Specified Mode: %s", pattern_name.c_str());
 	}
 	
+	ROS_INFO("Updated 4-5");
+	
 	//initialize control publisher/subscribers
 	init_publisher_subscriber(gnc_node);
 
@@ -75,7 +77,9 @@ int main(int argc, char** argv)
 		rate.sleep();
 
 		//Update the drone's position
+		ROS_INFO("Attempting to get drone state...");
 		mp.update_drone_state(curr_waypoint_new);
+		ROS_INFO("Got drone state!");
 		//mp.output_drone_state();
 
 		// Save the previous waypoint
@@ -103,9 +107,11 @@ int main(int argc, char** argv)
 			//////////// MAIN LOOP HERE ////////////
 			
 			// Determine the phase of the mission at the given timestep
+			ROS_INFO("Determining phase...");
 			mp.determine_phase();
 
 			// Execute the phase
+			ROS_INFO("Determining motion...");
 			curr_waypoint_new = mp.determine_motion(curr_waypoint_new);
 
 			// IF the phase is in ABORT, land the drone and exit the program

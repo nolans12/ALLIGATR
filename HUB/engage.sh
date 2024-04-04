@@ -21,8 +21,8 @@ while getopts "b:mp:" opt; do
 done
 
 # Housekeeping, this will shift the command line arguments so that $1 refers to the first argument, $2 to the second, and so on.
-shift $((OPTIND-1))
-[ "${1:-}" = "--" ] && shift
+#shift $((OPTIND-1))
+#[ "${1:-}" = "--" ] && shift
 
 # Sets the font to be bigger on Xterm
 xrdb -merge ~/.Xresources
@@ -65,7 +65,7 @@ cd ${CURRENT_DIR} #Go back to the build directory
 # sleep 2
 
 # Check if an argument was provided
-if [ -z "$1" ]; then
+if [ $BUILD_FLAG -eq 1 ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
@@ -133,7 +133,7 @@ run_node()
 # run_node gatr_computer_vision blob_detection_node.py Blob_Detection_Node
 
 # Primary sensor node, running AR tag detection
-#run_node gatr_computer_vision primary_node.py Primary_Detection_Node
+run_node gatr_computer_vision primary_node.py Primary_Detection_Node
 
 # AR Detection Node
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node

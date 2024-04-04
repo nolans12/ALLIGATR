@@ -188,7 +188,7 @@ def pose_callback(data):
     ALTITUDE = z
 
     # Output the x, y, z position
-    #rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
+    rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
 
 
 if __name__ == '__main__': # <- Executable 
