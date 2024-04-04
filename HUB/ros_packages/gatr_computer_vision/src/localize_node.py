@@ -103,8 +103,9 @@ def callbackAR_A(data):
     relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
-    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    # rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    rospy.loginfo("RGV A Detected! RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
 
     outData.data = [RGVX_inert, RGVY_inert]
 
@@ -120,8 +121,9 @@ def callbackAR_B(data):
     relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
-    rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    # rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
+    # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    rospy.loginfo("RGV A Detected! RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
 
     outData.data = [RGVX_inert, RGVY_inert]
 

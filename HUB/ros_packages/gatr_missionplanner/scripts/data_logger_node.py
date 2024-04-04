@@ -27,6 +27,8 @@ writeObj = None
 
 # Global phase variable
 PHASE = "STANDBY"
+DRONE_COUNTER = 0
+RGV_COUNTER = 0
 
 # Save FPS for video stream
 saveFPS = 1
@@ -74,9 +76,12 @@ def pose_callback(data):
     ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
 
     # Write the data to the file
-    global drone_state_hist_file
+    global drone_state_hist_file, DRONE_COUNTER
     writer = csv.writer(drone_state_hist_file)
     writer.writerow([x, y, z, roll, pitch, yaw, PHASE, ros_now])
+
+    # Increment the counter
+    DRONE_COUNTER += 1
     
 # rgv A callback
 def callbackrgvA(data):
@@ -86,9 +91,12 @@ def callbackrgvA(data):
     # Get the current time
     ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
 
-    global rgvA_detections_file
+    global rgvA_detections_file, RGV_COUNTER
     writer = csv.writer(rgvA_detections_file)
     writer.writerow([data.data[0], data.data[1], PHASE, ros_now])
+
+    # Increment the counter
+    RGV_COUNTER += 1
 
 # rgv B callback
 def callbackrgvB(data):
@@ -98,9 +106,12 @@ def callbackrgvB(data):
     # Get the current time
     ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
 
-    global rgvB_detections_file
+    global rgvB_detections_file, RGV_COUNTER
     writer = csv.writer(rgvB_detections_file)
     writer.writerow([data.data[0], data.data[1], PHASE, ros_now])
+
+    # Increment the counter
+    RGV_COUNTER += 1
 
 def callbackphase(data):
     global PHASE
@@ -167,13 +178,25 @@ if __name__ == '__main__':
     # videoTime_writer.writerow(["Time"])
 
     # Set ros rate to 10 hz
-    rate = rospy.Rate(10)
-    rospy.spin()
+    rate = rospy.Rate(1)
+
+    # Wait until the phase is not standby
+    rospy.loginfo("Waiting for phase to change out of STANDBY...")
+    while PHASE == "STANDBY":
+        rate.sleep()
+
+    rospy.loginfo("Phase changed to: " + PHASE + ". Data logger node started")
 
     # Main loop, just check for callbacks on the subscribers
     while not rospy.is_shutdown():
 
-        rospy.sleep(0.1)
+        # Output the number of data points logged
+        rospy.loginfo("Drone data points logged: " + str(DRONE_COUNTER))
+        rospy.loginfo("RGV data points logged: " + str(RGV_COUNTER))
+
+        rate.sleep()
+
+    rospy.spin()
 
     rospy.logfatal("Data logger node stopped")
         

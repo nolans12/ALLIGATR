@@ -25,49 +25,49 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     uas_state_sub = gnc_node.subscribe("mavros/local_position/pose", 3, &MissionPlanner::get_current_location_mav, this);
     phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
 
-    // Check if the files already exist
-    std::string base_filename = "rgvA_positions";
-    std::string extension = ".csv";
-    int counter = 0;
+    // // Check if the files already exist
+    // // std::string base_filename = "rgvA_positions";
+    // // std::string extension = ".csv";
+    // int counter = 0;
 
-    // Create the initial filename
-    std::string fileend = extension;
+    // // Create the initial filename
+    // std::string fileend = extension;
 
-    // // Check if the file exists
-    // while (std::filesystem::exists(base_filename + fileend)) {
-    //     // If the file exists, increment the counter and append it to the filename
-    //     counter++;
-    //     fileend = "_" + std::to_string(counter) + extension;
-    // }
+    // // // Check if the file exists
+    // // while (std::filesystem::exists(base_filename + fileend)) {
+    // //     // If the file exists, increment the counter and append it to the filename
+    // //     counter++;
+    // //     fileend = "_" + std::to_string(counter) + extension;
+    // // }
 
-    // Open CSV file for writing
-    rgvA_csv.open("rgvA_positions" + fileend);
-    rgvA_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
+    // // Open CSV file for writing
+    // rgvA_csv.open("rgvA_positions" + fileend);
+    // rgvA_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
 
-    // Open CSV file for writing
-    rgvB_csv.open("rgvB_positions" + fileend);
-    rgvB_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
+    // // Open CSV file for writing
+    // rgvB_csv.open("rgvB_positions" + fileend);
+    // rgvB_csv << "X (m), Y (m), Time (s), Phase, Time" << std::endl; // Write header to CSV file
 
-    // Open CSV file for writing
-    uas_csv.open("uas_positions" + fileend);
-    uas_csv << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
+    // // Open CSV file for writing
+    // uas_csv.open("uas_positions" + fileend);
+    // uas_csv << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 
-    // Open CSV file for writing
-    uas_csv_rgvA.open("uas_positions_rgvA" + fileend);
-    uas_csv_rgvA << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
+    // // Open CSV file for writing
+    // uas_csv_rgvA.open("uas_positions_rgvA" + fileend);
+    // uas_csv_rgvA << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 
-    // Open CSV file for writing
-    uas_csv_rgvB.open("uas_positions_rgvB" + fileend);
-    uas_csv_rgvB << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
+    // // Open CSV file for writing
+    // uas_csv_rgvB.open("uas_positions_rgvB" + fileend);
+    // uas_csv_rgvB << "X (m), Y (m), Z (m), Phase, Time" << std::endl; // Write header to CSV file
 }
 
 MissionPlanner::~MissionPlanner() {
     // Close CSV file
-    rgvA_csv.close();
-    rgvB_csv.close();
-    uas_csv.close();
-    uas_csv_rgvA.close();
-    uas_csv_rgvB.close();
+    // rgvA_csv.close();
+    // rgvB_csv.close();
+    // uas_csv.close();
+    // uas_csv_rgvA.close();
+    // uas_csv_rgvB.close();
 
 }
 
@@ -102,9 +102,9 @@ void MissionPlanner::rgvA_detected_callback(const std_msgs::Float32MultiArray::C
     env.rgvAPosition[1] = std::accumulate(env.rgvAHistory.y_pos.begin(), env.rgvAHistory.y_pos.end(), 0.0) / env.rgvAHistory.y_pos.size();
 
     // Write RGV A position to CSV file
-    rgvA_csv << x << "," << y << "," << last_rgvA_detection.toSec() << ", " << phase << ", " << last_rgvA_detection << std::endl;
-    uas_csv_rgvA << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection << std::endl;
-    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection  << std::endl;   
+    // rgvA_csv << x << "," << y << "," << last_rgvA_detection.toSec() << ", " << phase << ", " << last_rgvA_detection << std::endl;
+    // uas_csv_rgvA << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection << std::endl;
+    // uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvA_detection  << std::endl;   
 }
 
 // Callback function to be updated when the RGV is detected
@@ -135,9 +135,9 @@ void MissionPlanner::rgvB_detected_callback(const std_msgs::Float32MultiArray::C
     env.rgvBPosition[1] = std::accumulate(env.rgvBHistory.y_pos.begin(), env.rgvBHistory.y_pos.end(), 0.0) / env.rgvBHistory.y_pos.size();
 
     // Write RGV B position to CSV file
-    rgvB_csv << x << "," << y << "," << last_rgvB_detection.toSec() << ", " << phase << ", " << last_rgvB_detection  << std::endl;
-    uas_csv_rgvB << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase  << ", " << last_rgvB_detection << std::endl;
-    uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvB_detection  << std::endl;
+//     rgvB_csv << x << "," << y << "," << last_rgvB_detection.toSec() << ", " << phase << ", " << last_rgvB_detection  << std::endl;
+//     uas_csv_rgvB << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase  << ", " << last_rgvB_detection << std::endl;
+//     uas_csv << drone.state[0] << "," << drone.state[1] << "," << drone.state[2] << "," << phase << ", " << last_rgvB_detection  << std::endl;
 }
 
 void MissionPlanner::get_current_location_mav(const geometry_msgs::PoseStamped::ConstPtr& msg){
@@ -241,6 +241,14 @@ void MissionPlanner::determine_phase(){
 
 void MissionPlanner::boundary_control_phase(){
     
+    //////// OVERRIDE ////////
+
+    phase = "Search";
+    search_point_time = ros::Time::now();
+    ROS_INFO("Boundary control phase overridden. Search phase sent instead...");
+
+    //////////////////////////
+
     // Is the drone out of bounds?
     if (out_of_bounds(drone.state)){
         phase = "Boundary Control";
@@ -633,7 +641,7 @@ void MissionPlanner::joint_phase(){
 
         // If the drone lost one or both of the RGVs, return to the search phase
         if ((ros::Time::now() - joint_last_detection) > ros::Duration(drone.joint_detection_duration)){
-            phase = "Search";
+            phase = "Joint Search";
             ROS_INFO("RGVs have been lost. Returning to search...");
         }
     }
@@ -1106,10 +1114,10 @@ double MissionPlanner::getYaw(std::vector<double> waypoint) {
 
 
 void MissionPlanner::output_drone_state(){
-    //std::vector<double> dronePos = drone.state;
+    std::vector<double> dronePos = drone.state;
     // Output the current location of the UAS and the next location it is going to
-    //std::cout << std::fixed << std::setprecision(2);
-    //std::cout << "Current Position: " << dronePos[0] << ", " << dronePos[1] << ", " << dronePos[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Current Position: " << dronePos[0] << ", " << dronePos[1] << ", " << dronePos[2] << " -> Going to " << drone.dest[0] << ", " << drone.dest[1] << ", " << drone.dest[2] << std::endl;
     //enu_2_local(dronePos);
 
 }
@@ -1125,11 +1133,6 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", bounds_g[0][0], bounds_g[1][0], bounds_g[0][1], bounds_g[1][1]);
     //     return true;
     // }
-    return false;
-}
-
-bool MissionPlanner::RGV_detected(){
-    // Check if an RGV is detected through the AR tag node
     return false;
 }
 

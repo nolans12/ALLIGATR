@@ -70,9 +70,6 @@ class MissionPlanner {
         // Check if a waypoint would fall outside of the environment bounds
         bool out_of_bounds(std::vector<double> waypoint);
 
-        // Check if an RGV is detected through the AR tag node
-        bool RGV_detected();
-
         bool isRGVAClosest();
 
         // Check if the drone has stopped moving
@@ -109,11 +106,11 @@ class MissionPlanner {
         ros::Time last_rgvA_detection; // Time the last RGV-A detection was made
         ros::Time last_rgvB_detection; // Time the last RGV-B detection was made
 
-        // CSV file to store RGV positions
-        std::ofstream rgvA_csv;
-        std::ofstream rgvB_csv;
-        std::ofstream uas_csv;
-        std::ofstream uas_csv_rgvA;
-        std::ofstream uas_csv_rgvB;
+        // // CSV file to store RGV positions
+        // std::ofstream rgvA_csv;
+        // std::ofstream rgvB_csv;
+        // std::ofstream uas_csv;
+        // std::ofstream uas_csv_rgvA;
+        // std::ofstream uas_csv_rgvB;
 };
 

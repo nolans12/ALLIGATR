@@ -59,10 +59,10 @@ int main(int argc, char** argv)
 	//create local reference frame 
 	initialize_local_frame();
 
-	set_speed(1.0); //m/s
+	set_speed(2); // m/s
 
 	//request takeoff
-	takeoff(10);
+	takeoff(50);
 
 	//specify control loop rate. We recommend a low frequency to not over load the FCU with messages. Too many messages will cause the drone to be sluggish
 	ros::Rate rate(2.0);
@@ -139,8 +139,8 @@ int main(int argc, char** argv)
 			}
 
 			// Set the new waypoint
-			ROS_INFO("");
-			mp.output_drone_state();
+			//ROS_INFO("");
+			//mp.output_drone_state();
 			set_destination_enu(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], curr_waypoint_new[3]);
 		}
 
