@@ -90,7 +90,7 @@ def processImg(img):
         else:
             out_str = "No AR Tag %s" % rospy.get_time()
 
-        #rospy.loginfo(out_str)
+    rospy.loginfo(out_str)
     return corners_A, corners_B
     
 # Highlight the detected markers
@@ -122,14 +122,14 @@ if __name__ == '__main__': # <- Executable
 
     rospy.init_node("ARtag_detection_node") # Initialize the ROS node
 
-    rospy.loginfo("############# ARtag DETECTION NODE #################") # This will output to the terminal
+    rospy.loginfo("############# SECONDARY AR DETECTION NODE #################") # This will output to the terminal
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pub_corners_A = rospy.Publisher('CV/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
-    pub_corners_B = rospy.Publisher('CV/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
+    pub_corners_A = rospy.Publisher('CV/Secondary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
+    pub_corners_B = rospy.Publisher('CV/Secondary/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
     pub_image = rospy.Publisher('CV/Secondary_Video', Image, queue_size=1)
 
     ####################################################################

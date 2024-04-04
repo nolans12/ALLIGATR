@@ -94,13 +94,49 @@ def localize(ARCorners):
 
     return relX, relY
 
-# RGV A callback
-def callbackAR_A(data):
+
+# RGV A callback PRIMARY SENSOR
+def callback_primary_AR_A(data):
     # Echo data to the ROS node
     outData = Float32MultiArray()
     AR_CORNERS_A = data               # Update AR Tag corner estimate
 
-    relX, relY = localize(AR_CORNERS_A)     # Get relative coordinates in meters
+    relX, relY = localize(data)     # Get relative coordinates in meters
+    RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
+
+    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+
+    outData.data = [RGVX_inert, RGVY_inert]
+
+    pubCoord_primary_A.publish(outData)       # Output estimates
+    rate.sleep()
+
+# RGV B callback PRIMARY SENSOR
+def callback_primary_AR_B(data):
+    # Echo data to the ROS node
+    outData = Float32MultiArray()
+    AR_CORNERS_B = data               # Update AR Tag corner estimate
+
+    relX, relY = localize(data)     # Get relative coordinates in meters
+    RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
+
+    rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+
+    outData.data = [RGVX_inert, RGVY_inert]
+
+    pubCoord_primary_B.publish(outData)       # Output estimates
+    rate.sleep()
+
+
+# RGV A callback SECONDARY SENSOR
+def callback_secondary_AR_A(data):
+    # Echo data to the ROS node
+    outData = Float32MultiArray()
+    AR_CORNERS_A = data               # Update AR Tag corner estimate
+
+    relX, relY = localize(data)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
     # rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
@@ -109,16 +145,16 @@ def callbackAR_A(data):
 
     outData.data = [RGVX_inert, RGVY_inert]
 
-    pubCoord_A.publish(outData)       # Output estimates
+    pubCoord_secondary_A.publish(outData)       # Output estimates
     rate.sleep()
 
-# RGV B callback
-def callbackAR_B(data):
+# RGV B callback SECONDARY SENSOR
+def callback_secondary_AR_B(data):
     # Echo data to the ROS node
     outData = Float32MultiArray()
     AR_CORNERS_B = data               # Update AR Tag corner estimate
 
-    relX, relY = localize(AR_CORNERS_B)     # Get relative coordinates in meters
+    relX, relY = localize(data)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
     # rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
@@ -127,7 +163,7 @@ def callbackAR_B(data):
 
     outData.data = [RGVX_inert, RGVY_inert]
 
-    pubCoord_B.publish(outData)       # Output estimates
+    pubCoord_secondary_B.publish(outData)       # Output estimates
     rate.sleep()
 
 # Subscribe to get position data of the drone relative to its instantiated inertial local frame, this is the ENU frame with the origin
@@ -165,12 +201,16 @@ if __name__ == '__main__': # <- Executable
     rospy.loginfo("Initializing ROS connection...")
     
     ################## Publisher Definitions ###########################
-    pubCoord_A = rospy.Publisher('CV/inert_coord_A', Float32MultiArray, queue_size=1)
-    pubCoord_B = rospy.Publisher('CV/inert_coord_B', Float32MultiArray, queue_size=1)
+    pubCoord_primary_A = rospy.Publisher('CV/inert_coord_A', Float32MultiArray, queue_size=1)
+    pubCoord_primary_B = rospy.Publisher('CV/inert_coord_B', Float32MultiArray, queue_size=1)
+    pubCoord_secondary_A = rospy.Publisher('CV/Secondary/inert_coord_A', Float32MultiArray, queue_size=1)
+    pubCoord_secondary_B = rospy.Publisher('CV/Secondary/inert_coord_B', Float32MultiArray, queue_size=1)
 
     ################## Subscriber Definitions ###########################
-    subCorners_A = rospy.Subscriber('CV/AR_corners_A', Int32MultiArray, callbackAR_A)
-    subCorners_B = rospy.Subscriber('CV/AR_corners_B', Int32MultiArray, callbackAR_B)
+    subCorners_primary_A = rospy.Subscriber('CV/Primary/AR_corners_A', Int32MultiArray, callback_primary_AR_A)
+    subCorners_primary_B = rospy.Subscriber('CV/Primary/AR_corners_B', Int32MultiArray, callback_primary_AR_B)
+    subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
+    subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
 
     ####################################################################
