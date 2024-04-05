@@ -87,8 +87,10 @@ class MissionPlanner {
         unsigned short int smootherCount;
         uas drone;
         environment env;
-        ros::Subscriber rel_coord_A_sub;
-        ros::Subscriber rel_coord_B_sub;
+        ros::Subscriber inert_coord_A_sub_primary;
+        ros::Subscriber inert_coord_B_sub_primary;
+        ros::Subscriber inert_coord_A_sub_secondary;
+        ros::Subscriber inert_coord_B_sub_secondary;
         ros::Subscriber uas_state_sub;
         ros::Publisher phase_pub;
 

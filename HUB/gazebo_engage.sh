@@ -93,6 +93,9 @@ sleep 3
 #xterm -e "roslaunch iq_sim apm.launch" &
 #sleep 3
 
+# Primary sensor node, running AR tag detection
+run_node gatr_computer_vision primary_node.py Primary_Detection_Node
+
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
 run_node gatr_computer_vision localize_node.py Localization_Node

@@ -190,7 +190,10 @@ if __name__ == '__main__': # <- Executable
 
     if faux_camera:
         # Verify that there is a connection to the webcam/image_raw topic
-        sub_img = rospy.Subscriber('webcam/image_raw', Image, callback_GAZEBO)
+        if camera_index == 0:
+            sub_img = rospy.Subscriber('webcam/image_raw', Image, callback_GAZEBO)
+        else:
+            sub_img = rospy.Subscriber('webcam/image_raw2', Image, callback_GAZEBO)
         rospy.spin()
 
 

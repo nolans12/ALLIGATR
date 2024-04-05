@@ -20,8 +20,10 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     search_point_time = ros::Time::now();
     phases = {phase};
     smootherCount = 0;
-    rel_coord_A_sub = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
-    rel_coord_B_sub = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    inert_coord_A_sub_primary = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    inert_coord_B_sub_primary = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    inert_coord_A_sub_secondary = gnc_node.subscribe("CV/Secondary/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    inert_coord_B_sub_secondary = gnc_node.subscribe("CV/Secondary/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
     uas_state_sub = gnc_node.subscribe("mavros/local_position/pose", 3, &MissionPlanner::get_current_location_mav, this);
     phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
 
@@ -209,8 +211,6 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
             time_joint_localized = ros::Duration(0.0);
         }
     }
-
-    ROS_INFO("Got the drone's position!");
 }
 
 

@@ -84,7 +84,7 @@ def pose_callback(data):
     DRONE_COUNTER += 1
     
 # rgv A callback
-def callbackrgvA(data):
+def callbackrgvA_primary(data):
     # Writes the data to the rgvA_detections.csv file
     # data in the form of [rgvX, rgvY, phase, Time]
 
@@ -93,13 +93,28 @@ def callbackrgvA(data):
 
     global rgvA_detections_file, RGV_COUNTER
     writer = csv.writer(rgvA_detections_file)
-    writer.writerow([data.data[0], data.data[1], PHASE, ros_now])
+    writer.writerow([data.data[0], data.data[1], PHASE, ros_now, "Primary"])
+
+    # Increment the counter
+    RGV_COUNTER += 1
+
+# rgv A callback
+def callbackrgvA_secondary(data):
+    # Writes the data to the rgvA_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    global rgvA_detections_file, RGV_COUNTER
+    writer = csv.writer(rgvA_detections_file)
+    writer.writerow([data.data[0], data.data[1], PHASE, ros_now, "Secondary"])
 
     # Increment the counter
     RGV_COUNTER += 1
 
 # rgv B callback
-def callbackrgvB(data):
+def callbackrgvB_primary(data):
     # Writes the data to the rgvB_detections.csv file
     # data in the form of [rgvX, rgvY, phase, Time]
 
@@ -108,7 +123,22 @@ def callbackrgvB(data):
 
     global rgvB_detections_file, RGV_COUNTER
     writer = csv.writer(rgvB_detections_file)
-    writer.writerow([data.data[0], data.data[1], PHASE, ros_now])
+    writer.writerow([data.data[0], data.data[1], PHASE, ros_now, "Primary"])
+
+    # Increment the counter
+    RGV_COUNTER += 1
+
+# rgv B callback
+def callbackrgvB_secondary(data):
+    # Writes the data to the rgvB_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    global rgvB_detections_file, RGV_COUNTER
+    writer = csv.writer(rgvB_detections_file)
+    writer.writerow([data.data[0], data.data[1], PHASE, ros_now, "Secondary"])
 
     # Increment the counter
     RGV_COUNTER += 1
@@ -139,8 +169,10 @@ if __name__ == '__main__':
 
     # Subscribers
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
-    subrgvA = rospy.Subscriber('CV/inert_coord_A', Float32MultiArray, callbackrgvA)
-    subrgvB = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB)
+    subrgvA_p = rospy.Subscriber('CV/inert_coord_A', Float32MultiArray, callbackrgvA_primary)
+    subrgvB_p = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB_primary)
+    subrgvA_s = rospy.Subscriber('CV/Secondary/inert_coord_A', Float32MultiArray, callbackrgvA_secondary)
+    subrgvB_s = rospy.Subscriber('CV/Secondary/inert_coord_B', Float32MultiArray, callbackrgvB_secondary)
     subphase = rospy.Subscriber('MP/phase', String, callbackphase)
     #sub_img = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
 
