@@ -54,7 +54,14 @@ cd ~/catkin_ws
 
 # Build the catkin_ws only if the build flag is set
 if [ $BUILD_FLAG -eq 1 ]; then
-    catkin build
+    cd src
+    ln -s ${CURRENT_DIR}/ros_packages
+    cd ..
+
+    catkin build #Use catkin_make if not using MAVROS and catkin build if using MAVROS
+    source devel/setup.bash
+    source ~/.bashrc
+    cd ${CURRENT_DIR} #Go back to the build directory
 fi
 
 source devel/setup.bash

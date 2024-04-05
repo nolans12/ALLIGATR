@@ -209,6 +209,8 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
             time_joint_localized = ros::Duration(0.0);
         }
     }
+
+    ROS_INFO("Got the drone's position!");
 }
 
 
