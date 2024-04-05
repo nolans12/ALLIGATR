@@ -11,12 +11,14 @@ MP_ARGS=""
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Parse command line arguments. This will check if the -b and -mp command line inputs are set
-while getopts "b:mp:" opt; do
+while getopts "bmp" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
         ;;
-    mp) MP_ARGS="$OPTARG"
-        ;;
+    \?)
+      echo "Invalid option: -$opt" 1>&2
+      exit 1
+      ;;
     esac
 done
 
@@ -53,7 +55,7 @@ CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
 
 # Build the catkin_ws only if the build flag is set
-if [ $BUILD_FLAG -eq 1 ]; then
+if [ $BUILD_FLAG -eq 0 ]; then
     # cd src
     # ln -s ${CURRENT_DIR}/ros_packages
     # cd ..
@@ -72,9 +74,9 @@ cd ${CURRENT_DIR} #Go back to the build directory
 # sleep 2
 
 # Check if an argument was provided
-if [ $BUILD_FLAG -eq 1 ]; then
+if [ $# -eq 0 ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
-    echo "Usage: <-b> to build the ROS packages"
+    echo "Usage: <-b> to skip building the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     
