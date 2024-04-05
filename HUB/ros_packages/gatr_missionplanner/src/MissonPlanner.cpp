@@ -979,7 +979,7 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     // if both RGVs are in view, optimize z height
     width = norm({rgvAPos[0] - rgvBPos[0], rgvAPos[1] - rgvBPos[1]}) / 2.0 + drone.fovWide*0.1;
     desiredHeight = width / tan(drone.fovWide*M_PI/360.0);
-    if (desiredHeight < env.bounds[1][2]) {
+    if (desiredHeight > env.bounds[1][2]) {
         desiredHeight = env.bounds[1][2];
     }
 

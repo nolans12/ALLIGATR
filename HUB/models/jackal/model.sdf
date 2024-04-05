@@ -26,7 +26,8 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <scale>0.0254 0.0254 0.0254</scale>
+            <!-- <scale>0.0254 0.0254 0.0254</scale> -->
+            <scale>0.0615 0.0615 0.0615</scale>
             <uri>model://jackal/meshes/jackal_1_lowpoly.dae</uri>
           </mesh>
         </geometry>
