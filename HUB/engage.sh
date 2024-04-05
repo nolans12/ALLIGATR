@@ -21,7 +21,7 @@ while getopts "b:mp:" opt; do
 done
 
 # Housekeeping, this will shift the command line arguments so that $1 refers to the first argument, $2 to the second, and so on.
-#shift $((OPTIND-1))
+shift $((OPTIND-1))
 #[ "${1:-}" = "--" ] && shift
 
 # Sets the font to be bigger on Xterm
@@ -54,9 +54,9 @@ cd ~/catkin_ws
 
 # Build the catkin_ws only if the build flag is set
 if [ $BUILD_FLAG -eq 1 ]; then
-    cd src
-    ln -s ${CURRENT_DIR}/ros_packages
-    cd ..
+    # cd src
+    # ln -s ${CURRENT_DIR}/ros_packages
+    # cd ..
 
     catkin build #Use catkin_make if not using MAVROS and catkin build if using MAVROS
     source devel/setup.bash

@@ -77,13 +77,9 @@ int main(int argc, char** argv)
 		rate.sleep();
 
 		//Update the drone's position
-<<<<<<< HEAD
 		//ROS_INFO("Getting the drone's positon and destination...");
-=======
-		ROS_INFO("Attempting to get drone state...");
->>>>>>> d2e050c733d9318a3b7051b541f4977199588ba8
 		mp.update_drone_state(curr_waypoint_new);
-		ROS_INFO("Got drone state!");
+		//ROS_INFO("Got drone state!");
 		//mp.output_drone_state();
 
 		// Save the previous waypoint
@@ -111,15 +107,11 @@ int main(int argc, char** argv)
 			//////////// MAIN LOOP HERE ////////////
 			
 			// Determine the phase of the mission at the given timestep
-<<<<<<< HEAD
 			//ROS_INFO("Determining phase ...");
-=======
-			ROS_INFO("Determining phase...");
->>>>>>> d2e050c733d9318a3b7051b541f4977199588ba8
 			mp.determine_phase();
 
 			// Execute the phase
-			ROS_INFO("Determining motion...");
+			//ROS_INFO("Determining motion...");
 			curr_waypoint_new = mp.determine_motion(curr_waypoint_new);
 
 			// IF the phase is in ABORT, land the drone and exit the program
