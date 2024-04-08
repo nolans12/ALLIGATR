@@ -11,17 +11,19 @@ MP_ARGS=""
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Parse command line arguments. This will check if the -b and -mp command line inputs are set
-while getopts "b:mp:" opt; do
+while getopts "bmp" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
         ;;
-    mp) MP_ARGS="$OPTARG"
-        ;;
+    \?)
+      echo "Invalid option: -$opt" 1>&2
+      exit 1
+      ;;
     esac
 done
 
 # Housekeeping, this will shift the command line arguments so that $1 refers to the first argument, $2 to the second, and so on.
-#shift $((OPTIND-1))
+shift $((OPTIND-1))
 #[ "${1:-}" = "--" ] && shift
 
 # Sets the font to be bigger on Xterm
@@ -53,8 +55,15 @@ CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
 
 # Build the catkin_ws only if the build flag is set
-if [ $BUILD_FLAG -eq 1 ]; then
-    catkin build
+if [ $BUILD_FLAG -eq 0 ]; then
+    # cd src
+    # ln -s ${CURRENT_DIR}/ros_packages
+    # cd ..
+
+    catkin build #Use catkin_make if not using MAVROS and catkin build if using MAVROS
+    source devel/setup.bash
+    source ~/.bashrc
+    cd ${CURRENT_DIR} #Go back to the build directory
 fi
 
 source devel/setup.bash
@@ -65,9 +74,9 @@ cd ${CURRENT_DIR} #Go back to the build directory
 # sleep 2
 
 # Check if an argument was provided
-if [ $BUILD_FLAG -eq 1 ]; then
+if [ $# -eq 0 ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
-    echo "Usage: <-b> to build the ROS packages"
+    echo "Usage: <-b> to skip building the ROS packages"
     echo "Usage: <-mp> to specify the mission planner special mode"
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     

@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	set_speed(2); // m/s
 
 	//request takeoff
-	takeoff(50);
+	takeoff(10);
 
 	//specify control loop rate. We recommend a low frequency to not over load the FCU with messages. Too many messages will cause the drone to be sluggish
 	ros::Rate rate(2.0);
@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 		rate.sleep();
 
 		//Update the drone's position
-		ROS_INFO("Attempting to get drone state...");
+		//ROS_INFO("Getting the drone's positon and destination...");
 		mp.update_drone_state(curr_waypoint_new);
-		ROS_INFO("Got drone state!");
+		//ROS_INFO("Got drone state!");
 		//mp.output_drone_state();
 
 		// Save the previous waypoint
@@ -107,11 +107,11 @@ int main(int argc, char** argv)
 			//////////// MAIN LOOP HERE ////////////
 			
 			// Determine the phase of the mission at the given timestep
-			ROS_INFO("Determining phase...");
+			//ROS_INFO("Determining phase ...");
 			mp.determine_phase();
 
 			// Execute the phase
-			ROS_INFO("Determining motion...");
+			//ROS_INFO("Determining motion...");
 			curr_waypoint_new = mp.determine_motion(curr_waypoint_new);
 
 			// IF the phase is in ABORT, land the drone and exit the program

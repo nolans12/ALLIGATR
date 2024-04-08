@@ -20,8 +20,10 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     search_point_time = ros::Time::now();
     phases = {phase};
     smootherCount = 0;
-    rel_coord_A_sub = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
-    rel_coord_B_sub = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    inert_coord_A_sub_primary = gnc_node.subscribe("CV/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    inert_coord_B_sub_primary = gnc_node.subscribe("CV/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
+    inert_coord_A_sub_secondary = gnc_node.subscribe("CV/Secondary/inert_coord_A", 1, &MissionPlanner::rgvA_detected_callback, this);
+    inert_coord_B_sub_secondary = gnc_node.subscribe("CV/Secondary/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback, this);
     uas_state_sub = gnc_node.subscribe("mavros/local_position/pose", 3, &MissionPlanner::get_current_location_mav, this);
     phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
 
@@ -977,7 +979,7 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     // if both RGVs are in view, optimize z height
     width = norm({rgvAPos[0] - rgvBPos[0], rgvAPos[1] - rgvBPos[1]}) / 2.0 + drone.fovWide*0.1;
     desiredHeight = width / tan(drone.fovWide*M_PI/360.0);
-    if (desiredHeight < env.bounds[1][2]) {
+    if (desiredHeight > env.bounds[1][2]) {
         desiredHeight = env.bounds[1][2];
     }
 

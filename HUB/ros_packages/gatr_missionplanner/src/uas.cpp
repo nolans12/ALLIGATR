@@ -21,8 +21,8 @@ uas::uas() {
     home = {0.0, 0.0};
 
     // Camera field of view
-    fovNarrow = 47;
-    fovWide = 70;
+    fovNarrow = 105;
+    fovWide = 120;
 
     // Averaging parameters for estimating RGV position
     time_history_average = 10;
