@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, Int32MultiArray
 from std_msgs.msg import String
 from tf.transformations import euler_from_quaternion
 from datetime import datetime
@@ -16,13 +16,14 @@ import cv2
 # Folder format: data_YYYY_MM_DD_HH_MM_SS
 # Files: rgvA_detections.csv, rgvB_detections.csv, drone_state_hist.csv
 
-
 # Global file handles
 drone_state_hist_file = None
 rgvA_detections_file = None
 rgvB_detections_file = None
 video_timestamp_file = None
 writeObj = None
+rgvA_AR_file = None
+rgvB_AR_file = None
 
 
 # Global phase variable
@@ -143,6 +144,50 @@ def callbackrgvB_secondary(data):
     # Increment the counter
     RGV_COUNTER += 1
 
+    # RGV A AR Callback
+def callback_primary_AR_A(data):
+    global rgvA_AR_file
+    # Writes the data to the rgvA_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    writer = csv.writer(rgvA_AR_file)
+    writer.writerow([data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], ros_now, "Primary"])
+
+# RGV A AR Callback
+def callback_secondary_AR_A(data):
+    global rgvA_AR_file
+    # Writes the data to the rgvA_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    writer = csv.writer(rgvA_AR_file)
+    writer.writerow([data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], ros_now, "Secondary"])
+
+
+def callback_primary_AR_B(data):
+    global rgvB_AR_file
+    # Writes the data to the rgvA_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    writer = csv.writer(rgvB_AR_file)
+    writer.writerow([data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], ros_now, "Primary"])
+
+def callback_secondary_AR_B(data):
+    global rgvB_AR_file
+    # Writes the data to the rgvA_detections.csv file
+    # data in the form of [rgvX, rgvY, phase, Time]
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    writer = csv.writer(rgvB_AR_file)
+    writer.writerow([data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], ros_now, "Secondary"])
+
+
 def callbackphase(data):
     global PHASE
     PHASE = data.data
@@ -173,6 +218,10 @@ if __name__ == '__main__':
     subrgvB_p = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB_primary)
     subrgvA_s = rospy.Subscriber('CV/Secondary/inert_coord_A', Float32MultiArray, callbackrgvA_secondary)
     subrgvB_s = rospy.Subscriber('CV/Secondary/inert_coord_B', Float32MultiArray, callbackrgvB_secondary)
+    subCorners_primary_A = rospy.Subscriber('CV/Primary/AR_corners_A', Int32MultiArray, callback_primary_AR_A)
+    subCorners_primary_B = rospy.Subscriber('CV/Primary/AR_corners_B', Int32MultiArray, callback_primary_AR_B)
+    subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
+    subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
     subphase = rospy.Subscriber('MP/phase', String, callbackphase)
     #sub_img = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
 
@@ -190,6 +239,12 @@ if __name__ == '__main__':
     rgvB_detections_file = open(os.path.join(data_dir, "rgvB_detections.csv"), 'w')
     check_file(rgvB_detections_file)
 
+    # AR Tag Detection Save Files
+    rgvA_AR_file = open(os.path.join(data_dir, "rgvA_AR.csv"), 'w')
+    check_file(rgvA_AR_file)
+    rgvB_AR_file = open(os.path.join(data_dir, "rgvB_AR.csv"), 'w')
+    check_file(rgvB_AR_file)
+
     # Video file
     # video_timestamp_file = open(os.path.join(data_dir, "video_timestamp_file.csv"), 'w')
     # check_file(video_timestamp_file)
@@ -205,6 +260,12 @@ if __name__ == '__main__':
 
     rgvB_writer = csv.writer(rgvB_detections_file)
     rgvB_writer.writerow(["rgvX", "rgvY", "Time"])
+
+    rgvA_AR_writer = csv.writer(rgvA_AR_file)
+    rgvA_AR_writer.writerow(["AR_A"])
+
+    rgvB_AR_writer = csv.writer(rgvB_AR_file)
+    rgvB_AR_writer.writerow(["AR_B"])
 
     # videoTime_writer = csv.writer(video_timestamp_file)
     # videoTime_writer.writerow(["Time"])
@@ -245,3 +306,5 @@ if __name__ == '__main__':
     drone_state_hist_file.close()
     rgvA_detections_file.close()
     rgvB_detections_file.close()
+    rgvA_AR_file.close()
+    rgvB_AR_file.close()
