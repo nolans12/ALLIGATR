@@ -221,6 +221,6 @@ if __name__ == '__main__': # <- Executable
     while not rospy.is_shutdown():
         # Spin so the script keeps looking for messages
         rospy.spin()
-            
 
+        
     rospy.loginfo("End of localization program") # This will output to the terminal
