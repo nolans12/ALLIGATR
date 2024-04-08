@@ -953,7 +953,7 @@ std::vector<double> MissionPlanner::fine_motion(std::vector<double> waypoint) {
     }
     // if neither RGV is in view, remain at the same point
 
-    waypoint[3] = getYaw(waypoint);
+    //waypoint[3] = getYaw(waypoint);
     waypoint[2] = drone.fine_altitude;
 
     return waypoint;

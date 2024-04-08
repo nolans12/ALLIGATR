@@ -226,6 +226,15 @@ if __name__ == '__main__':
         rospy.loginfo("Drone data points logged: " + str(DRONE_COUNTER))
         rospy.loginfo("RGV data points logged: " + str(RGV_COUNTER))
 
+        flag = ''
+        try:
+            flag = str(input("Enter 'q' to quit: "))
+        except EOFError:
+            pass
+
+        if flag == 'q':
+            break
+
         rate.sleep()
 
     rospy.spin()
