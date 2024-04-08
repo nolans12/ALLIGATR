@@ -8,6 +8,11 @@ from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
 from tf.transformations import euler_from_quaternion
 
+# Phase Smoother
+global phase_counter_A, phase_counter_B
+phase_counter_A = 0
+phase_counter_B = 0
+
 # Global current state variables
 AR_CORNERS_A = Int32MultiArray()
 AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]

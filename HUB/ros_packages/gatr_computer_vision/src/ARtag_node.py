@@ -238,7 +238,7 @@ if __name__ == '__main__': # <- Executable
             phase_smoother_counter_A = 0
         elif phase_smoother_counter_A < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
             phase_smoother_counter_A += 1
-            pub_corners_A.publish(corners_msg_A_last)
+            #pub_corners_A.publish(corners_msg_A_last)      # UNCOMMENT THIS LINE TO ADD PHASE SMOOTHER
 
         if corners_msg_B.data[0]:
             pub_corners_B.publish(corners_msg_B)
@@ -246,10 +246,10 @@ if __name__ == '__main__': # <- Executable
             phase_smoother_counter_B = 0
         elif phase_smoother_counter_B < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
             phase_smoother_counter_B += 1
-            pub_corners_B.publish(corners_msg_B_last)
+            #pub_corners_B.publish(corners_msg_B_last)      # UNCOMMENT THIS LINE TO ADD PHASE SMOOTHER
 
         #rate.sleep()
-        
+
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
