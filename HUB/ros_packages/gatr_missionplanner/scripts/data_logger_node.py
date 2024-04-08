@@ -213,11 +213,11 @@ if __name__ == '__main__':
     rate = rospy.Rate(1)
 
     # Wait until the phase is not standby
-    rospy.loginfo("Waiting for phase to change out of STANDBY...")
-    while PHASE == "STANDBY":
-        rate.sleep()
+    # rospy.loginfo("Waiting for phase to change out of STANDBY...")
+    # while PHASE == "STANDBY":
+    #     rate.sleep()
 
-    rospy.loginfo("Phase changed to: " + PHASE + ". Data logger node started")
+    # rospy.loginfo("Phase changed to: " + PHASE + ". Data logger node started")
 
     # Main loop, just check for callbacks on the subscribers
     while not rospy.is_shutdown():
@@ -228,7 +228,7 @@ if __name__ == '__main__':
 
         flag = ''
         try:
-            flag = str(input("Enter 'q' to quit: "))
+            flag = str(raw_input("Enter 'q' to quit: "))
         except EOFError:
             pass
 
