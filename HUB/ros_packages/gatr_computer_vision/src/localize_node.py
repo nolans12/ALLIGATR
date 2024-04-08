@@ -94,8 +94,8 @@ def localize(ARCorners):
     # Relative coordinates in meters
     relX = ALTITUDE * np.tan(alpha + PITCH)
     relY = ALTITUDE * np.tan(beta + ROLL)
-    # relX = ALTITUDE * np.tan(alpha)
-    # relY = ALTITUDE * np.tan(beta)
+    #relX = ALTITUDE * np.tan(alpha)
+    #relY = ALTITUDE * np.tan(beta)
 
     return relX, relY
 
