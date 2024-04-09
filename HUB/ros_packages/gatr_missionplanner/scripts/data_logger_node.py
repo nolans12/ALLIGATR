@@ -308,3 +308,5 @@ if __name__ == '__main__':
     rgvB_detections_file.close()
     rgvA_AR_file.close()
     rgvB_AR_file.close()
+
+    rospy.loginfo("CSV files closed. Ending node...")

@@ -3,6 +3,7 @@
 # Initialize our own variables
 # Build flag is used to determine if the ROS packages should be built before execution. Use if changes to ros_packages are made
 BUILD_FLAG=0
+LOBO_FLAG=0 #Lobotimzed flag, just runs CV and mavros
 
 # MP_ARGS is used to specify the mission planner special mode
 MP_ARGS=""
@@ -11,9 +12,11 @@ MP_ARGS=""
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Parse command line arguments. This will check if the -b and -mp command line inputs are set
-while getopts "bmp" opt; do
+while getopts "bl" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
+        ;;
+    l)  LOBO_FLAG=1
         ;;
     \?)
       echo "Invalid option: -$opt" 1>&2
@@ -77,7 +80,7 @@ cd ${CURRENT_DIR} #Go back to the build directory
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to skip building the ROS packages"
-    echo "Usage: <-mp> to specify the mission planner special mode"
+    echo "Usage: <-l> to only run CV and MAVROS"
     xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     
 else
@@ -147,15 +150,17 @@ run_node gatr_computer_vision primary_node.py Primary_Detection_Node
 # AR Detection Node
 run_node gatr_computer_vision ARtag_node.py AR_Tag_Detection_Node
 
-# Localization Node
-run_node gatr_computer_vision localize_node.py Localize_Node
+if [ $LOBO_FLAG -eq 0 ]; then
+    # Localization Node
+    run_node gatr_computer_vision localize_node.py Localize_Node
 
-# Data Logger
-#run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
+    # Data Logger
+    #run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
 
-# Mision Planner Node
-# run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
-xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
+    # Mision Planner Node
+    # run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
+fi
 
 # Start the MAVLINK connection to cube, opening on ttyTHS1 port
 xterm -T "mavlink" -e "sudo mavproxy.py --master=/dev/ttyTHS1" &  
