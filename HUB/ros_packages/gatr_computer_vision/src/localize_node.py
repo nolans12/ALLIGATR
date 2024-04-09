@@ -8,6 +8,11 @@ from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
 from tf.transformations import euler_from_quaternion
 
+# Phase Smoother
+global phase_counter_A, phase_counter_B
+phase_counter_A = 0
+phase_counter_B = 0
+
 # Global current state variables
 AR_CORNERS_A = Int32MultiArray()
 AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -89,8 +94,8 @@ def localize(ARCorners):
     # Relative coordinates in meters
     relX = ALTITUDE * np.tan(alpha + PITCH)
     relY = ALTITUDE * np.tan(beta + ROLL)
-    # relX = ALTITUDE * np.tan(alpha)
-    # relY = ALTITUDE * np.tan(beta)
+    #relX = ALTITUDE * np.tan(alpha)
+    #relY = ALTITUDE * np.tan(beta)
 
     return relX, relY
 
@@ -221,6 +226,6 @@ if __name__ == '__main__': # <- Executable
     while not rospy.is_shutdown():
         # Spin so the script keeps looking for messages
         rospy.spin()
-            
 
+        
     rospy.loginfo("End of localization program") # This will output to the terminal

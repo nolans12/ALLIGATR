@@ -57,6 +57,9 @@ class MissionPlanner {
         /////////// Computer Vision + ROS ///////////////////
         void rgvA_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
         void rgvB_detected_callback(const std_msgs::Float32MultiArray::ConstPtr& coords);
+        void rgvA_detected_callback_s(const std_msgs::Float32MultiArray::ConstPtr& coords);
+        void rgvB_detected_callback_s(const std_msgs::Float32MultiArray::ConstPtr& coords);
+
 
         /////////// Helper Functions //////////////////////
         double getYaw(std::vector<double> waypoint);
@@ -80,6 +83,14 @@ class MissionPlanner {
         void setPhase(std::string phaseIn);
 
         void get_current_location_mav(const geometry_msgs::PoseStamped::ConstPtr& msg);
+
+        void set_primary_activated(bool activated);
+        void set_secondary_activated(bool activated);
+
+        bool get_primary_activated();
+        bool get_secondary_activated();
+
+        void set_cameras(bool primary, bool secondary);
         
     private:
         std::string phase;
@@ -87,6 +98,10 @@ class MissionPlanner {
         unsigned short int smootherCount;
         uas drone;
         environment env;
+
+        bool primary_activated;
+        bool secondary_activated;
+
         ros::Subscriber inert_coord_A_sub_primary;
         ros::Subscriber inert_coord_B_sub_primary;
         ros::Subscriber inert_coord_A_sub_secondary;

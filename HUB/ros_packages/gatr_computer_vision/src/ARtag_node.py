@@ -8,7 +8,6 @@ from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-
 # Try to open the 0 index for the secondary camera
 camera_index = 0
 
@@ -23,7 +22,6 @@ processFPS = 30
 
 # Frame count
 frameCount = 0
-
 
 # Image callback for received image
 def callback_GAZEBO(data):
@@ -230,26 +228,19 @@ if __name__ == '__main__': # <- Executable
             pass
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
+
             
         # Publish to the ROS node
         if corners_msg_A.data[0]:
             pub_corners_A.publish(corners_msg_A)
             corners_msg_A_last.data = corners_msg_A.data
-            phase_smoother_counter_A = 0
-        elif phase_smoother_counter_A < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
-            phase_smoother_counter_A += 1
-            pub_corners_A.publish(corners_msg_A_last)
 
         if corners_msg_B.data[0]:
             pub_corners_B.publish(corners_msg_B)
             corners_msg_B_last.data = corners_msg_B.data
-            phase_smoother_counter_B = 0
-        elif phase_smoother_counter_B < phase_max: # Smoothing out the detection, returns the last detection if no new detection is found
-            phase_smoother_counter_B += 1
-            pub_corners_B.publish(corners_msg_B_last)
 
         #rate.sleep()
-        
+
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal

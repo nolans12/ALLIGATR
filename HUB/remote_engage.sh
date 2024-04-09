@@ -3,6 +3,7 @@
 # Initialize our own variables
 # Build flag is used to determine if the ROS packages should be built before execution. Use if changes to ros_packages are made
 BUILD_FLAG=0
+LOBO_FLAG=0 #Lobotimzed flag, just runs CV and mavros
 
 # MP_ARGS is used to specify the mission planner special mode
 MP_ARGS=""
@@ -11,18 +12,22 @@ MP_ARGS=""
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Parse command line arguments. This will check if the -b and -mp command line inputs are set
-while getopts "b:mp:" opt; do
+while getopts "bl" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
         ;;
-    mp) MP_ARGS="$OPTARG"
+    l)  LOBO_FLAG=1
         ;;
+    \?)
+      echo "Invalid option: -$opt" 1>&2
+      exit 1
+      ;;
     esac
 done
 
 # Housekeeping, this will shift the command line arguments so that $1 refers to the first argument, $2 to the second, and so on.
 shift $((OPTIND-1))
-[ "${1:-}" = "--" ] && shift
+#[ "${1:-}" = "--" ] && shift
 
 # Sets the font to be bigger on Xterm
 xrdb -merge ~/.Xresources
@@ -68,7 +73,7 @@ cd ${CURRENT_DIR} #Go back to the build directory
 if [ -z "$1" ]; then
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
-    echo "Usage: <-mp> to specify the mission planner special mode"
+    echo "Usage: <-l> to offload mission planner to the remote machine"
     # xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     exit 1
     
@@ -120,6 +125,18 @@ run_node()
 
 # Data Logger
 run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
+
+if [ $LOBO_FLAG -eq 1 ]; then
+    # Localization Node
+    run_node gatr_computer_vision localize_node.py Localize_Node
+
+    # Data Logger
+    #run_node gatr_missionplanner data_logger_node.py Data_Logger_Node
+
+    # Mision Planner Node
+    # run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
+    xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
+fi
 
 #############################################################
 
