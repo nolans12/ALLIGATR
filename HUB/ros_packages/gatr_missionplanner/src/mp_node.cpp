@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	//create local reference frame 
 	initialize_local_frame();
 
-	set_speed(2); // m/s
+	set_speed(0.1); // m/s
 
 	//request takeoff
 	takeoff(10);

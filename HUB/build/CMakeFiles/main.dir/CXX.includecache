@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/ckohl10/ALLIGATR/HUB/src/CameraObject.cpp
+/home/jetson/ALLIGATR/HUB/src/CameraObject.cpp
 headers/CameraObject.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/CameraObject.h
+/home/jetson/ALLIGATR/HUB/src/headers/CameraObject.h
 
-/home/ckohl10/ALLIGATR/HUB/src/HUB.cpp
+/home/jetson/ALLIGATR/HUB/src/HUB.cpp
 headers/HUB.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/HUB.h
+/home/jetson/ALLIGATR/HUB/src/headers/HUB.h
 
-/home/ckohl10/ALLIGATR/HUB/src/headers/CORE.h
+/home/jetson/ALLIGATR/HUB/src/headers/CORE.h
 iostream
 -
 string
@@ -24,39 +24,39 @@ cstdlib
 set
 -
 HUB.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/HUB.h
+/home/jetson/ALLIGATR/HUB/src/headers/HUB.h
 CameraObject.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/CameraObject.h
+/home/jetson/ALLIGATR/HUB/src/headers/CameraObject.h
 pathStep.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/pathStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/pathStep.h
 phaseStep.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/phaseStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/phaseStep.h
 
-/home/ckohl10/ALLIGATR/HUB/src/headers/CameraObject.h
+/home/jetson/ALLIGATR/HUB/src/headers/CameraObject.h
 CORE.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/CORE.h
+/home/jetson/ALLIGATR/HUB/src/headers/CORE.h
 
-/home/ckohl10/ALLIGATR/HUB/src/headers/HUB.h
+/home/jetson/ALLIGATR/HUB/src/headers/HUB.h
 CORE.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/CORE.h
+/home/jetson/ALLIGATR/HUB/src/headers/CORE.h
 
-/home/ckohl10/ALLIGATR/HUB/src/headers/pathStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/pathStep.h
 
-/home/ckohl10/ALLIGATR/HUB/src/headers/phaseStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/phaseStep.h
 string
 -
 
-/home/ckohl10/ALLIGATR/HUB/src/main.cpp
+/home/jetson/ALLIGATR/HUB/src/main.cpp
 headers/CORE.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/CORE.h
+/home/jetson/ALLIGATR/HUB/src/headers/CORE.h
 
-/home/ckohl10/ALLIGATR/HUB/src/pathStep.cpp
+/home/jetson/ALLIGATR/HUB/src/pathStep.cpp
 headers/pathStep.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/pathStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/pathStep.h
 
-/home/ckohl10/ALLIGATR/HUB/src/phaseStep.cpp
+/home/jetson/ALLIGATR/HUB/src/phaseStep.cpp
 headers/phaseStep.h
-/home/ckohl10/ALLIGATR/HUB/src/headers/phaseStep.h
+/home/jetson/ALLIGATR/HUB/src/headers/phaseStep.h
 string
 -
 
