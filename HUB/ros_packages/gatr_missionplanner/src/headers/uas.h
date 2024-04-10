@@ -24,6 +24,7 @@ public:
     std::vector<double> state;
     std::vector<double> dest;
     std::vector<double> home;
+    //std::vector<double> vel;
     double epsilon, fovNarrow, fovWide, theta, coarseATime, coarseBTime, fineATime, fineBTime, jointTime, orbit_radius, theta_step;
     double trail_altitude, coarse_altitude, fine_altitude;
     double coarse_duration, fine_duration, joint_duration, detection_duration, boundary_duration, search_point_duration, joint_detection_duration;

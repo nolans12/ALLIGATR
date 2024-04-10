@@ -169,6 +169,7 @@ void MissionPlanner::rgvB_detected_callback_s(const std_msgs::Float32MultiArray:
 void MissionPlanner::get_current_location_mav(const geometry_msgs::PoseStamped::ConstPtr& msg){
     // Update the state of the UAS in the local frame as defined in the mavros node
     drone.state = {msg->pose.position.x, msg->pose.position.y, msg->pose.position.z, get_current_heading()};
+    //drone.vel = {msg->twist.linear.x, msg->twist.linear.y, msg->twist.linear.z};
 
     //output_drone_state();
 }

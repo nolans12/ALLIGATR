@@ -6,6 +6,7 @@ import numpy as np
 from std_msgs.msg import Int32MultiArray
 from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf.transformations import euler_from_quaternion
 
 # Phase Smoother
@@ -22,12 +23,21 @@ AR_CORNERS_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # Global Drone State
 global PITCH, ROLL, YAW, DRONEX, DRONEY, ALTITUDE, AR_LENGTH, XPIXELS, YPIXELS
+global VEL_X, VEL_Y, VEL_Z, TIME_OF_POSE_CALL
+global DRONEX_SET, DRONEY_SET, ALTITUDE_SET # <- These are the setpoints for the drone
 PITCH = 0
 ROLL = 0
 YAW = 0
 DRONEX = 0
 DRONEY = 0
 ALTITUDE = 9.144                           # Assume we localize at 30 ft (9.144 meters)
+DRONEX_SET = 0
+DRONEY_SET = 0
+ALTITUDE_SET = 0
+TIME_OF_POSE_CALL = 0
+VEL_X = 0
+VEL_Y = 0
+VEL_Z = 0
 
 # Global AR Tag and Camera Data
 #AR_LENGTH = 0.2496                          # 24.96 cm AR tag side length for the Gazebo AR tag
@@ -174,7 +184,7 @@ def callback_secondary_AR_B(data):
 # Subscribe to get position data of the drone relative to its instantiated inertial local frame, this is the ENU frame with the origin
 # at the point of initialization
 def pose_callback(data):
-    global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW
+    global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW, VEL_X, VEL_Y, VEL_Z, TIME_OF_POSE_CALL
 
     # Get the pose data
     x = data.pose.position.x
@@ -188,9 +198,18 @@ def pose_callback(data):
     (ROLL, PITCH, YAW) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
 
     # Set the global variables
+    DRONEX_SET = x
+    DRONEY_SET = y
+    ALTITUDE_SET = z
     DRONEX = x
     DRONEY = y
     ALTITUDE = z
+    VEL_X = data.twist.linear.x
+    VEL_Y = data.twist.linear.y
+    VEL_Z = data.twist.linear.z
+
+    # Set the time of pose call to the current time in seconds
+    TIME_OF_POSE_CALL = rospy.get_time()
 
     # Output the x, y, z position
     rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
@@ -217,6 +236,7 @@ if __name__ == '__main__': # <- Executable
     subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
     subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
+    #subState = rospy.Subscriber("/mavros/global_position/local", PoseWithCovarianceStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
@@ -224,8 +244,17 @@ if __name__ == '__main__': # <- Executable
     
     # Begin the main loop that consistently outputs Localization estimates
     while not rospy.is_shutdown():
-        # Spin so the script keeps looking for messages
-        rospy.spin()
+        
+        # Use linearized dynamics to interpolate the position of the RGV
+        dt = rospy.get_time() - TIME_OF_POSE_CALL
 
+        # Interpolate the position of the RGV
+        DRONEX = DRONEX_SET + VEL_X * dt
+        DRONEY = DRONEY_SET + VEL_Y * dt
+        ALTITUDE = ALTITUDE_SET + VEL_Z * dt
+
+    
+    # Spin so the script keeps looking for messages
+    rospy.spin()
         
     rospy.loginfo("End of localization program") # This will output to the terminal

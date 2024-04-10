@@ -294,6 +294,45 @@ if __name__ == '__main__':
             pass
 
         if flag == 'q':
+            # Close the CSV files
+            drone_state_hist_file.close()
+            # Check that csv was succesfully closed
+            if drone_state_hist_file.closed:
+                rospy.loginfo("drone_state_hist.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close drone_state_hist.csv")
+
+
+            rgvA_detections_file.close()
+            # Check that csv was succesfully closed
+            if rgvA_detections_file.closed:
+                rospy.loginfo("rgvA_detections.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvA_detections.csv")
+
+
+            rgvB_detections_file.close()
+            # Check that csv was succesfully closed
+            if rgvB_detections_file.closed:
+                rospy.loginfo("rgvB_detections.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvB_detections.csv")
+
+            rgvA_AR_file.close()
+            # Check that csv was succesfully closed
+            if rgvA_AR_file.closed:
+                rospy.loginfo("rgvA_AR.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvA_AR.csv")
+
+            rgvB_AR_file.close()
+            # Check that csv was succesfully closed
+            if rgvB_AR_file.closed:
+                rospy.loginfo("rgvB_AR.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvB_AR.csv")
+
+            rospy.loginfo("CSV files closed. Ending node...")
             break
 
         rate.sleep()
@@ -302,11 +341,3 @@ if __name__ == '__main__':
 
     rospy.logfatal("Data logger node stopped")
         
-    # Close the CSV files
-    drone_state_hist_file.close()
-    rgvA_detections_file.close()
-    rgvB_detections_file.close()
-    rgvA_AR_file.close()
-    rgvB_AR_file.close()
-
-    rospy.loginfo("CSV files closed. Ending node...")
