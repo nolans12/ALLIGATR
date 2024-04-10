@@ -11,8 +11,10 @@ from tf.transformations import euler_from_quaternion
 # New: import for /mavros/global_position/local
 from nav_msgs.msg import Odometry
 
+######## USE /mavros/global_position/local INSTEAD OF /mavros/local_position/pose ########
 global useGlobal
-useGlobal = True
+useGlobal = False
+##########################################################################################
 
 # Phase Smoother
 global phase_counter_A, phase_counter_B
@@ -192,17 +194,18 @@ def pose_callback(data):
     global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW, TIME_OF_POSE_CALL
     global DRONEX_SET, DRONEY_SET, ALTITUDE_SET
 
-    # ORIGINAL, WITH /mavros/local_position/pose:
-    # x = data.pose.position.x
-    # y = data.pose.position.y
-    # z = data.pose.position.z
-    # orientation_q = data.pose.orientation
-
-    # NEW, WITH /mavros/global_position/local:
-    x = data.pose.pose.position.x
-    y = data.pose.pose.position.y
-    z = data.pose.pose.position.z
-    orientation_q = data.pose.pose.orientation
+    if useGlobal:
+        # NEW, WITH /mavros/global_position/local:
+        x = data.pose.pose.position.x
+        y = data.pose.pose.position.y
+        z = data.pose.pose.position.z
+        orientation_q = data.pose.pose.orientation
+    else:
+        # ORIGINAL, WITH /mavros/local_position/pose:
+        x = data.pose.position.x
+        y = data.pose.position.y
+        z = data.pose.position.z
+        orientation_q = data.pose.orientation
 
     # Convert quaternion to Euler angles (roll, pitch, yaw)
     (ROLL, PITCH, YAW) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
@@ -242,8 +245,10 @@ if __name__ == '__main__': # <- Executable
     subCorners_primary_B = rospy.Subscriber('CV/Primary/AR_corners_B', Int32MultiArray, callback_primary_AR_B)
     subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
     subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
-    #subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
-    subState = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback)
+    if useGlobal:
+        subState = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback)
+    else:
+        subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
