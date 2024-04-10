@@ -93,12 +93,12 @@ def pose_callback_global(data):
     # data in the form of [X, Y, Z, Roll, Pitch, Yaw, phase, Time]
 
     # Get the pose data
-    x = data.pose.position.x
-    y = data.pose.position.y
-    z = data.pose.position.z
+    x = data.pose.pose.position.x
+    y = data.pose.pose.position.y
+    z = data.pose.pose.position.z
 
     # Extract quaternion orientation from the message
-    orientation_q = data.pose.orientation
+    orientation_q = data.pose.pose.orientation
 
     # Convert quaternion to Euler angles (roll, pitch, yaw)
     (roll, pitch, yaw) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 
     # Subscribers
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
-    subState = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback_global)
+    subState_g = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback_global)
     subrgvA_p = rospy.Subscriber('CV/inert_coord_A', Float32MultiArray, callbackrgvA_primary)
     subrgvB_p = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB_primary)
     subrgvA_s = rospy.Subscriber('CV/Secondary/inert_coord_A', Float32MultiArray, callbackrgvA_secondary)
