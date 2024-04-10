@@ -108,7 +108,7 @@ def pose_callback_global(data):
 
     # Write the data to the file
     global drone_global_state_hist_file, DRONE_COUNTER_G
-    writer = csv.writer(drone_state_hist_file)
+    writer = csv.writer(drone_global_state_hist_file)
     writer.writerow([x, y, z, roll, pitch, yaw, PHASE, ros_now])
 
     # Increment the counter
