@@ -318,6 +318,7 @@ if __name__ == '__main__':
 
         # Output the number of data points logged
         rospy.loginfo("Drone data points logged: " + str(DRONE_COUNTER))
+        rospy.loginfo("Drone global data points logged: " + str(DRONE_COUNTER_G))
         rospy.loginfo("RGV data points logged: " + str(RGV_COUNTER))
 
         flag = ''
