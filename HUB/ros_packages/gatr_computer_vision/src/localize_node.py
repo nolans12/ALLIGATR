@@ -191,6 +191,23 @@ def pose_callback(data):
     y = data.pose.position.y
     z = data.pose.position.z
 
+    # Since using global_position/local, the orientation is in the UTM frame, need to convert it to ENU frame based on the latitude and longitude
+    # The conversion is R1(pi/2 - lattiude)*R3(pi/2 + longitude) where R1 and R3 are the rotation matrices about the x and z axes respectively
+    
+    # for now hardcode in inputs from mission planner
+    lattiude = -35.36299
+    longitude = 149.1652724
+
+    # now perform the transforms on x, y, z
+    # transfomration matrix is 
+    #[-sin(longitude), cos(longitude), 0; 
+    #-sin(lattiude)*cos(longitude), -sin(lattiude)*sin(longitude), cos(lattiude);
+    #cos(lattiude)*cos(longitude), cos(lattiude)*sin(longitude), sin(lattiude)];
+    
+    x = -1*np.sin(longitude)*x + np.cos(longitude)*y
+    y = -1*np.sin(lattiude)*np.cos(longitude)*x - np.sin(lattiude)*np.sin(longitude)*y + np.cos(lattiude)*z
+    z = np.cos(lattiude)*np.cos(longitude)*x + np.cos(lattiude)*np.sin(longitude)*y + np.sin(lattiude)*z
+    
     # Extract quaternion orientation from the message
     orientation_q = data.pose.orientation
 
@@ -235,8 +252,8 @@ if __name__ == '__main__': # <- Executable
     subCorners_primary_B = rospy.Subscriber('CV/Primary/AR_corners_B', Int32MultiArray, callback_primary_AR_B)
     subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
     subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
-    subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
-    #subState = rospy.Subscriber("/mavros/global_position/local", PoseWithCovarianceStamped, pose_callback)
+    #subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
+    subState = rospy.Subscriber("/mavros/global_position/local", PoseWithCovarianceStamped, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
