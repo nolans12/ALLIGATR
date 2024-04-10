@@ -26,6 +26,17 @@ processFPS = 30
 # Frame count
 frameCount = 0
 
+# Save FPS
+saveFPS = 1
+saveBool = 0        # Boolean to save video, 1 means to record video
+
+# Video file
+if saveBool:
+    size = (int(1920), int(1080)) 
+    filename = "primaryVideo%s.avi" % rospy.get_time()
+    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+
+
 # Image callback for received image
 def callback_GAZEBO(data):
     # Used to convert between ROS and OpenCV images
@@ -222,6 +233,12 @@ if __name__ == '__main__': # <- Executable
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
 
+            # Save image
+            if saveBool:
+                if frameCount % (camFPS // saveFPS) == 0: 
+                    # Save video
+                    writeObj.write(img)
+
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
 
@@ -250,6 +267,7 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B_last)
 
 
+    writeObj.release()
     cv2.destroyAllWindows()         
     cap.release()
     rospy.loginfo("End of program") 
