@@ -6,8 +6,13 @@ import numpy as np
 from std_msgs.msg import Int32MultiArray
 from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf.transformations import euler_from_quaternion
+
+# New: import for /mavros/global_position/local
+from nav_msgs.msg import Odometry
+
+global useGlobal
+useGlobal = True
 
 # Phase Smoother
 global phase_counter_A, phase_counter_B
@@ -184,32 +189,20 @@ def callback_secondary_AR_B(data):
 # Subscribe to get position data of the drone relative to its instantiated inertial local frame, this is the ENU frame with the origin
 # at the point of initialization
 def pose_callback(data):
-    global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW, VEL_X, VEL_Y, VEL_Z, TIME_OF_POSE_CALL
+    global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW, TIME_OF_POSE_CALL
+    global DRONEX_SET, DRONEY_SET, ALTITUDE_SET
 
-    # Get the pose data
-    x = data.pose.position.x
-    y = data.pose.position.y
-    z = data.pose.position.z
+    # ORIGINAL, WITH /mavros/local_position/pose:
+    # x = data.pose.position.x
+    # y = data.pose.position.y
+    # z = data.pose.position.z
+    # orientation_q = data.pose.orientation
 
-    # Since using global_position/local, the orientation is in the UTM frame, need to convert it to ENU frame based on the latitude and longitude
-    # The conversion is R1(pi/2 - lattiude)*R3(pi/2 + longitude) where R1 and R3 are the rotation matrices about the x and z axes respectively
-    
-    # for now hardcode in inputs from mission planner
-    lattiude = -35.36299
-    longitude = 149.1652724
-
-    # now perform the transforms on x, y, z
-    # transfomration matrix is 
-    #[-sin(longitude), cos(longitude), 0; 
-    #-sin(lattiude)*cos(longitude), -sin(lattiude)*sin(longitude), cos(lattiude);
-    #cos(lattiude)*cos(longitude), cos(lattiude)*sin(longitude), sin(lattiude)];
-    
-    x = -1*np.sin(longitude)*x + np.cos(longitude)*y
-    y = -1*np.sin(lattiude)*np.cos(longitude)*x - np.sin(lattiude)*np.sin(longitude)*y + np.cos(lattiude)*z
-    z = np.cos(lattiude)*np.cos(longitude)*x + np.cos(lattiude)*np.sin(longitude)*y + np.sin(lattiude)*z
-    
-    # Extract quaternion orientation from the message
-    orientation_q = data.pose.orientation
+    # NEW, WITH /mavros/global_position/local:
+    x = data.pose.pose.position.x
+    y = data.pose.pose.position.y
+    z = data.pose.pose.position.z
+    orientation_q = data.pose.pose.orientation
 
     # Convert quaternion to Euler angles (roll, pitch, yaw)
     (ROLL, PITCH, YAW) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
@@ -221,9 +214,6 @@ def pose_callback(data):
     DRONEX = x
     DRONEY = y
     ALTITUDE = z
-    VEL_X = data.twist.linear.x
-    VEL_Y = data.twist.linear.y
-    VEL_Z = data.twist.linear.z
 
     # Set the time of pose call to the current time in seconds
     TIME_OF_POSE_CALL = rospy.get_time()
@@ -253,23 +243,11 @@ if __name__ == '__main__': # <- Executable
     subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
     subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
     #subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
-    subState = rospy.Subscriber("/mavros/global_position/local", PoseWithCovarianceStamped, pose_callback)
+    subState = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback)
 
     ####################################################################
     rate = rospy.Rate(10) # 10hz
     rospy.sleep(1.0)
-    
-    # Begin the main loop that consistently outputs Localization estimates
-    while not rospy.is_shutdown():
-        
-        # Use linearized dynamics to interpolate the position of the RGV
-        dt = rospy.get_time() - TIME_OF_POSE_CALL
-
-        # Interpolate the position of the RGV
-        DRONEX = DRONEX_SET + VEL_X * dt
-        DRONEY = DRONEY_SET + VEL_Y * dt
-        ALTITUDE = ALTITUDE_SET + VEL_Z * dt
-
     
     # Spin so the script keeps looking for messages
     rospy.spin()
