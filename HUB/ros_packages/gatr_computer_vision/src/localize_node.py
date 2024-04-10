@@ -187,9 +187,9 @@ def pose_callback(data):
     global DRONEX, DRONEY, ALTITUDE, PITCH, ROLL, YAW, VEL_X, VEL_Y, VEL_Z, TIME_OF_POSE_CALL
 
     # Get the pose data
-    x = data.pose.position.x
-    y = data.pose.position.y
-    z = data.pose.position.z
+    x_temp = data.pose.position.x
+    y_temp = data.pose.position.y
+    z_temp = data.pose.position.z
 
     # Since using global_position/local, the orientation is in the UTM frame, need to convert it to ENU frame based on the latitude and longitude
     # The conversion is R1(pi/2 - lattiude)*R3(pi/2 + longitude) where R1 and R3 are the rotation matrices about the x and z axes respectively
@@ -203,10 +203,10 @@ def pose_callback(data):
     #[-sin(longitude), cos(longitude), 0; 
     #-sin(lattiude)*cos(longitude), -sin(lattiude)*sin(longitude), cos(lattiude);
     #cos(lattiude)*cos(longitude), cos(lattiude)*sin(longitude), sin(lattiude)];
-    
-    x = -1*np.sin(longitude)*x + np.cos(longitude)*y
-    y = -1*np.sin(lattiude)*np.cos(longitude)*x - np.sin(lattiude)*np.sin(longitude)*y + np.cos(lattiude)*z
-    z = np.cos(lattiude)*np.cos(longitude)*x + np.cos(lattiude)*np.sin(longitude)*y + np.sin(lattiude)*z
+
+    x = -1*np.sin(longitude)*x_temp + np.cos(longitude)*y_temp
+    y = -1*np.sin(lattiude)*np.cos(longitude)*x_temp - np.sin(lattiude)*np.sin(longitude)*y_temp + np.cos(lattiude)*z_temp
+    z = np.cos(lattiude)*np.cos(longitude)*x_temp + np.cos(lattiude)*np.sin(longitude)*y_temp + np.sin(lattiude)*z_temp
     
     # Extract quaternion orientation from the message
     orientation_q = data.pose.orientation
