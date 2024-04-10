@@ -13,7 +13,7 @@ from nav_msgs.msg import Odometry
 
 ######## USE /mavros/global_position/local INSTEAD OF /mavros/local_position/pose ########
 global useGlobal
-useGlobal = False
+useGlobal = True
 ##########################################################################################
 
 # Phase Smoother
