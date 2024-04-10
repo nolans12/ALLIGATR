@@ -3,6 +3,7 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float32MultiArray, Int32MultiArray
 from std_msgs.msg import String
+from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
 from datetime import datetime
 from sensor_msgs.msg import Image
@@ -18,6 +19,7 @@ import cv2
 
 # Global file handles
 drone_state_hist_file = None
+drone_global_state_hist_file = None
 rgvA_detections_file = None
 rgvB_detections_file = None
 video_timestamp_file = None
@@ -29,6 +31,7 @@ rgvB_AR_file = None
 # Global phase variable
 PHASE = "STANDBY"
 DRONE_COUNTER = 0
+DRONE_COUNTER_G = 0
 RGV_COUNTER = 0
 
 # Save FPS for video stream
@@ -83,6 +86,33 @@ def pose_callback(data):
 
     # Increment the counter
     DRONE_COUNTER += 1
+
+    # Pose callback
+def pose_callback_global(data):
+    # Writes the state of the drone to the drone_state_hist.csv file
+    # data in the form of [X, Y, Z, Roll, Pitch, Yaw, phase, Time]
+
+    # Get the pose data
+    x = data.pose.pose.position.x
+    y = data.pose.pose.position.y
+    z = data.pose.pose.position.z
+
+    # Extract quaternion orientation from the message
+    orientation_q = data.pose.pose.orientation
+
+    # Convert quaternion to Euler angles (roll, pitch, yaw)
+    (roll, pitch, yaw) = euler_from_quaternion([orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
+
+    # Get the current time
+    ros_now = rospy.get_time()  # This is the time in seconds since the start of the node
+
+    # Write the data to the file
+    global drone_global_state_hist_file, DRONE_COUNTER_G
+    writer = csv.writer(drone_global_state_hist_file)
+    writer.writerow([x, y, z, roll, pitch, yaw, PHASE, ros_now])
+
+    # Increment the counter
+    DRONE_COUNTER_G += 1
     
 # rgv A callback
 def callbackrgvA_primary(data):
@@ -214,6 +244,7 @@ if __name__ == '__main__':
 
     # Subscribers
     subState = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, pose_callback)
+    subState_g = rospy.Subscriber("/mavros/global_position/local", Odometry, pose_callback_global)
     subrgvA_p = rospy.Subscriber('CV/inert_coord_A', Float32MultiArray, callbackrgvA_primary)
     subrgvB_p = rospy.Subscriber('CV/inert_coord_B', Float32MultiArray, callbackrgvB_primary)
     subrgvA_s = rospy.Subscriber('CV/Secondary/inert_coord_A', Float32MultiArray, callbackrgvA_secondary)
@@ -234,6 +265,8 @@ if __name__ == '__main__':
 
     drone_state_hist_file = open(os.path.join(data_dir, "drone_state_hist.csv"), 'w')
     check_file(drone_state_hist_file)
+    drone_global_state_hist_file = open(os.path.join(data_dir, "drone_global_state_hist.csv"), 'w')
+    check_file(drone_global_state_hist_file)
     rgvA_detections_file = open(os.path.join(data_dir, "rgvA_detections.csv"), 'w')
     check_file(rgvA_detections_file)
     rgvB_detections_file = open(os.path.join(data_dir, "rgvB_detections.csv"), 'w')
@@ -285,6 +318,7 @@ if __name__ == '__main__':
 
         # Output the number of data points logged
         rospy.loginfo("Drone data points logged: " + str(DRONE_COUNTER))
+        rospy.loginfo("Drone global data points logged: " + str(DRONE_COUNTER_G))
         rospy.loginfo("RGV data points logged: " + str(RGV_COUNTER))
 
         flag = ''
@@ -294,7 +328,48 @@ if __name__ == '__main__':
             pass
 
         if flag == 'q':
-            break
+            # Close the CSV files
+            drone_state_hist_file.close()
+            # Check that csv was succesfully closed
+            if drone_state_hist_file.closed:
+                rospy.loginfo("drone_state_hist.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close drone_state_hist.csv")
+
+
+            rgvA_detections_file.close()
+            # Check that csv was succesfully closed
+            if rgvA_detections_file.closed:
+                rospy.loginfo("rgvA_detections.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvA_detections.csv")
+
+
+            rgvB_detections_file.close()
+            # Check that csv was succesfully closed
+            if rgvB_detections_file.closed:
+                rospy.loginfo("rgvB_detections.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvB_detections.csv")
+
+            rgvA_AR_file.close()
+            # Check that csv was succesfully closed
+            if rgvA_AR_file.closed:
+                rospy.loginfo("rgvA_AR.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvA_AR.csv")
+
+            rgvB_AR_file.close()
+            # Check that csv was succesfully closed
+            if rgvB_AR_file.closed:
+                rospy.loginfo("rgvB_AR.csv closed successfully")
+            else:
+                rospy.logerr("Failed to close rgvB_AR.csv")
+
+            rospy.loginfo("CSV files closed. Ending node...")
+            
+            # Stop spinning and end the node
+            rospy.signal_shutdown("Quiting...")
 
         rate.sleep()
 
@@ -302,11 +377,3 @@ if __name__ == '__main__':
 
     rospy.logfatal("Data logger node stopped")
         
-    # Close the CSV files
-    drone_state_hist_file.close()
-    rgvA_detections_file.close()
-    rgvB_detections_file.close()
-    rgvA_AR_file.close()
-    rgvB_AR_file.close()
-
-    rospy.loginfo("CSV files closed. Ending node...")
