@@ -29,7 +29,7 @@ saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 4
+COMPRESS_CONST = 1
 
 
 
@@ -248,7 +248,7 @@ if __name__ == '__main__': # <- Executable
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                     # Save video
-                    writeObj.write(compressed_frame)
+                    writeObj.write(img)
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
