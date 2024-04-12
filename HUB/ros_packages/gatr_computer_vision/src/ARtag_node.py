@@ -31,11 +31,7 @@ saveBool = 1        # Boolean to save video, 1 means to record video
 # resize the image by this amount
 COMPRESS_CONST = 4
 
-# Video file
-if saveBool:
-    size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-    filename = "secondaryVideo%s.avi" % rospy.get_time()
-    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
+
 
 # Image callback for received image
 def callback_GAZEBO(data):
@@ -154,6 +150,12 @@ if __name__ == '__main__': # <- Executable
 
     # Used to convert between ROS and OpenCV images
     br = CvBridge()
+
+    # Video file
+    if saveBool:
+        size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
+        filename = "secondaryVideo%s.avi" % str(rospy.get_time())
+        writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
