@@ -25,7 +25,7 @@ frameCount = 0
 
 # Save FPS
 saveFPS = 1
-saveBool = 0        # Boolean to save video, 1 means to record video
+saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
