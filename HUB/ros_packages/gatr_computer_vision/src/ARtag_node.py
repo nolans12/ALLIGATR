@@ -27,11 +27,15 @@ frameCount = 0
 saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
+# Compression Level
+# resize the image by this amount
+COMPRESS_CONST = 4
+
 # Video file
 if saveBool:
-    size = (int(1920), int(1080)) 
+    size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
     filename = "secondaryVideo%s.avi" % rospy.get_time()
-    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
 # Image callback for received image
 def callback_GAZEBO(data):
@@ -221,8 +225,14 @@ if __name__ == '__main__': # <- Executable
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
+                # Compress image by resizing
+                compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+
+                # Convert to ros message
+                ros_image = br.cv2_to_imgmsg(compressed_frame)
+
                 # Publish image message to image topic
-                pub_image.publish(br.cv2_to_imgmsg(img))
+                pub_image.publish(ros_image)
 
             # Process Image
             if frameCount % (camFPS // processFPS) == 0:                
@@ -232,8 +242,11 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
+                    # Compress image by resizing
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+
                     # Save video
-                    writeObj.write(img)
+                    writeObj.write(compressed_frame)
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
@@ -244,7 +257,6 @@ if __name__ == '__main__': # <- Executable
             pass
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
-
             
         # Publish to the ROS node
         if corners_msg_A.data[0]:
@@ -255,7 +267,6 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B)
             corners_msg_B_last.data = corners_msg_B.data
 
-        #rate.sleep()
 
     writeObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera

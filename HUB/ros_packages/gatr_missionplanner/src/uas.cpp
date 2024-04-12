@@ -34,12 +34,12 @@ uas::uas() {
     fine_altitude = 35.0 * 0.3048; // 35 ft to m
 
     // Time durations for each phase before moving on to the next phase
-    coarse_duration = 30.0; // 10 seconds
-    fine_duration = 20.0; // 10 seconds
+    coarse_duration = 60.0; // 10 seconds
+    fine_duration = 30.0; // 10 seconds
     joint_duration = 20.0; // 10 seconds
     detection_duration = 5.0; // Time before the RGV is considered lost (s)
     boundary_duration = 5.0; // Time before the UAS aborts when out of bounds (s)
-    search_point_duration = 15.0; // Time before the UAS moves on from a search point if it still hasn't reached it(s)
+    search_point_duration = 10.0; // Time before the UAS moves on from a search point if it still hasn't reached it(s)
     joint_detection_duration = 15.0; // Time before the UAS aborts when the RGVs are lost in the joint phase (s)
 
     // If there is no detections within these times, reset the phase timer

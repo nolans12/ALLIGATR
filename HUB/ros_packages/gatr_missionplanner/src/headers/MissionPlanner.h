@@ -91,6 +91,10 @@ class MissionPlanner {
         bool get_secondary_activated();
 
         void set_cameras(bool primary, bool secondary);
+
+        // Locking functions to avoid localizing both RGVs at the same time
+        void set_lock();
+        void reset_lock();
         
     private:
         std::string phase;
@@ -99,8 +103,12 @@ class MissionPlanner {
         uas drone;
         environment env;
 
+        // Bools that determine which cameras are dictating the drone's motion
         bool primary_activated;
         bool secondary_activated;
+
+        // Locking variables that keep the drone from localizing both RGVs at the same time
+        std::string target_lock; // The target the drone is currently locked onto
 
         ros::Subscriber inert_coord_A_sub_primary;
         ros::Subscriber inert_coord_B_sub_primary;
