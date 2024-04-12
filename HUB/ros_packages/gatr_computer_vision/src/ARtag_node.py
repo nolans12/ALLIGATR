@@ -250,6 +250,10 @@ if __name__ == '__main__': # <- Executable
                     # Save video
                     writeObj.write(img)
 
+                    # Log info
+                    rospy.loginfo("Saved frame")
+            
+
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
 
