@@ -27,11 +27,15 @@ frameCount = 0
 saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
+# Compression Level
+# resize the image by this amount
+COMPRESS_CONST = 4
+
 # Video file
 if saveBool:
-    size = (int(1920), int(1080)) 
+    size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
     filename = "secondaryVideo%s.avi" % rospy.get_time()
-    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
 # Image callback for received image
 def callback_GAZEBO(data):
@@ -221,16 +225,11 @@ if __name__ == '__main__': # <- Executable
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
-                # Encode the image
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
-                result, encimg = cv2.imencode('.jpg', img, encode_param)
-
-                # Display the frame
-                # decimg = cv2.imdecode(encimg, 1)
-                # cv2.imshow('frame', decimg)
+                # Compress image by resizing
+                compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                 # Convert to ros message
-                ros_image = br.cv2_to_imgmsg(encimg, encoding='passthrough')
+                ros_image = br.cv2_to_imgmsg(compressed_frame)
 
                 # Publish image message to image topic
                 pub_image.publish(ros_image)
@@ -243,8 +242,11 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
+                    # Compress image by resizing
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+
                     # Save video
-                    writeObj.write(img)
+                    writeObj.write(compressed_frame)
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count

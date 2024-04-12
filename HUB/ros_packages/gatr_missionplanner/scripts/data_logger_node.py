@@ -41,6 +41,8 @@ RGV_COUNTER = 0
 primaryVidBool = 1      # Set equal to 1 to save video, otherwise 0
 secondaryVidBool = 1    # Set equal to 1 to save video, otherwise 0
 saveFPS = 1
+COMPRESS_CONST = 4
+SAVE_SIZE = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST))  # Make sure this matches with the compression size output
 
 # Create a new directory for the data
 def create_directory(save_location):
@@ -231,14 +233,11 @@ def callbackphase(data):
 def callback_SecondaryVid(data):
     global secondaryVideoObj, secondary_video_timestamp_file
     br = CvBridge()
-    img = br.imgmsg_to_cv2(data, desired_encoding='passthrough')        # Convert ROS Image message to OpenCV image
-
-    # Decode image
-    decimg = cv2.imdecode(img, 1)
+    img = br.imgmsg_to_cv2(data)        # Convert ROS Image message to OpenCV image
 
     # Save image and time to a file
     ros_now = rospy.get_time()
-    secondaryVideoObj.write(decimg)
+    secondaryVideoObj.write(img)
     writer = csv.writer(secondary_video_timestamp_file)
     writer.writerow([ros_now])
 
@@ -246,14 +245,11 @@ def callback_SecondaryVid(data):
 def callback_PrimaryVid(data):
     global primaryVideoObj, primary_video_timestamp_file
     br = CvBridge()
-    img = br.imgmsg_to_cv2(data, desired_encoding='passthrough')        # Convert ROS Image message to OpenCV image
-
-    # Decode image
-    decimg = cv2.imdecode(img, 1)
+    img = br.imgmsg_to_cv2(data)        # Convert ROS Image message to OpenCV image
 
     # Save image and time to a file
     ros_now = rospy.get_time()
-    primaryVideoObj.write(decimg)
+    primaryVideoObj.write(img)
     writer = csv.writer(primary_video_timestamp_file)
     writer.writerow([ros_now])
 
@@ -308,9 +304,8 @@ if __name__ == '__main__':
         # Primary video
         primary_video_timestamp_file = open(os.path.join(data_dir, "primary_video_timestamp_file.csv"), 'w')
         check_file(primary_video_timestamp_file)
-        size = (int(1920), int(1080)) 
         #primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
-        primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.mp4"), cv2.VideoWriter_fourcc(*'mp4v'), saveFPS, size)
+        primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.avi"), cv2.VideoWriter_fourcc(*'XVID'), saveFPS, SAVE_SIZE)
 
     if secondaryVidBool:
         # Subscriber
@@ -319,9 +314,8 @@ if __name__ == '__main__':
         # Secondary video
         secondary_video_timestamp_file = open(os.path.join(data_dir, "secondary_video_timestamp_file.csv"), 'w')
         check_file(secondary_video_timestamp_file)
-        size = (int(1920), int(1080)) 
         #secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
-        secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.mp4"), cv2.VideoWriter_fourcc(*'mp4v'), saveFPS, size) 
+        secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'XVID'), saveFPS, SAVE_SIZE) 
 
 
     # Write the headers to the files
