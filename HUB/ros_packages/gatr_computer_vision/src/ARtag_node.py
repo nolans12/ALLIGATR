@@ -29,7 +29,7 @@ saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 1
+COMPRESS_CONST = 4
 
 
 
@@ -252,7 +252,7 @@ if __name__ == '__main__': # <- Executable
                     resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
                     # Save video
-                    writeObj.write(resized)
+                    writeObj.write(img)
 
                     # Log info
                     rospy.loginfo("Saved frame")
