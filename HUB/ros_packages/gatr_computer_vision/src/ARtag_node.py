@@ -221,8 +221,19 @@ if __name__ == '__main__': # <- Executable
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
+                # Encode the image
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
+                result, encimg = cv2.imencode('.jpg', img, encode_param)
+
+                # Display the frame
+                # decimg = cv2.imdecode(encimg, 1)
+                # cv2.imshow('frame', decimg)
+
+                # Convert to ros message
+                ros_image = br.cv2_to_imgmsg(encimg, encoding='passthrough')
+
                 # Publish image message to image topic
-                pub_image.publish(br.cv2_to_imgmsg(img))
+                pub_image.publish(ros_image)
 
             # Process Image
             if frameCount % (camFPS // processFPS) == 0:                
@@ -244,7 +255,6 @@ if __name__ == '__main__': # <- Executable
             pass
         else:
             out_str = "Camera Connection Lost %s" % rospy.get_time()
-
             
         # Publish to the ROS node
         if corners_msg_A.data[0]:
@@ -255,7 +265,6 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B)
             corners_msg_B_last.data = corners_msg_B.data
 
-        #rate.sleep()
 
     writeObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera
