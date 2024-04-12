@@ -22,11 +22,14 @@ drone_state_hist_file = None
 drone_global_state_hist_file = None
 rgvA_detections_file = None
 rgvB_detections_file = None
-video_timestamp_file = None
-writeObj = None
 rgvA_AR_file = None
 rgvB_AR_file = None
 
+# Video files
+secondary_video_timestamp_file = None
+primary_video_timestamp_file = None
+secondaryVideoObj = None
+primaryVideoObj = None
 
 # Global phase variable
 PHASE = "STANDBY"
@@ -35,6 +38,8 @@ DRONE_COUNTER_G = 0
 RGV_COUNTER = 0
 
 # Save FPS for video stream
+primaryVidBool = 0      # Set equal to 1 to save video, otherwise 0
+secondaryVidBool = 0    # Set equal to 1 to save video, otherwise 0
 saveFPS = 1
 
 # Create a new directory for the data
@@ -174,7 +179,7 @@ def callbackrgvB_secondary(data):
     # Increment the counter
     RGV_COUNTER += 1
 
-    # RGV A AR Callback
+# RGV A AR Callback
 def callback_primary_AR_A(data):
     global rgvA_AR_file
     # Writes the data to the rgvA_detections.csv file
@@ -217,22 +222,40 @@ def callback_secondary_AR_B(data):
     writer = csv.writer(rgvB_AR_file)
     writer.writerow([data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], ros_now, "Secondary"])
 
-
 def callbackphase(data):
     global PHASE
     PHASE = data.data
 
+
+# Save secondary video
 def callback_SecondaryVid(data):
-    global writeObj, video_timestamp_file
+    global secondaryVideoObj, secondary_video_timestamp_file
     br = CvBridge()
-    img = br.imgmsg_to_cv2(data)        # Convert ROS Image message to OpenCV image
+    img = br.imgmsg_to_cv2(data, desired_encoding='passthrough')        # Convert ROS Image message to OpenCV image
+
+    # Decode image
+    decimg = cv2.imdecode(img, 1)
 
     # Save image and time to a file
     ros_now = rospy.get_time()
-    writeObj.write(img)
-    writer = csv.writer(video_timestamp_file)
+    secondaryVideoObj.write(decimg)
+    writer = csv.writer(secondary_video_timestamp_file)
     writer.writerow([ros_now])
 
+# Save primary video
+def callback_PrimaryVid(data):
+    global primaryVideoObj, primary_video_timestamp_file
+    br = CvBridge()
+    img = br.imgmsg_to_cv2(data, desired_encoding='passthrough')        # Convert ROS Image message to OpenCV image
+
+    # Decode image
+    decimg = cv2.imdecode(img, 1)
+
+    # Save image and time to a file
+    ros_now = rospy.get_time()
+    primaryVideoObj.write(decimg)
+    writer = csv.writer(primary_video_timestamp_file)
+    writer.writerow([ros_now])
 
 
 if __name__ == '__main__':
@@ -254,7 +277,6 @@ if __name__ == '__main__':
     subCorners_secondary_A = rospy.Subscriber('CV/Secondary/AR_corners_A', Int32MultiArray, callback_secondary_AR_A)
     subCorners_secondary_B = rospy.Subscriber('CV/Secondary/AR_corners_B', Int32MultiArray, callback_secondary_AR_B)
     subphase = rospy.Subscriber('MP/phase', String, callbackphase)
-    #sub_img = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
 
     # Hyperparameters
     save_location = os.path.expanduser("~/ALLIGATR/HUB/data")
@@ -278,11 +300,27 @@ if __name__ == '__main__':
     rgvB_AR_file = open(os.path.join(data_dir, "rgvB_AR.csv"), 'w')
     check_file(rgvB_AR_file)
 
-    # Video file
-    # video_timestamp_file = open(os.path.join(data_dir, "video_timestamp_file.csv"), 'w')
-    # check_file(video_timestamp_file)
-    # size = (int(1920), int(1080)) 
-    # writeObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+    # Video files
+    if primaryVidBool:
+        # Subscriber
+        sub_img_primary = rospy.Subscriber('CV/Primary_Video', Image, callback_PrimaryVid)
+
+        # Primary video
+        primary_video_timestamp_file = open(os.path.join(data_dir, "primary_video_timestamp_file.csv"), 'w')
+        check_file(primary_video_timestamp_file)
+        size = (int(1920), int(1080)) 
+        primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+
+    if secondaryVidBool:
+        # Subscriber
+        sub_img_secondary = rospy.Subscriber('CV/Secondary_Video', Image, callback_SecondaryVid)
+
+        # Secondary video
+        secondary_video_timestamp_file = open(os.path.join(data_dir, "secondary_video_timestamp_file.csv"), 'w')
+        check_file(secondary_video_timestamp_file)
+        size = (int(1920), int(1080)) 
+        secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
+
 
     # Write the headers to the files
     drone_writer = csv.writer(drone_state_hist_file)
@@ -365,6 +403,24 @@ if __name__ == '__main__':
                 rospy.loginfo("rgvB_AR.csv closed successfully")
             else:
                 rospy.logerr("Failed to close rgvB_AR.csv")
+
+            # Close video files if saving video
+            if primaryVidBool:
+                primary_video_timestamp_file.close()
+                if primary_video_timestamp_file.closed:
+                    rospy.loginfo("primary_video_timestamp_file.csv closed successfully")
+                else:
+                    rospy.logerr("Failed to close primary_video_timestamp_file.csv")
+                primaryVideoObj.release()
+
+            if secondaryVidBool:
+                secondary_video_timestamp_file.close()
+                if secondary_video_timestamp_file.closed:
+                    rospy.loginfo("secondary_video_timestamp_file.csv closed successfully")
+                else:
+                    rospy.logerr("Failed to close secondary_video_timestamp_file.csv")
+                secondaryVideoObj.release()
+                
 
             rospy.loginfo("CSV files closed. Ending node...")
             
