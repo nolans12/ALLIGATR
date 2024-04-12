@@ -244,11 +244,15 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
-                    # Compress image by resizing
-                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+                    # Resize the image
+                    scale_percent = 25  # percent of original size
+                    width = int(img.shape[1] * scale_percent / 100)
+                    height = int(img.shape[0] * scale_percent / 100)
+                    dim = (width, height)
+                    resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
 
                     # Save video
-                    writeObj.write(img)
+                    writeObj.write(resized)
 
                     # Log info
                     rospy.loginfo("Saved frame")
