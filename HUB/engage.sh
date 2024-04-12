@@ -37,7 +37,8 @@ SOURCE_FILE="src/main.cpp"
 
 # Function to kill all child processes when script exits
 function cleanup {
-    pkill -P $$
+    pkill -P $$ -2
+    sleep 5
 }
 trap cleanup EXIT
 
