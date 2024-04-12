@@ -126,8 +126,8 @@ def callback_primary_AR_A(data):
     relX, relY = localize(data)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
-    rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    rospy.loginfo("RGV A Primary - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
 
     outData.data = [RGVX_inert, RGVY_inert]
 
@@ -143,8 +143,8 @@ def callback_primary_AR_B(data):
     relX, relY = localize(data)     # Get relative coordinates in meters
     RGVX_inert, RGVY_inert = inertLocalize(relX, relY)
 
-    rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
-    rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
+    rospy.loginfo("RGV B Primary - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
+    # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
 
     outData.data = [RGVX_inert, RGVY_inert]
 
@@ -163,7 +163,7 @@ def callback_secondary_AR_A(data):
 
     # rospy.loginfo("RGV Inertial - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
     # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
-    rospy.loginfo("RGV A Detected! RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("RGV A Secondary - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
 
     outData.data = [RGVX_inert, RGVY_inert]
 
@@ -181,7 +181,7 @@ def callback_secondary_AR_B(data):
 
     # rospy.loginfo("RGV Inertial - RGVB_x: {}, RGVB_y: {}".format(RGVX_inert, RGVY_inert))
     # rospy.loginfo("Drone_x: {}, Drone_y: {}, Drone_z: {}, Drone_Yaw".format(DRONEX, DRONEY, ALTITUDE, YAW))
-    rospy.loginfo("RGV A Detected! RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
+    rospy.loginfo("RGV B Secondary - RGVA_x: {}, RGVA_y: {}".format(RGVX_inert, RGVY_inert))
 
     outData.data = [RGVX_inert, RGVY_inert]
 
@@ -222,7 +222,7 @@ def pose_callback(data):
     TIME_OF_POSE_CALL = rospy.get_time()
 
     # Output the x, y, z position
-    rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
+    # rospy.loginfo("Position - x: {}, y: {}, z: {}, Yaw: {}".format(x, y, z, YAW))
 
 
 if __name__ == '__main__': # <- Executable 

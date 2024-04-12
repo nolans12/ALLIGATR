@@ -17,6 +17,7 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     // drone = uas();
     // env = environment();
     phase = "Search";
+    target_lock = "None";
     search_point_time = ros::Time::now();
     phases = {phase};
     smootherCount = 0;
@@ -315,7 +316,7 @@ void MissionPlanner::search_phase(){
     }
 
     // RGV A is detected
-    else if (env.rgvAInView){
+    if (env.rgvAInView){
 
         // Has RGV A been finely localized?
         if (env.rgvAFineComplete){
@@ -327,6 +328,7 @@ void MissionPlanner::search_phase(){
                 joint_time_engaged = ros::Time::now();
                 joint_last_detection = ros::Time::now();
                 ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
+                return;
             }
 
             else{
@@ -342,17 +344,19 @@ void MissionPlanner::search_phase(){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             ROS_INFO("RGV A has been coarsely localized. Moving to fine phase...");
+            return;
         }
 
         else{
             // If RGV A has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV A has been detected but not localized. Starting trail phase...");
+            return;
         }   
     } 
 
     // RGV B is detected
-    else if (env.rgvBInView){
+    if (env.rgvBInView){
 
         // Has RGV B been finely localized?
         if (env.rgvBFineComplete){
@@ -364,6 +368,7 @@ void MissionPlanner::search_phase(){
                 joint_time_engaged = ros::Time::now();
                 joint_last_detection = ros::Time::now();
                 ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
+                return;
             }
 
             else{
@@ -379,12 +384,14 @@ void MissionPlanner::search_phase(){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             ROS_INFO("RGV B has been coarsely localized. Moving to fine phase...");
+            return;
         }
 
         else{
             // If RGV B has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV B has been detected but not localized. Starting trail phase...");
+            return;
         }   
 
     }
@@ -402,6 +409,9 @@ void MissionPlanner::trail_phase(){
     // Make sure the correct cameras are activated
     set_cameras(true, true);
 
+    //Set the lock on rgv A if no lock is set and rgv A is in view and not localized
+    set_lock();
+
     if (out_of_bounds(drone.state)){
         ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
         phase = "Boundary Control";
@@ -409,7 +419,7 @@ void MissionPlanner::trail_phase(){
     }
 
     // RGV A is detected
-    else if (env.rgvAInView){
+    else if (target_lock == "RGV A"){
 
         // Is RGV A stopped?
         if (rgvAStopped()) //rgvStopped returns a vector of two bools for [RGVA, RGVB]
@@ -428,7 +438,7 @@ void MissionPlanner::trail_phase(){
     }
 
     // RGV B is detected
-    else if(env.rgvBInView){
+    else if(target_lock == "RGV B"){
 
         // Is RGV B stopped?
         if (rgvBStopped()) //rgvStopped returns a vector of two bools for [RGVA, RGVB]
@@ -460,6 +470,9 @@ void MissionPlanner::coarse_phase(){
     // Make sure the correct cameras are activated
     set_cameras(true, false);
 
+    //Set the lock on rgv A if no lock is set and rgv A is in view and not localized
+    set_lock();
+
     if (out_of_bounds(drone.state)){
         ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
         phase = "Boundary Control";
@@ -467,7 +480,7 @@ void MissionPlanner::coarse_phase(){
     }
 
     // If rgv A is detected and not coarsely localized yet
-    else if (env.rgvAInView && !env.rgvACoarseComplete){
+    else if (target_lock == "RGV A" && !env.rgvACoarseComplete){
         // if (rgvAStopped()){
         if (true){
             // If the drone has been in the coarse phase for more than X seconds, move to the fine phase
@@ -498,7 +511,7 @@ void MissionPlanner::coarse_phase(){
         }
     }
 
-    else if (env.rgvAInView && env.rgvACoarseComplete){
+    else if (target_lock == "RGV A" && env.rgvACoarseComplete){
         // The drone was trailed, but already coarsely localized. Check if it has been fine localized
         phase = "Fine";
         fine_time_engaged = ros::Time::now();
@@ -506,7 +519,7 @@ void MissionPlanner::coarse_phase(){
     }
 
     // If rgv B is detected and not finely localized yet
-    else if (env.rgvBInView && !env.rgvBCoarseComplete){
+    else if (target_lock == "RGV B"  && !env.rgvBCoarseComplete){
         // if (rgvBStopped()){
         if (true){
             // If the drone has been in the coarse phase for more than X seconds, move to the fine phase
@@ -535,7 +548,7 @@ void MissionPlanner::coarse_phase(){
         }
     }
 
-    else if (env.rgvBInView && env.rgvBCoarseComplete){
+    else if (target_lock == "RGV B"  && env.rgvBCoarseComplete){
         // The drone was trailed, but already coarsely localized. Check if it has been fine localized
         phase = "Fine";
         fine_time_engaged = ros::Time::now();
@@ -565,6 +578,9 @@ void MissionPlanner::fine_phase(){
     // Make sure the correct cameras are activated
     set_cameras(false, true);
 
+    //Set the lock on rgv A if no lock is set and rgv A is in view and not localized
+    set_lock();
+
     if (out_of_bounds(drone.state)){
         ROS_INFO("Drone is out of bounds. Moving to boundary control phase...");
         phase = "Boundary Control";
@@ -572,7 +588,7 @@ void MissionPlanner::fine_phase(){
     }
 
     // If rgv A is detected and not finely localized yet
-    else if (env.rgvAInView && !env.rgvAFineComplete){
+    else if (target_lock == "RGV A" && !env.rgvAFineComplete){
         // if (rgvAStopped()){
         if (true){
             // If the drone has been in the fine phase for more than X seconds, check if both have been localized
@@ -595,6 +611,7 @@ void MissionPlanner::fine_phase(){
                 else{
                     // Search for RGV B
                     phase = "Search";
+                    reset_lock();
                     ROS_INFO("RGV B has not been finely localized. Searching for RGV B...");
                 }
             }
@@ -611,7 +628,7 @@ void MissionPlanner::fine_phase(){
     }
 
     // If rgv B is detected and not finely localized yet
-    else if (env.rgvBInView && !env.rgvBFineComplete){
+    else if (target_lock == "RGV B" && !env.rgvBFineComplete){
         // if (rgvBStopped()){
         if (true){
             // If the drone has been in the fine phase for more than X seconds, check if both have been localized
@@ -634,6 +651,7 @@ void MissionPlanner::fine_phase(){
                 else{
                     // Search for RGV A
                     phase = "Search";
+                    reset_lock();
                     ROS_INFO("RGV A has not been finely localized. Searching for RGV A...");
                 }
             }
@@ -749,6 +767,38 @@ void MissionPlanner::joint_search_phase(){
     }
 }
 
+void MissionPlanner::set_lock(){
+    // If the drone has not locked onto an RGV, lock onto the first one it sees
+    if (target_lock == "None"){
+
+        // Lock on to the first RGV it sees, but only if they still need to be localized
+        if (env.rgvAInView && (!env.rgvACoarseComplete || !env.rgvAFineComplete)){
+            target_lock = "RGV A";
+            ROS_INFO("Locking onto RGV A...");
+        }
+        else if (env.rgvBInView && (!env.rgvBCoarseComplete || !env.rgvBFineComplete)){
+            target_lock = "RGV B";
+            ROS_INFO("Locking onto RGV B...");
+        }
+    } else {
+
+        // Check if the drone has lost detection of a locked RGV
+        if (target_lock == "RGV A" && ros::Time::now() - last_rgvA_detection > ros::Duration(drone.detection_duration)){
+            target_lock = "None";
+            ROS_INFO("Lost detection of RGV A. Releasing lock...");
+        }
+        else if (target_lock == "RGV B" && ros::Time::now() - last_rgvB_detection > ros::Duration(drone.detection_duration)){
+            target_lock = "None";
+            ROS_INFO("Lost detection of RGV B. Releasing lock...");
+        }
+    }
+}
+
+void MissionPlanner::reset_lock(){
+    target_lock = "None";
+    ROS_INFO("Releasing lock...");
+}
+
 
 ///////////// Motions //////////////////////
 std::vector<double> MissionPlanner::determine_motion(std::vector<double> waypoint){
@@ -849,37 +899,49 @@ std::vector<double> MissionPlanner::trail_motion(std::vector<double> waypoint) {
     // rgvAPos = env.rgvAPosition;
     // rgvBPos = env.rgvBPosition;
 
-    if (env.rgvAInView && env.rgvBInView) {
-        // if both RGVs are in view, follow closest one
-        if (isRGVAClosest()) {
-            waypoint[0] = env.rgvAPosition[0];
-            waypoint[1] = env.rgvAPosition[1];
-        }
-        else {
-            waypoint[0] = env.rgvBPosition[0];
-            waypoint[1] = env.rgvBPosition[1];
-        }
-    }
-    else if (env.rgvAInView) {
-        // if RGV-A is in view, follow it
+    // if (env.rgvAInView && env.rgvBInView) {
+    //     // if both RGVs are in view, follow closest one
+    //     if (isRGVAClosest()) {
+    //         waypoint[0] = env.rgvAPosition[0];
+    //         waypoint[1] = env.rgvAPosition[1];
+    //     }
+    //     else {
+    //         waypoint[0] = env.rgvBPosition[0];
+    //         waypoint[1] = env.rgvBPosition[1];
+    //     }
+    // }
+    // else if (env.rgvAInView) {
+    //     // if RGV-A is in view, follow it
+    //     waypoint[0] = env.rgvAPosition[0];
+    //     waypoint[1] = env.rgvAPosition[1];
+    // }
+    // else if (env.rgvBInView) {
+    //     // if RGV-B is in view, follow it
+    //     waypoint[0] = env.rgvBPosition[0];
+    //     waypoint[1] = env.rgvBPosition[1];
+    // }
+    // else if (env.rgvAPosition[3] > env.rgvBPosition[3]) {
+    //     // if no RGV is in view, but most recent rgv detected is RGV-A, target the last known position of it
+    //     waypoint[0] = env.rgvAPosition[0];
+    //     waypoint[1] = env.rgvAPosition[1];
+    // }
+    // else {
+    //     // if no RGV is in view, but most recent rgv detected is RGV-B, target the last known position of it
+    //     waypoint[0] = env.rgvBPosition[0];
+    //     waypoint[1] = env.rgvBPosition[1];
+    // }
+
+    // New trail motion using target locking
+    if (target_lock == "RGV A"){
         waypoint[0] = env.rgvAPosition[0];
         waypoint[1] = env.rgvAPosition[1];
     }
-    else if (env.rgvBInView) {
-        // if RGV-B is in view, follow it
+    else if (target_lock == "RGV B"){
         waypoint[0] = env.rgvBPosition[0];
         waypoint[1] = env.rgvBPosition[1];
     }
-    else if (env.rgvAPosition[3] > env.rgvBPosition[3]) {
-        // if no RGV is in view, but most recent rgv detected is RGV-A, target the last known position of it
-        waypoint[0] = env.rgvAPosition[0];
-        waypoint[1] = env.rgvAPosition[1];
-    }
-    else {
-        // if no RGV is in view, but most recent rgv detected is RGV-B, target the last known position of it
-        waypoint[0] = env.rgvBPosition[0];
-        waypoint[1] = env.rgvBPosition[1];
-    }
+
+    // If the drone is not locked, the waypoint will not be changed
 
     waypoint[3] = getYaw(waypoint);
     waypoint[2] = drone.trail_altitude;
@@ -1021,7 +1083,7 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     std::vector<double> dronePos = drone.state;
     std::vector<double> rgvAPos = env.rgvAPosition;
     std::vector<double> rgvBPos = env.rgvBPosition;
-    std::vector<double> v1, v2, crossed;
+    //std::vector<double> v1, v2, crossed;
     double midpoint[2] = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2};
     double width, desiredHeight, yaw;
 
@@ -1032,15 +1094,22 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
         desiredHeight = env.bounds[1][2];
     }
 
-    if (rgvAPos[1] < rgvBPos[1]) {
-        v1 = {rgvAPos[0]-rgvBPos[0], rgvAPos[1]-rgvBPos[1], 0};
+    // Find the yaw angle as perpendicular to the line between the RGVs
+     // Calculate the vector from rgvAPos to rgvBPos
+    std::vector<double> v = {rgvBPos[0] - rgvAPos[0], rgvBPos[1] - rgvAPos[1]};
+
+    // Calculate the yaw angle in radians
+    yaw = atan2(v[1], v[0]);
+
+    // Convert the yaw angle to degrees and make it perpendicular to the line between the RGVs
+    yaw = yaw * (180.0 / M_PI);
+
+    // Ensure the yaw angle is between 0 and 360
+    if (yaw < 0) {
+        yaw += 360;
     }
-    else {
-        v1 = {rgvBPos[0]-rgvAPos[0], rgvBPos[1]-rgvAPos[1], 0};
-    }
-    v2 = {1, 0, 0};
-    yaw = atan2(norm(cross(v1,v2)), dot(v1,v2));
-    waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, desiredHeight, yaw * (180/M_PI)};
+
+    waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, desiredHeight, yaw};
 
     // if (env.rgvAInView && env.rgvBInView) {
     //     // if both RGVs are in view, optimize z height

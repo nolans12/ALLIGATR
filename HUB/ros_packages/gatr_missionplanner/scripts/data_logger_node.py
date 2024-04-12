@@ -38,8 +38,8 @@ DRONE_COUNTER_G = 0
 RGV_COUNTER = 0
 
 # Save FPS for video stream
-primaryVidBool = 0      # Set equal to 1 to save video, otherwise 0
-secondaryVidBool = 0    # Set equal to 1 to save video, otherwise 0
+primaryVidBool = 1      # Set equal to 1 to save video, otherwise 0
+secondaryVidBool = 1    # Set equal to 1 to save video, otherwise 0
 saveFPS = 1
 
 # Create a new directory for the data
@@ -309,7 +309,8 @@ if __name__ == '__main__':
         primary_video_timestamp_file = open(os.path.join(data_dir, "primary_video_timestamp_file.csv"), 'w')
         check_file(primary_video_timestamp_file)
         size = (int(1920), int(1080)) 
-        primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+        #primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
+        primaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "primaryVideo.mp4"), cv2.VideoWriter_fourcc(*'mp4v'), saveFPS, size)
 
     if secondaryVidBool:
         # Subscriber
@@ -319,7 +320,8 @@ if __name__ == '__main__':
         secondary_video_timestamp_file = open(os.path.join(data_dir, "secondary_video_timestamp_file.csv"), 'w')
         check_file(secondary_video_timestamp_file)
         size = (int(1920), int(1080)) 
-        secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
+        #secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.avi"), cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
+        secondaryVideoObj = cv2.VideoWriter(os.path.join(data_dir, "secondaryVideo.mp4"), cv2.VideoWriter_fourcc(*'mp4v'), saveFPS, size) 
 
 
     # Write the headers to the files

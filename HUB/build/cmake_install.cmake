@@ -1,4 +1,4 @@
-# Install script for directory: /home/mini/ALLIGATR/HUB
+# Install script for directory: /home/ckohl10/ALLIGATR/HUB
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/mini/ALLIGATR/HUB/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ckohl10/ALLIGATR/HUB/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
