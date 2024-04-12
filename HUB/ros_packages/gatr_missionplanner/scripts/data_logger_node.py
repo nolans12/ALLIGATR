@@ -253,6 +253,64 @@ def callback_PrimaryVid(data):
     writer = csv.writer(primary_video_timestamp_file)
     writer.writerow([ros_now])
 
+def close_all():
+    global drone_state_hist_file, rgvA_detections_file, rgvB_detections_file, rgvA_AR_file, rgvB_AR_file, primary_video_timestamp_file, secondary_video_timestamp_file, primaryVideoObj, secondaryVideoObj
+
+    # Close the CSV files
+    drone_state_hist_file.close()
+    # Check that csv was succesfully closed
+    if drone_state_hist_file.closed:
+        rospy.loginfo("drone_state_hist.csv closed successfully")
+    else:
+        rospy.logerr("Failed to close drone_state_hist.csv")
+
+
+    rgvA_detections_file.close()
+    # Check that csv was succesfully closed
+    if rgvA_detections_file.closed:
+        rospy.loginfo("rgvA_detections.csv closed successfully")
+    else:
+        rospy.logerr("Failed to close rgvA_detections.csv")
+
+
+    rgvB_detections_file.close()
+    # Check that csv was succesfully closed
+    if rgvB_detections_file.closed:
+        rospy.loginfo("rgvB_detections.csv closed successfully")
+    else:
+        rospy.logerr("Failed to close rgvB_detections.csv")
+
+    rgvA_AR_file.close()
+    # Check that csv was succesfully closed
+    if rgvA_AR_file.closed:
+        rospy.loginfo("rgvA_AR.csv closed successfully")
+    else:
+        rospy.logerr("Failed to close rgvA_AR.csv")
+
+    rgvB_AR_file.close()
+    # Check that csv was succesfully closed
+    if rgvB_AR_file.closed:
+        rospy.loginfo("rgvB_AR.csv closed successfully")
+    else:
+        rospy.logerr("Failed to close rgvB_AR.csv")
+
+    # Close video files if saving video
+    if primaryVidBool:
+        primary_video_timestamp_file.close()
+        if primary_video_timestamp_file.closed:
+            rospy.loginfo("primary_video_timestamp_file.csv closed successfully")
+        else:
+            rospy.logerr("Failed to close primary_video_timestamp_file.csv")
+        primaryVideoObj.release()
+
+    if secondaryVidBool:
+        secondary_video_timestamp_file.close()
+        if secondary_video_timestamp_file.closed:
+            rospy.loginfo("secondary_video_timestamp_file.csv closed successfully")
+        else:
+            rospy.logerr("Failed to close secondary_video_timestamp_file.csv")
+        secondaryVideoObj.release()
+
 
 if __name__ == '__main__':
 
@@ -425,6 +483,8 @@ if __name__ == '__main__':
 
         rate.sleep()
 
+    
+    close_all()
     rospy.spin()
 
     rospy.logfatal("Data logger node stopped")
