@@ -23,8 +23,6 @@ def phaseCallback(data):
     # Say the phase
     soundhandle.say(s, voice, volume)
 
-    # Wait for the sound to finish
-    rospy.sleep(2)
 
 if __name__ == '__main__':
     # Initialize the node
@@ -46,7 +44,6 @@ if __name__ == '__main__':
 
     # Say the initial message
     soundhandle.say('I am alive.', voice, volume)
-    rospy.sleep(1)
 
     rospy.spin()
 
