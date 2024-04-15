@@ -749,7 +749,7 @@ void MissionPlanner::joint_phase(){
         env.jointComplete = true;
         phase = "Return Home";
         ROS_INFO("Joint phase has been completed. Returning to home...");
-        thought = "I am free! Returning home!"
+        thought = "I am free! Returning home!";
     }
 
     else if (env.rgvAInView && env.rgvBInView){
