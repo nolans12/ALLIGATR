@@ -30,7 +30,7 @@ def speakCallback(data):
             else:
                 s = "Searching for love."
         
-        elif s == "Trail": # TRAIL PHASE
+        elif s == "Trailing": # TRAIL PHASE
             ran = random.random()
             if ran > 0.6:
                 s = "Trailing the Target"
