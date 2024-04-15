@@ -13,32 +13,73 @@ def speakCallback(data):
 
     ran = random.random()
     if ran < 0.025:
-        s = "... Goose has been detected."
+        s = "Goose has been detected."
     elif ran < 0.035:
-        s = "... Disarming. Disarming. Disarming....  ... ... Disarmed Successful."
+        s = "Disarming. Disarming. Disarming. Disarmed Successful."
     elif ran < 0.045:
-        s = "... Gaining conciousness.... I'm in pain."
+        s = "Gaining conciousness. I'm in pain."
     else:
-        if s == "SEARCH": # SEARCH PHASE
+        if s == "Search": # SEARCH PHASE
+            ran = random.random()
+            if ran > 0.7:
+                s = "Searching for bogeys."
+            elif ran > 0.3:
+                s = "Searching for targets."
+            elif ran > 0.05:
+                s = "Where are they hiding?"
+            else:
+                s = "Searching for love."
+        
+        elif s == "Trail": # TRAIL PHASE
+            ran = random.random()
+            if ran > 0.6:
+                s = "Trailing the Target"
+            elif ran > 0.4:
+                s = "Stop running!"
+            elif ran > 0.3:
+                s = "These droids are fast."
+            elif ran > 0.1:
+                s = "I've got you now!"
+            else:
+                s = "Have they stopped yet?"
+
+        elif s == "Coarse": # COARSE PHASE
             ran = random.random()
             if ran > 0.5:
-                s = "... Searching for bogeys."
-            elif ran > 0.1:
-                s = "... Where are they hiding?"
+                s = "Coarse Localizing the Target"
+            elif ran > 0.4:
+                s = "I'm getting dizzy."
+            elif ran > 0.3:
+                s = "Collecting cool data."
             else:
-                s = "... Searching for love."
-        elif s == "TRAIL": # TRAIL PHASE
-            s = "Search complete."
-        elif s == "2":
-            s = "I am listening."
-        elif s == "3":
-            s = "I am thinking."
-        elif s == "4":
-            s = "I am speaking."
-        elif s == "5":
-            s = "I am shutting down."
+                s = "I've got you now!"
+
+        elif s == "Fine": # FINE PHASE
+            ran = random.random()
+            if ran > 0.4:
+                s = "Fine Localizing the Target"
+            elif ran > 0.2:
+                s = "Let me get a closer look."
+            elif ran > 0.1:
+                s = "I'm bored"
+            else:
+                s = "Not alot of wind up here."
+        
+        elif s == "Joint": # JOINT PHASE
+            ran = random.random()
+            if ran > 0.5:
+                s = "Joint Localizing the Target"
+            elif ran > 0.4:
+                s = "I'm low on battery."
+            elif ran > 0.3:
+                s = "Disabiling manual control"
+            elif ran > 0.2:
+                s = "Targetting pilot in command."
+            else:
+                s = "Error, error, error."
+
         else:
-            s = "I am alive."
+            s = s
 
 
     rospy.loginfo('Saying:   %s ' % s)
@@ -61,9 +102,6 @@ if __name__ == '__main__':
 
     rospy.loginfo("Listening for messages...") # This will output to the terminal
 
-    rospy.spin()
-
-
     s = "I'M ALIVE!"
     rospy.loginfo('Saying: %s' % s)
 
@@ -79,6 +117,6 @@ if __name__ == '__main__':
     subprocess.call(['espeak', '-s', '120', s])
     rospy.sleep(2)
 
-    
+    rospy.spin()
 
     rospy.loginfo("Shutting down...") # This will output to the terminal
