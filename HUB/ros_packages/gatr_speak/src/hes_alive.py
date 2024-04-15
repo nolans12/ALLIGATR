@@ -16,6 +16,7 @@ def phaseCallback(data):
     global voice, volume
 
     # Callback for the phase topic
+    # s needs to be a char array
     s = data.data
     rospy.loginfo('Saying: %s' % s)
 
@@ -39,11 +40,13 @@ if __name__ == '__main__':
     soundhandle = SoundClient() # Create a sound client object
     rospy.loginfo("Sound client initialized.") # This will output to the terminal
 
-    global voice, volume
-
     rate = rospy.Rate(1)
     rospy.loginfo('Voice: %s' % voice)
     rospy.loginfo('Volume: %s' % volume)
+
+    # Say the initial message
+    soundhandle.say('I am alive.', voice, volume)
+    rospy.sleep(1)
 
     rospy.spin()
 
