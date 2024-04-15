@@ -154,10 +154,6 @@ fi
 if [ $SPEAK_FLAG -eq 0 ]; then
     # Required the audio common stack and lbasound2
 
-    # Listens for speak commands
-    xterm -hold -geometry 40x10 -T "Speaker" -e "source ~/.bashrc; rosrun sound_play soundplay_node.py" &
-    sleep 1
-
     # Speak the output of the mission planner
     run_node gatr_speak hes_alive.py GATR_GPT
 fi

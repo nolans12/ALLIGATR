@@ -364,7 +364,7 @@ void MissionPlanner::search_phase(){
             // If RGV A has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV A has been detected but not localized. Starting trail phase...");
-            thought = "Detected and trailing";
+            thought = "Trailing";
             say(thought);
             return;
         }   
@@ -411,7 +411,7 @@ void MissionPlanner::search_phase(){
             // If RGV B has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV B has been detected but not localized. Starting trail phase...");
-            thought = "Detected and trailing";
+            thought = "Trailing";
             say(thought);
             return;
         }   
@@ -533,12 +533,18 @@ void MissionPlanner::coarse_phase(){
 
                 // Output how long it has been localizing for
                 ROS_INFO("RGV A has been localized for %f seconds...", coarse_length.toSec());
+                std::ostringstream stream;
+                stream << std::fixed << std::setprecision(1) << coarse_length.toSec();
+                std::string coarse_length_str = stream.str();
+                
+                thought = "Localized for " + coarse_length_str + " seconds";
+                say(thought);
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV A has started moving again. Returning to trail phase...");
-            thought = "Trailing again";
+            thought = "Trailing";
             say(thought);
         }
     }
@@ -576,14 +582,18 @@ void MissionPlanner::coarse_phase(){
 
                 // Output how long it has been localizing for
                 ROS_INFO("RGV B has been localized for %f seconds...", coarse_length.toSec());
-                thought = "Localized for " + std::to_string(coarse_length.toSec()) + " seconds";
+                std::ostringstream stream;
+                stream << std::fixed << std::setprecision(1) << coarse_length.toSec();
+                std::string coarse_length_str = stream.str();
+                
+                thought = "Localized for " + coarse_length_str + " seconds";
                 say(thought);
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV B has started moving again. Returning to trail phase...");
-            thought = "Trailing again";
+            thought = "Trailing";
             say(thought);
         }
     }
@@ -665,14 +675,19 @@ void MissionPlanner::fine_phase(){
             else{
                 // Output how long it has been localizing for
                 ROS_INFO("RGV A has been finely localized for %f seconds...", fine_length.toSec());
-                thought = "Localized for " + std::to_string(fine_length.toSec()) + " seconds";
+                
+                std::ostringstream stream;
+                stream << std::fixed << std::setprecision(1) << fine_length.toSec();
+                std::string fine_length_str = stream.str();
+                
+                thought = "Localized for " + fine_length_str + " seconds";
                 say(thought);
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV A has started moving again. Returning to trail phase...");
-            thought = "Trailing again";
+            thought = "Trailing";
             say(thought);
         }
     }
@@ -713,14 +728,18 @@ void MissionPlanner::fine_phase(){
             else{
                 // Output how long it has been localizing for
                 ROS_INFO("RGV B has been finely localized for %f seconds...", fine_length.toSec());
-                thought = "Localized for " + std::to_string(fine_length.toSec()) + " seconds";
+                std::ostringstream stream;
+                stream << std::fixed << std::setprecision(1) << fine_length.toSec();
+                std::string fine_length_str = stream.str();
+                
+                thought = "Localized for " + fine_length_str + " seconds";
                 say(thought);
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV B has started moving again. Returning to trail phase...");
-            thought = "Trailing again";
+            thought = "Trailing";
             say(thought);
         }
     }
