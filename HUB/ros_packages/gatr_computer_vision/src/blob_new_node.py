@@ -3,6 +3,7 @@
 import rospy
 import cv2
 import csv
+import numpy as np
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
@@ -29,10 +30,14 @@ saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 4.0
+COMPRESS_CONST = 4
 
-# Video object
-primaryVideoObj = None
+
+# Video file
+if saveBool:
+    size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
+    filename = "primaryVideo%s.avi" % rospy.get_time()
+    writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
 
 # Image callback for received image
@@ -68,91 +73,59 @@ def callback_GAZEBO(data):
     cv2.waitKey(1)
 
 
-# Function that checks a given image for an AR tag and returns corners if its found
+# Process the image, BLOB DETECTION
 def processImg(img):
-    corners_A = [0, 0, 0, 0, 0, 0, 0, 0]
-    corners_B = [0, 0, 0, 0, 0, 0, 0, 0]
+    # Make a copy of Image; find the HSV range; convert it to OpenCV
+    # undrestandble range and make a mask from it
+    frm=im.copy()
+    frm = cv2.cvtColor(frm, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(frm, fixHSVRange(0, 0, 0), fixHSVRange(360, 4.53, 100))
 
-    if img is None:
-        out_str = "Camera Connection Lost %s" % rospy.get_time()
-    else:          
-        # Search for Aruco tag
-        corners, ids, rejected = cv2.aruco.detectMarkers(img, finalDict)
+    # Remove the noise
+    noise=cv2.dilate(mask,np.ones((5,5)))
+    noise=cv2.erode(mask,np.ones((5,5)))
+    noise=cv2.medianBlur(mask,7)
 
-        # Output the detected corners if detected
-        if corners:
-            k = 0
-            for i in ids:
-                # Format the corners as an array
-                firstCorners = corners[k][0]
-                topLeft = firstCorners[1]
-                topRight = firstCorners[2]
-                bottomRight = firstCorners[3]
-                bottomLeft = firstCorners[0]
-                outArr = [int(topLeft[0]), int(topLeft[1]), int(topRight[0]), int(topRight[1]), int(bottomRight[0]), int(bottomRight[1]), int(bottomLeft[0]), int(bottomLeft[1])]
+    # Change image channels
+    mask=cv2.cvtColor(mask,cv2.COLOR_GRAY2BGR)
+    noise=cv2.cvtColor(noise,cv2.COLOR_GRAY2BGR)
+    cleanMask=~noise
 
-                if i == 1:
-                    corners_A = outArr
-                else:
-                    corners_B = outArr
-                k = k + 1
+    # Make a new mask without noise
+    centerMask=cv2.cvtColor(cleanMask.copy(),cv2.COLOR_BGR2GRAY)
+        
+    # Image detector
+    keypoints = detector.detect(centerMask)
 
-            out_str = "AR Tag Detected %s" % rospy.get_time()
-        else:
-            out_str = "No AR Tag %s" % rospy.get_time()
+    # Not detected
+    if not keypoints:
+        return -1    # Return negative for no detection
 
-    rospy.loginfo(out_str)
-    return corners_A, corners_B
-    
-# Highlight the detected markers
-def aruco_display(corners, image):
-    if corners.data[0]: # Are any aruco tags detected
-        topLeft = (int(corners.data[0]), int(corners.data[1]))
-        topRight = (int(corners.data[2]), int(corners.data[3]))
-        bottomRight = (int(corners.data[4]), int(corners.data[5]))
-        bottomLeft = (int(corners.data[6]), int(corners.data[7]))
+    # Zip the detected centroid arrays
+    centroids_x = np.array([])
+    centroids_y = np.array([])
+    for keypoint in keypoints:
+        centroids_x = np.append(centroids_x, keypoint.pt[0])
+        centroids_y = np.append(centroids_y, keypoint.pt[1])
 
-        # Draw the lines for the AR tag detection
-        cv2.line(image, topLeft, topRight, (0, 0, 255), 2)
-        cv2.line(image, topRight, bottomRight, (0, 0, 255), 2)
-        cv2.line(image, bottomRight, bottomLeft, (0, 0, 255), 2)
-        cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
-    return image
+    # X and Y centroid coordinates of the detected RGVs
+    centroids_x = centroids_x.astype(int)
+    centroids_y = centroids_y.astype(int)
 
-# Function for shutting down the node
-def releaseObjects():
-    global primaryVideoObj
-    primaryVideoObj.release()
-    rospy.loginfo("Successfully closed the primary video file.") 
-
-    cv2.destroyAllWindows()         # Close everything and release the camera
-    cap.release()
-    rospy.loginfo("End of program") # This will output to the terminal
+    return zip(centroids_x,centroids_y)
 
 
 if __name__ == '__main__': # <- Executable 
-    # ArUco dictionary
-    ARUCO_DICT = {
-        "DICT_6X6_250": cv2.aruco.DICT_6X6_250,
-    }
-
-    # Get predefined dictionary for AR tag detection
-    aruco_type = "DICT_6X6_250"
-    finalDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
-
+    
     rospy.init_node("Primary_Detection_Node") # Initialize the ROS node
 
-    rospy.loginfo("############# PRIMARY AR DETECTION NODE #################") # This will output to the terminal
+    rospy.loginfo("############# PRIMARY BLOB DETECTION NODE #################") # This will output to the terminal
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
-
-    # Add callback for shutdown
-    rospy.on_shutdown(releaseObjects)
     
     ################## Publisher Definitions ###########################
-    pub_corners_A = rospy.Publisher('CV/Primary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
-    pub_corners_B = rospy.Publisher('CV/Primary/AR_corners_B', Int32MultiArray, queue_size=1)     # RGV B
+    pub_centroid = rospy.Publisher('CV/Primary/centroid', Int32MultiArray, queue_size=1)     # RGV B
     pub_image = rospy.Publisher('CV/Primary_Video', Image, queue_size=1)
 
     ####################################################################
@@ -166,11 +139,12 @@ if __name__ == '__main__': # <- Executable
     # Used to convert between ROS and OpenCV images
     br = CvBridge()
 
-    # Video file 
-    if saveBool:
-        size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = "primaryVideo%s.avi" % str(rospy.get_time())
-        primaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
+    # Setup SimpleBlobDetector parameters.
+    rospy.loginfo("Initializing Blob Detection Parameters...")
+    params = cv2.SimpleBlobDetector_Params()
+
+    # Create a detector with the parameters
+    detector = cv2.SimpleBlobDetector_create(params)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
@@ -179,6 +153,10 @@ if __name__ == '__main__': # <- Executable
     camera_found = False
     faux_camera = False
     attempts = 0   
+
+    phase_max = 10 #Number of frames to smooth out the detection
+    phase_smoother_counter_A = 2*phase_max
+    phase_smoother_counter_B = 2*phase_max
 
     # Initialize the Camera and Savings
     while not camera_found and not faux_camera:
@@ -219,12 +197,6 @@ if __name__ == '__main__': # <- Executable
 
     # Begin the main loop that consistently outputs AR tag corners when running
     while not rospy.is_shutdown():
-        # Output messages
-        corners_msg_A = Int32MultiArray()
-        corners_msg_B = Int32MultiArray()
-        corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
-        corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
-
 
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
@@ -254,7 +226,7 @@ if __name__ == '__main__': # <- Executable
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                     # Save video
-                    primaryVideoObj.write(compressed_frame)
+                    writeObj.write(compressed_frame)
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
@@ -264,16 +236,10 @@ if __name__ == '__main__': # <- Executable
             # Wait for received image with the callback
             pass
         else:
-            out_str = "Camera Connection Lost %s" % str(rospy.get_time())
-            rospy.loginfo(out_str)
+            out_str = "Camera Connection Lost %s" % rospy.get_time()
             
-        # Publish to the ROS node
-        if corners_msg_A.data[0]:
-            pub_corners_A.publish(corners_msg_A)
-        if corners_msg_B.data[0]:
-            pub_corners_B.publish(corners_msg_B)
 
-    primaryVideoObj.release()
+    writeObj.release()
     cv2.destroyAllWindows()         
     cap.release()
     rospy.loginfo("End of program") 

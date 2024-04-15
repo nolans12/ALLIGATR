@@ -48,6 +48,33 @@ def fixHSVRange(h, s, v):
     # OpenCV H,S,V: (0-180,0-255 ,0-255)
     return (180 * h / 360, 255 * s / 100, 255 * v / 100)
 
+# attempt to use gaussianblur to speed up?
+def detectBlob_new(im):
+    # Convert the image to HSV
+    frm = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(frm, fixHSVRange(0, 0, 0), fixHSVRange(360, 4.53, 100))
+
+    # Apply Gaussian blur to reduce noise
+    blur = cv2.GaussianBlur(mask, (5, 5), 0)
+
+    # Convert the mask to grayscale
+    centerMask = cv2.cvtColor(blur, cv2.COLOR_GRAY2BGR)
+    centerMask = cv2.cvtColor(centerMask, cv2.COLOR_BGR2GRAY)
+
+    # Detect blobs
+    keypoints = detector.detect(centerMask)
+
+    # If no blobs are detected, return -1
+    if not keypoints:
+        return -1
+
+    # Extract the x and y coordinates of the centroids
+    centroids_x = np.array([keypoint.pt[0] for keypoint in keypoints]).astype(int)
+    centroids_y = np.array([keypoint.pt[1] for keypoint in keypoints]).astype(int)
+
+    return zip(centroids_x, centroids_y)
+
+
 def detectBlob(im):
     # Make a copy of Image; find the HSV range; convert it to OpenCV
     # undrestandble range and make a mask from it
@@ -166,8 +193,8 @@ if __name__ == '__main__': # <- Executable
             
             # Create video writer object
             # Get the time and create video object with the time of the beginning of the recording
-            vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
-            writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
+            # vidFilename = "primaryVideo_%s.avi" % rospy.get_time()
+            # writeObj = cv2.VideoWriter(vidFilename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size) 
             break            
 
         rospy.sleep(3.0) # Sleep for 3 seconds
@@ -210,42 +237,43 @@ if __name__ == '__main__': # <- Executable
             frameCount += 1                         # Update the frame count
 
             # Save to a file
-            if frameCount % (camFPS // saveFPS) == 0:
-                # Save image to video file
-                writeObj.write(img)
+            # if frameCount % (camFPS // saveFPS) == 0:
+            #     # Save image to video file
+            #     writeObj.write(img)
 
-                # Write to a file
-                timestamp = rospy.Time.now()
-                write_csv(filename, timestamp)
+            #     # Write to a file
+            #     timestamp = rospy.Time.now()
+            #     write_csv(filename, timestamp)
 
-            if frameCount >= 60:
-                frameCount = 0  # Reset frame count
+            # if frameCount >= 60:
+            #     frameCount = 0  # Reset frame count
 
 
             # Check if the image is empty, failed to get image
-            # if img is None:
-            #     out_str = "Camera Connection Lost %s" % rospy.get_time()
-            #     rosOut.data = [0, 0, 0, 0]
-            # else:
-            #     # Call blob detection
-            #     centroid = detectBlob(img)
+            if img is None:
+                out_str = "Camera Connection Lost %s" % rospy.get_time()
+                rosOut.data = [0, 0, 0, 0]
+            else:
+                # Call blob detection
+                centroid = detectBlob_new(img)
 
-            #     # Output detection
-            #     if centroid == -1:                                      # Not Detected
-            #         out_str = "Blob Not Detected %s" % rospy.get_time()
-            #         centOut = -1
-            #         rosOut.data = [0, 0, 0, 0]
-            #     else:                                                   # Detected, format as array
-            #         out_str = "Blob Detected %s" % rospy.get_time()
-            #         centOut = []
-            #         for i in centroid:
-            #             centOut.append(i[0])
-            #             centOut.append(i[1])
-            #         rosOut.data = centOut
+                # Output detection
+                if centroid == -1:                                      # Not Detected
+                    out_str = "Blob Not Detected %s" % rospy.get_time()
+                    centOut = -1
+                    rosOut.data = [0, 0, 0, 0]
+                else:                                                   # Detected, format as array
+                    out_str = "Blob Detected %s" % rospy.get_time()
+                    centOut = []
+                    for i in centroid:
+                        centOut.append(i[0])
+                        centOut.append(i[1])
+                    rosOut.data = centOut
 
         else:
             out_str = ("Camera Connection Lost %s" % rospy.get_time())
             rosOut.data = [0, 0, 0, 0]
+
             
         # Publish to the ROS node
         #rospy.loginfo(out_str)

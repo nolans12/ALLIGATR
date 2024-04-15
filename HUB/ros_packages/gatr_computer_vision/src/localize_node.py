@@ -21,6 +21,10 @@ global phase_counter_A, phase_counter_B
 phase_counter_A = 0
 phase_counter_B = 0
 
+# Use pitch and roll
+global usePitchRoll
+usePitchRoll = 1        # Set to 0 to not account for pitch/roll in the localization
+
 # Global current state variables
 AR_CORNERS_A = Int32MultiArray()
 AR_CORNERS_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -109,10 +113,12 @@ def localize(ARCorners):
     beta = np.arctan(yc * s / ALTITUDE)
 
     # Relative coordinates in meters
-    relX = ALTITUDE * np.tan(alpha + PITCH)
-    relY = ALTITUDE * np.tan(beta + ROLL)
-    #relX = ALTITUDE * np.tan(alpha)
-    #relY = ALTITUDE * np.tan(beta)
+    if usePitchRoll:
+        relX = ALTITUDE * np.tan(alpha + PITCH)
+        relY = ALTITUDE * np.tan(beta + ROLL)
+    else:
+        relX = ALTITUDE * np.tan(alpha)
+        relY = ALTITUDE * np.tan(beta)
 
     return relX, relY
 
