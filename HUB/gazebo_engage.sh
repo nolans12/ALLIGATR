@@ -117,7 +117,7 @@ xterm -hold -geometry 40x10 -T "Speaker" -e "source ~/.bashrc; rosrun sound_play
 sleep 1
 
 # Speak the output of the mission planner
-run_node gatr_speak hes_alive.py GATR_GPT
+run_node gatr_speak hes_alive_2.py GATR_GPT
 
 #############################################################
 
