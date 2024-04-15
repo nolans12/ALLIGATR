@@ -8,6 +8,7 @@ from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import pickle
+import numpy as np
 
 # Try to open the 1 index for the primary camera
 camera_index = 1
@@ -178,16 +179,23 @@ if __name__ == '__main__': # <- Executable
 
     # Undistort
     if undistBool:
-        # Specify the path to your pickle file
-        pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideMatrix.pkl'
-        with open(pickle_file_path, 'rb') as file:
-            # Load data from the pickle file
-            camMatrix = pickle.load(file)
 
-        pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideDist.pkl'
-        with open(pickle_file_path, 'rb') as file:
-            # Load data from the pickle file
-            distCoeff = pickle.load(file)
+        camMatrix = np.array([[2.49100915e+03, 0, 4.83656938e+02],
+              [0, 2.62434619e+03, 5.22873439e+02],
+              [0, 0, 1]])
+
+        distCoeff = np.array([-1.58920862e+00, -4.12086079e+00, -5.84693333e-03, 1.80546798e-01, 7.93548451e+01])  # k1, k2, p1, p2, k3
+
+        # Specify the path to your pickle file
+        # pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideMatrix.pkl'
+        # with open(pickle_file_path, 'rb') as file:
+        #     # Load data from the pickle file
+        #     camMatrix = pickle.load(file)
+
+        # pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideDist.pkl'
+        # with open(pickle_file_path, 'rb') as file:
+        #     # Load data from the pickle file
+        #     distCoeff = pickle.load(file)
 
         newcameramtx, roi=cv2.getOptimalNewCameraMatrix(camMatrix,distCoeff,(int(1920),int(1080)),1,(int(1920),int(1080)))
 
