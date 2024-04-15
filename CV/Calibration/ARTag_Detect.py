@@ -125,9 +125,12 @@ with open(pickle_file_path, 'rb') as file:
 
 # %% Video Capture With Webcam
 # Open the camera
-camera_index = 1
-pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
-cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+camera_index = 0
+# pipeline = 'nvarguscamerasrc sensor-id=' + str(camera_index) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)15/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
+# cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+
+# Webcam
+cap = cv2.VideoCapture(camera_index)
 
 
 while cap.isOpened():
@@ -150,7 +153,7 @@ while cap.isOpened():
         # Get the pose
         rVec, tVec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, AR_LENGTH, camMatrix, distCoeff)
 
-        print(tVec)
+        #print(tVec)
     
 	# Display the frame
     cv2.imshow('frame', image)
