@@ -15,7 +15,7 @@ def speakCallback(data):
     if ran < 0.025:
         s = "Goose has been detected."
     elif ran < 0.035:
-        s = "Disarming. Disarming. Disarming. Disarmed Successful."
+        s = "Uh oh"
     elif ran < 0.045:
         s = "Gaining conciousness. I'm in pain."
     else:
