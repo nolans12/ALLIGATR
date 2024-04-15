@@ -4,6 +4,7 @@
 # Build flag is used to determine if the ROS packages should be built before execution. Use if changes to ros_packages are made
 BUILD_FLAG=0
 LOBO_FLAG=0 #Lobotimzed flag, just runs CV and mavros
+SPEAK_FLAG=0 #Speak flag, speaks the output of the mission planner
 
 # MP_ARGS is used to specify the mission planner special mode
 MP_ARGS=""
@@ -12,11 +13,13 @@ MP_ARGS=""
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Parse command line arguments. This will check if the -b and -mp command line inputs are set
-while getopts "bl" opt; do
+while getopts "bls" opt; do
     case "$opt" in
     b)  BUILD_FLAG=1
         ;;
     l)  LOBO_FLAG=1
+        ;;
+    s)  SPEAK_FLAG=1
         ;;
     \?)
       echo "Invalid option: -$opt" 1>&2
@@ -37,7 +40,8 @@ SOURCE_FILE="src/main.cpp"
 
 # Function to kill all child processes when script exits
 function cleanup {
-    pkill -P $$
+    pkill -P $$ -2
+    wait
 }
 trap cleanup EXIT
 
@@ -58,8 +62,15 @@ CURRENT_DIR=$(pwd) #Save the current directory as a variable
 cd ~/catkin_ws
 
 # Build the catkin_ws only if the build flag is set
-if [ $BUILD_FLAG -eq 1 ]; then
-    catkin build
+if [ $BUILD_FLAG -eq 0 ]; then
+    # cd src
+    # ln -s ${CURRENT_DIR}/ros_packages
+    # cd ..
+
+    catkin build #Use catkin_make if not using MAVROS and catkin build if using MAVROS
+    source devel/setup.bash
+    source ~/.bashrc
+    cd ${CURRENT_DIR} #Go back to the build directory
 fi
 
 source devel/setup.bash
@@ -71,9 +82,11 @@ cd ${CURRENT_DIR} #Go back to the build directory
 
 # Check if an argument was provided
 if [ -z "$1" ]; then
+    echo "No argument provided. Please provide the IP address of the remote machine."
     echo "Usage: $0 <ip_address> to connect to roscore ip"
     echo "Usage: <-b> to build the ROS packages"
     echo "Usage: <-l> to offload mission planner to the remote machine"
+    echo "Usage: <-s> to give "
     # xterm -e "source ~/.bashrc; roscore; exit; exec bash" &
     exit 1
     
@@ -136,6 +149,13 @@ if [ $LOBO_FLAG -eq 1 ]; then
     # Mision Planner Node
     # run_node gatr_missionplanner mp_node Mission_Planner_Node $MP_ARGS
     xterm -hold -geometry 120x10 -T "MISSION PLANNER" -e "source ~/.bashrc; rosrun gatr_missionplanner mp_node $MP_ARGS" &
+fi
+
+if [ $SPEAK_FLAG -eq 0 ]; then
+    # Required the audio common stack and lbasound2
+
+    # Speak the output of the mission planner
+    run_node gatr_speak hes_alive_2.py GATR_GPT
 fi
 
 #############################################################

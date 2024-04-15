@@ -112,6 +112,9 @@ else
 fi
 sleep 3
 
+# Speak the output of the mission planner
+run_node gatr_speak hes_alive_2.py GATR_GPT
+
 #############################################################
 
 #Make the project using the passed in source file

@@ -64,11 +64,14 @@ int main(int argc, char** argv)
 	set_speed(0.1); // m/s
 
 	//request takeoff
+	mp.say("Takeoff Initiated");
 	takeoff(10);
 
 	//specify control loop rate. We recommend a low frequency to not over load the FCU with messages. Too many messages will cause the drone to be sluggish
 	ros::Rate rate(2.0);
 	int counter = 0;
+
+	mp.say("Mission Started. Searching for RGVs...");
 
 	// MAIN LOOP //
 	while(ros::ok())

@@ -95,9 +95,12 @@ class MissionPlanner {
         // Locking functions to avoid localizing both RGVs at the same time
         void set_lock();
         void reset_lock();
+
+        void say(std::string message);
         
     private:
         std::string phase;
+        std::string thought;
         std::vector<std::string> phases;
         unsigned short int smootherCount;
         uas drone;
@@ -116,6 +119,7 @@ class MissionPlanner {
         ros::Subscriber inert_coord_B_sub_secondary;
         ros::Subscriber uas_state_sub;
         ros::Publisher phase_pub;
+        ros::Publisher speak_pub; // Publisher to the speak node
 
         ros::Time coarse_time_engaged; // Time the drone started the coarse localization phase
         ros::Time fine_time_engaged; // Time the drone started the fine localization phase

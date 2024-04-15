@@ -29,8 +29,10 @@ saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 4
+COMPRESS_CONST = 4.0
 
+# Video object
+secondaryVideoObj = None
 
 
 # Image callback for received image
@@ -116,6 +118,15 @@ def aruco_display(corners, image):
         cv2.line(image, bottomLeft, topLeft, (0, 0, 255), 2)
     return image
 
+# Function for shutting down the node
+def releaseObjects():
+    global secondaryVideoObj
+    secondaryVideoObj.release()
+    rospy.loginfo("Successfully closed the secondary video file.") 
+
+    cv2.destroyAllWindows()         # Close everything and release the camera
+    cap.release()
+    rospy.loginfo("End of program") # This will output to the terminal
 
 
 if __name__ == '__main__': # <- Executable 
@@ -134,6 +145,9 @@ if __name__ == '__main__': # <- Executable
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
+
+    # Add callback for shutdown
+    rospy.on_shutdown(releaseObjects)
     
     ################## Publisher Definitions ###########################
     pub_corners_A = rospy.Publisher('CV/Secondary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
@@ -155,7 +169,7 @@ if __name__ == '__main__': # <- Executable
     if saveBool:
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
         filename = "secondaryVideo%s.avi" % str(rospy.get_time())
-        writeObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
+        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
@@ -164,15 +178,6 @@ if __name__ == '__main__': # <- Executable
     camera_found = False
     faux_camera = False
     attempts = 0   
-
-    # Phase Smoothing Variables
-    corners_msg_A_last = Int32MultiArray()
-    corners_msg_B_last = Int32MultiArray()
-    corners_msg_A_last.data = [0, 0, 0, 0, 0, 0, 0, 0]
-    corners_msg_B_last.data = [0, 0, 0, 0, 0, 0, 0, 0]
-    phase_max = 10 #Number of frames to smooth out the detection
-    phase_smoother_counter_A = 2*phase_max
-    phase_smoother_counter_B = 2*phase_max
 
     # Initialize the Camera and Savings
     while not camera_found and not faux_camera:
@@ -245,19 +250,14 @@ if __name__ == '__main__': # <- Executable
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
                     # Resize the image
-                    scale_percent = 25  # percent of original size
-                    width = int(img.shape[1] * scale_percent / 100)
-                    height = int(img.shape[0] * scale_percent / 100)
-                    dim = (width, height)
-                    resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                     # Save video
-                    writeObj.write(resized)
+                    secondaryVideoObj.write(compressed_frame)
 
                     # Log info
-                    rospy.loginfo("Saved frame")
+                    rospy.loginfo("Saved Secondary frame")
             
-
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count
 
@@ -266,19 +266,17 @@ if __name__ == '__main__': # <- Executable
             # Wait for received image with the callback
             pass
         else:
-            out_str = "Camera Connection Lost %s" % rospy.get_time()
+            out_str = "Camera Connection Lost %s" % str(rospy.get_time())
+            rospy.loginfo(out_str)
             
         # Publish to the ROS node
         if corners_msg_A.data[0]:
             pub_corners_A.publish(corners_msg_A)
-            corners_msg_A_last.data = corners_msg_A.data
-
         if corners_msg_B.data[0]:
             pub_corners_B.publish(corners_msg_B)
-            corners_msg_B_last.data = corners_msg_B.data
 
 
-    writeObj.release()
+    secondaryVideoObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
