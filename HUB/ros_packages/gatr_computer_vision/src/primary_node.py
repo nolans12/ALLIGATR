@@ -29,7 +29,7 @@ saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Undistort bool
-undistBool = 1      # 1 to undistort
+undistBool = 0      # 1 to undistort
 
 # Compression Level
 # resize the image by this amount
