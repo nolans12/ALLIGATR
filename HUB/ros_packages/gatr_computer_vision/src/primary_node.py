@@ -7,6 +7,7 @@ from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+import pickle
 
 # Try to open the 1 index for the primary camera
 camera_index = 1
@@ -27,9 +28,12 @@ frameCount = 0
 saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
+# Undistort bool
+undistBool = 1      # 1 to undistort
+
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 4.0
+COMPRESS_CONST = 8.0
 
 # Video object
 primaryVideoObj = None
@@ -172,6 +176,22 @@ if __name__ == '__main__': # <- Executable
         filename = "primaryVideo%s.avi" % str(rospy.get_time())
         primaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
+    # Undistort
+    if undistBool:
+        # Specify the path to your pickle file
+        pickle_file_path = 'WideMatrix.pkl'
+        with open(pickle_file_path, 'rb') as file:
+            # Load data from the pickle file
+            camMatrix = pickle.load(file)
+
+        pickle_file_path = 'WideDist.pkl'
+        with open(pickle_file_path, 'rb') as file:
+            # Load data from the pickle file
+            distCoeff = pickle.load(file)
+
+        newcameramtx, roi=cv2.getOptimalNewCameraMatrix(camMatrix,distCoeff,(int(1920),int(1080)),1,(int(1920),int(1080)))
+
+
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
 
@@ -243,7 +263,10 @@ if __name__ == '__main__': # <- Executable
                 pub_image.publish(ros_image)
 
             # Process Image
-            if frameCount % (camFPS // processFPS) == 0:                
+            if frameCount % (camFPS // processFPS) == 0:
+                if undistBool:  #undistort
+                    img = cv2.undistort(img, camMatrix, distCoeff, None, newcameramtx)    
+
                 # Output message with corners
                 corners_msg_A.data, corners_msg_B.data = processImg(img)
 

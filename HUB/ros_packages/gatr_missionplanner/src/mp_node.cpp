@@ -150,6 +150,12 @@ int main(int argc, char** argv)
 			// Set the new waypoint
 			//ROS_INFO("");
 			//mp.output_drone_state();
+
+			// Filter the waypoint
+			//std::vector<double> setpoint = mp.filter_waypoint(curr_waypoint_new);
+			//set_destination_enu(setpoint[0], setpoint[1], setpoint[2], setpoint[3]);
+
+
 			set_destination_enu(curr_waypoint_new[0], curr_waypoint_new[1], curr_waypoint_new[2], curr_waypoint_new[3]);
 		}
 
