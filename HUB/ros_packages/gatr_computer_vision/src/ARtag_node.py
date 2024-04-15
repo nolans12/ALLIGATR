@@ -29,7 +29,7 @@ saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 4.0
+COMPRESS_CONST = 8.0
 
 # Video object
 secondaryVideoObj = None
