@@ -7,13 +7,23 @@ from sound_play.libsoundplay import SoundClient
 from std_msgs.msg import String
 import rospy
 
+global voice, volume
+
+voice = 'voice_kal_diphone'
+volume = 1.0
+
 def phaseCallback(data):
+    global voice, volume
+
     # Callback for the phase topic
     s = data.data
     rospy.loginfo('Saying: %s' % s)
 
     # Say the phase
     soundhandle.say(s, voice, volume)
+
+    # Wait for the sound to finish
+    rospy.sleep(2)
 
 if __name__ == '__main__':
     # Initialize the node
@@ -29,10 +39,9 @@ if __name__ == '__main__':
     soundhandle = SoundClient() # Create a sound client object
     rospy.loginfo("Sound client initialized.") # This will output to the terminal
 
-    rate = rospy.Rate(1)
+    global voice, volume
 
-    voice = 'voice_kal_diphone'
-    volume = 1.0
+    rate = rospy.Rate(1)
     rospy.loginfo('Voice: %s' % voice)
     rospy.loginfo('Volume: %s' % volume)
 

@@ -112,6 +112,13 @@ else
 fi
 sleep 3
 
+# Listens for speak commands
+xterm -hold -geometry 40x10 -T "Speaker" -e "source ~/.bashrc; rosrun sound_play soundplay_node.py" &
+sleep 1
+
+# Speak the output of the mission planner
+run_node gatr_speak hes_alive.py GATR_GPT
+
 #############################################################
 
 #Make the project using the passed in source file
