@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+import sys
+# Import after printing usage for speed.
+from sound_play.msg import SoundRequest
+from sound_play.libsoundplay import SoundClient
+from std_msgs.msg import String
+import rospy
+
+def phaseCallback(data):
+    # Callback for the phase topic
+    s = data.data
+    rospy.loginfo('Saying: %s' % s)
+
+    # Say the phase
+    soundhandle.say(s, voice, volume)
+
+if __name__ == '__main__':
+    # Initialize the node
+    rospy.init_node('speaker', anonymous=True)
+
+    rospy.loginfo("### GATR GPT ###") # This will output to the terminal
+
+    # Subscribers
+    subState = rospy.Subscriber("/MP/phase", String, phaseCallback, queue_size=1)
+
+    # Initialize the sound client
+    rospy.loginfo("Initializing sound client...") # This will output to the terminal
+    soundhandle = SoundClient() # Create a sound client object
+    rospy.loginfo("Sound client initialized.") # This will output to the terminal
+
+    rate = rospy.Rate(1)
+
+    voice = 'voice_kal_diphone'
+    volume = 1.0
+    rospy.loginfo('Voice: %s' % voice)
+    rospy.loginfo('Volume: %s' % volume)
+
+    rospy.spin()
+
+    rospy.loginfo("Shutting down...") # This will output to the terminal

@@ -392,6 +392,9 @@ if __name__ == '__main__':
     rgvB_AR_writer = csv.writer(rgvB_AR_file)
     rgvB_AR_writer.writerow(["AR_B"])
 
+    rospy.loginfo("CSV files opened successfully")
+    rospy.loginfo("")
+
     # videoTime_writer = csv.writer(video_timestamp_file)
     # videoTime_writer.writerow(["Time"])
 
