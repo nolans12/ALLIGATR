@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/ckohl10/ALLIGATR/HUB/src/CameraObject.cpp" "/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/CameraObject.cpp.o"
-  "/home/ckohl10/ALLIGATR/HUB/src/HUB.cpp" "/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/HUB.cpp.o"
-  "/home/ckohl10/ALLIGATR/HUB/src/main.cpp" "/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/main.cpp.o"
-  "/home/ckohl10/ALLIGATR/HUB/src/pathStep.cpp" "/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/pathStep.cpp.o"
-  "/home/ckohl10/ALLIGATR/HUB/src/phaseStep.cpp" "/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/phaseStep.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/CameraObject.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/CameraObject.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/HUB.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/HUB.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/main.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/main.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/pathStep.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/pathStep.cpp.o"
+  "/home/mini/ALLIGATR/HUB/src/phaseStep.cpp" "/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir/src/phaseStep.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

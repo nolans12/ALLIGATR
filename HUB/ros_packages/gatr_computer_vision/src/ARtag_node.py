@@ -32,7 +32,6 @@ saveBool = 0        # Boolean to save video, 1 means to record video
 COMPRESS_CONST = 4
 
 
-
 # Image callback for received image
 def callback_GAZEBO(data):
     # Used to convert between ROS and OpenCV images
