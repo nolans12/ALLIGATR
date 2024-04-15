@@ -496,7 +496,7 @@ void MissionPlanner::trail_phase(){
 void MissionPlanner::coarse_phase(){
 
     // Make sure the correct cameras are activated
-    set_cameras(true, false);
+    set_cameras(true, true);
 
     //Set the lock on rgv A if no lock is set and rgv A is in view and not localized
     set_lock();

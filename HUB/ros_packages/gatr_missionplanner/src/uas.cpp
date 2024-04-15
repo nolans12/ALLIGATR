@@ -43,9 +43,9 @@ uas::uas() {
     joint_detection_duration = 15.0; // Time before the UAS aborts when the RGVs are lost in the joint phase (s)
 
     // If there is no detections within these times, reset the phase timer
-    coarse_reset_time = 15.0; // 10 seconds
-    fine_reset_time = 15.0; // 10 seconds
-    joint_reset_time = 15.0; // 10 seconds
+    coarse_reset_time = 120.0; // 10 seconds
+    fine_reset_time = 120.0; // 10 seconds
+    joint_reset_time = 120.0; // 10 seconds
 
     // Maximum range that a waypoint can be outputted from the drone's state
     max_range = 4; // 0.5 m
