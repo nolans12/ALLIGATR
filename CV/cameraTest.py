@@ -4,6 +4,8 @@
 #import pandas as pd
 import cv2
 
+#python cameraTest.py --camera_index 1
+
 # ArUco dictionaries
 ARUCO_DICT = {
 	"DICT_4X4_50": cv2.aruco.DICT_4X4_50,
@@ -49,7 +51,18 @@ testDict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 # %% Video Capture With Camera
 
 # Set the camera index to 0 for the primary camera
-camera_index = 0
+import argparse
+
+# Create an argument parser
+parser = argparse.ArgumentParser(description='Process camera index.')
+parser.add_argument('--camera_index', type=int, default=0,
+                    help='an integer for the camera index')
+
+# Parse the arguments
+args = parser.parse_args()
+
+# Use the camera index from the command line arguments
+camera_index = args.camera_index
 
 # Define the GStreamer pipeline string
 # pipeline = f'nvarguscamerasrc sensor-id={camera_index} ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720, format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
