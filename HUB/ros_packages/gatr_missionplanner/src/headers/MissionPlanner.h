@@ -96,7 +96,9 @@ class MissionPlanner {
         void set_lock();
         void reset_lock();
 
-        void say(std::string message);
+        void say(std::string message); // Function to publish a message to the speak node
+
+        std::vector<double> filter_waypoint(std::vector<double> waypoint); // Takes returns a waypoint that is closer to the drone if it is far
         
     private:
         std::string phase;

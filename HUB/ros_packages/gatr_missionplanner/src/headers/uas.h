@@ -30,6 +30,7 @@ public:
     double coarse_duration, fine_duration, joint_duration, detection_duration, boundary_duration, search_point_duration, joint_detection_duration;
     double coarse_reset_time, fine_reset_time, joint_reset_time;
     bool jointComplete;
+    double max_range; // Max range that a waypoint can be outputted from the drone's state
     std::string status;
 
     int time_history_average; // Number of time steps to average for RGV position

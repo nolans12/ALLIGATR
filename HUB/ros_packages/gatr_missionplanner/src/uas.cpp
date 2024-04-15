@@ -47,6 +47,9 @@ uas::uas() {
     fine_reset_time = 15.0; // 10 seconds
     joint_reset_time = 15.0; // 10 seconds
 
+    // Maximum range that a waypoint can be outputted from the drone's state
+    max_range = 4; // 0.5 m
+
     p = 0;
     theta = -1.0f;
     theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]

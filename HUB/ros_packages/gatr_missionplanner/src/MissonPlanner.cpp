@@ -1044,6 +1044,8 @@ std::vector<double> MissionPlanner::trail_motion(std::vector<double> waypoint) {
     waypoint[3] = getYaw(waypoint);
     waypoint[2] = drone.trail_altitude;
 
+    waypoint = filter_waypoint(waypoint);
+
     return waypoint;
 }
 
@@ -1122,6 +1124,9 @@ std::vector<double> MissionPlanner::coarse_motion(std::vector<double> waypoint) 
     }
 
     waypoint = {x, y, drone.coarse_altitude, drone.theta*(180/M_PI)};
+
+    waypoint = filter_waypoint(waypoint);
+
     return waypoint;
 }
 
@@ -1230,6 +1235,8 @@ std::vector<double> MissionPlanner::joint_motion(std::vector<double> waypoint) {
     // else {
     //     waypoint = {(rgvAPos[0]+rgvBPos[0])/2, (rgvAPos[1]+rgvBPos[1])/2, env.bounds[1][2], waypoint[3]};
     // }
+
+    waypoint = filter_waypoint(waypoint);
 
     return waypoint;
 }
@@ -1460,3 +1467,16 @@ void MissionPlanner::say(std::string message){
     speak_pub.publish(speak_msg);
 }
 
+std::vector<double> MissionPlanner::filter_waypoint(std::vector<double> waypoint){
+    // Check if the waypoint is too far from the drone's position
+    double dist = pow(pow(drone.state[0]-waypoint[0], 2) + pow(drone.state[1]-waypoint[1], 2), 0.5);
+    if (dist > drone.max_range){
+        // get the normal vector to the waypoint from the drone
+        std::vector<double> normal = {(waypoint[0]-drone.state[0])/dist, (waypoint[1]-drone.state[1])/dist};
+        // scale the normal vector to the max range
+        waypoint[0] = drone.state[0] + normal[0]*drone.max_range;
+        waypoint[1] = drone.state[1] + normal[1]*drone.max_range;
+    }
+
+    return waypoint;
+}
