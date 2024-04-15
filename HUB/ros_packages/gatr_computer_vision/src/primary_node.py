@@ -29,7 +29,7 @@ saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Undistort bool
-undistBool = 0      # 1 to undistort
+undistBool = 1      # 1 to undistort
 
 # Compression Level
 # resize the image by this amount
@@ -179,12 +179,12 @@ if __name__ == '__main__': # <- Executable
     # Undistort
     if undistBool:
         # Specify the path to your pickle file
-        pickle_file_path = 'WideMatrix.pkl'
+        pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideMatrix.pkl'
         with open(pickle_file_path, 'rb') as file:
             # Load data from the pickle file
             camMatrix = pickle.load(file)
 
-        pickle_file_path = 'WideDist.pkl'
+        pickle_file_path = '~/ALLIGATR/HUB/ros_packages/gatr_computer_vision/src/WideDist.pkl'
         with open(pickle_file_path, 'rb') as file:
             # Load data from the pickle file
             distCoeff = pickle.load(file)
