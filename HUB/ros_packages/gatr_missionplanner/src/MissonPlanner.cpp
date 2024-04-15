@@ -537,7 +537,7 @@ void MissionPlanner::coarse_phase(){
                 stream << std::fixed << std::setprecision(1) << coarse_length.toSec();
                 std::string coarse_length_str = stream.str();
                 
-                thought = "Localized for " + coarse_length_str + " seconds";
+                thought = "Coarse localized for " + coarse_length_str + " seconds";
                 say(thought);
             }
         } else {
@@ -586,7 +586,7 @@ void MissionPlanner::coarse_phase(){
                 stream << std::fixed << std::setprecision(1) << coarse_length.toSec();
                 std::string coarse_length_str = stream.str();
                 
-                thought = "Localized for " + coarse_length_str + " seconds";
+                thought = "Coarse localized for " + coarse_length_str + " seconds";
                 say(thought);
             }
         } else {
@@ -680,7 +680,7 @@ void MissionPlanner::fine_phase(){
                 stream << std::fixed << std::setprecision(1) << fine_length.toSec();
                 std::string fine_length_str = stream.str();
                 
-                thought = "Localized for " + fine_length_str + " seconds";
+                thought = "Fine Localized for " + fine_length_str + " seconds";
                 say(thought);
             }
         } else {
@@ -804,7 +804,14 @@ void MissionPlanner::joint_phase(){
     else if (env.rgvAInView && env.rgvBInView){
         // Output how long it has been in the joint phase
         ROS_INFO("Joint phase has been engaged for %f seconds...", joint_length.toSec());
-        thought = "Joint phase engaged for " + std::to_string(joint_length.toSec()) + " seconds";
+        
+        std::ostringstream stream;
+        stream << std::fixed << std::setprecision(1) << joint_length.toSec();
+        std::string joint_length_str = stream.str();
+        
+        thought = "Joint for " + joint_length_str + " seconds";
+        
+
         say(thought);
         joint_last_detection = ros::Time::now();
     }

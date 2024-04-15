@@ -155,7 +155,7 @@ if [ $SPEAK_FLAG -eq 0 ]; then
     # Required the audio common stack and lbasound2
 
     # Speak the output of the mission planner
-    run_node gatr_speak hes_alive.py GATR_GPT
+    run_node gatr_speak hes_alive_2.py GATR_GPT
 fi
 
 #############################################################
