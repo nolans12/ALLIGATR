@@ -95,6 +95,8 @@ class MissionPlanner {
         // Locking functions to avoid localizing both RGVs at the same time
         void set_lock();
         void reset_lock();
+
+        void say(std::string message);
         
     private:
         std::string phase;
