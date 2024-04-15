@@ -22,6 +22,7 @@ def phaseCallback(data):
 
     # Say the phase
     soundhandle.say(s, voice, volume)
+    rospy.sleep(1)
 
 
 if __name__ == '__main__':

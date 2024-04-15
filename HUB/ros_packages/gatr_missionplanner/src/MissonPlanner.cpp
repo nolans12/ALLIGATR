@@ -27,6 +27,7 @@ MissionPlanner::MissionPlanner(ros::NodeHandle gnc_node) {
     inert_coord_B_sub_secondary = gnc_node.subscribe("CV/Secondary/inert_coord_B", 1, &MissionPlanner::rgvB_detected_callback_s, this);
     uas_state_sub = gnc_node.subscribe("mavros/local_position/pose", 3, &MissionPlanner::get_current_location_mav, this);
     phase_pub = gnc_node.advertise<std_msgs::String>("MP/phase", 10);
+    speak_pub = gnc_node.advertise<std_msgs::String>("MP/speak", 10);
 
 }
 
@@ -186,8 +187,11 @@ void MissionPlanner::update_drone_state(std::vector<double> waypoint){
 
     // Publish the phase of the UAS
     std_msgs::String phase_msg;
+    std_msgs::String speak_msg;
     phase_msg.data = phase;
+    speak_msg.data = thought;
     phase_pub.publish(phase_msg);
+    speak_pub.publish(speak_msg);
 
     // Check when the last time the rgvs were seen and if they are still in view
     if (env.rgvAInView)
@@ -301,6 +305,7 @@ void MissionPlanner::return_home_phase(){
     if (norm({drone.state[0] - drone.home[0], drone.state[1] - drone.home[1]}) < 1){
         phase = "ABORT";
         ROS_INFO("Drone is within 10 meters of home. Landing drone...");
+        thought = "Landing";
     }
 }
 
@@ -328,6 +333,8 @@ void MissionPlanner::search_phase(){
                 joint_time_engaged = ros::Time::now();
                 joint_last_detection = ros::Time::now();
                 ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
+                thought = "Joint";
+
                 return;
             }
 
@@ -335,6 +342,7 @@ void MissionPlanner::search_phase(){
                 // If RGV A has been finely localized, but RGV B has not, keep looking for RGV B
                 phase = "Search";
                 ROS_INFO("RGV A has been localized, but RGV B has not. Continuing search...");
+                //thought = "Localized that one already";
             }
 
         }
@@ -344,6 +352,7 @@ void MissionPlanner::search_phase(){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             ROS_INFO("RGV A has been coarsely localized. Moving to fine phase...");
+            thought = "Coarsely localized. Moving to fine phase";
             return;
         }
 
@@ -351,6 +360,7 @@ void MissionPlanner::search_phase(){
             // If RGV A has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV A has been detected but not localized. Starting trail phase...");
+            thought = "Detected and trailing";
             return;
         }   
     } 
@@ -368,6 +378,7 @@ void MissionPlanner::search_phase(){
                 joint_time_engaged = ros::Time::now();
                 joint_last_detection = ros::Time::now();
                 ROS_INFO("Both RGVs have been localized. Moving to joint phase...");
+                thought = "Joint";
                 return;
             }
 
@@ -375,6 +386,7 @@ void MissionPlanner::search_phase(){
                 // If RGV B has been finely localized, but RGV A has not, keep looking for RGV A
                 phase = "Search";
                 ROS_INFO("RGV B has been localized, but RGV A has not. Continuing search...");
+                //thought = "Localized that one already";
             }
 
         }
@@ -384,6 +396,7 @@ void MissionPlanner::search_phase(){
             phase = "Fine";
             fine_time_engaged = ros::Time::now();
             ROS_INFO("RGV B has been coarsely localized. Moving to fine phase...");
+            thought = "Coarsely localized. Moving to fine phase";
             return;
         }
 
@@ -391,6 +404,7 @@ void MissionPlanner::search_phase(){
             // If RGV B has been detected but not been coarsely localized, start trailing it
             phase = "Trail";
             ROS_INFO("RGV B has been detected but not localized. Starting trail phase...");
+            thought = "Detected and trailing";
             return;
         }   
 
@@ -428,6 +442,7 @@ void MissionPlanner::trail_phase(){
             phase = "Coarse";
             coarse_time_engaged = ros::Time::now();
             ROS_INFO("RGV A has stopped. Moving to coarse phase...");
+            thought = "Coarse";
         }
 
         else{
@@ -447,6 +462,7 @@ void MissionPlanner::trail_phase(){
             phase = "Coarse";
             coarse_time_engaged = ros::Time::now();
             ROS_INFO("RGV B has stopped. Moving to coarse phase...");
+            thought = "Coarse";
         }
 
         else{
@@ -461,6 +477,7 @@ void MissionPlanner::trail_phase(){
         phase = "Search";
         search_point_time = ros::Time::now();
         ROS_INFO("No RGVs detected for trailing, returning to search...");
+        thought = "Lost RGV. Returning to search";
     }
 
 }
@@ -495,6 +512,7 @@ void MissionPlanner::coarse_phase(){
                 time_finely_localized = ros::Duration(0);
                 env.rgvACoarseComplete = true;
                 ROS_INFO("RGV A has been coarsely localized. Moving to fine phase...");
+                thought = "Localized, moving to fine phase";
             }
 
             else{
@@ -508,6 +526,7 @@ void MissionPlanner::coarse_phase(){
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV A has started moving again. Returning to trail phase...");
+            thought = "Trailing again";
         }
     }
 
@@ -532,6 +551,7 @@ void MissionPlanner::coarse_phase(){
                 time_finely_localized = ros::Duration(0);
                 env.rgvBCoarseComplete = true;
                 ROS_INFO("RGV B has been coarsely localized. Moving to fine phase...");
+                thought = "Localized, moving to fine phase";
             }
 
             else{
@@ -540,11 +560,13 @@ void MissionPlanner::coarse_phase(){
 
                 // Output how long it has been localizing for
                 ROS_INFO("RGV B has been localized for %f seconds...", coarse_length.toSec());
+                thought = "Localized for " + std::to_string(coarse_length.toSec()) + " seconds";
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV B has started moving again. Returning to trail phase...");
+            thought = "Trailing again";
         }
     }
 
@@ -560,6 +582,7 @@ void MissionPlanner::coarse_phase(){
         phase = "Search";
         search_point_time = ros::Time::now();
         ROS_INFO("No RGVs detected for localization, returning to search...");
+        thought = "Lost RGV. Returning to search";
 
         // Add the duration of the coarse phase to the search phase
         if (ros::Time::now() - last_rgvA_detection < ros::Time::now() - last_rgvB_detection){
@@ -595,6 +618,7 @@ void MissionPlanner::fine_phase(){
             ros::Duration fine_length = (ros::Time::now() - fine_time_engaged) + time_finely_localized;
             if (fine_length > ros::Duration(drone.fine_duration)){
                 ROS_INFO("RGV A has been finely localized");
+                thought = "Localized";
                 env.rgvAFineComplete = true;
                 time_coarsely_localized = ros::Duration(0);
                 time_finely_localized = ros::Duration(0);
@@ -602,6 +626,7 @@ void MissionPlanner::fine_phase(){
                 // If RGV B has been finely localized as well, move to the joint phase
                 if (env.rgvBFineComplete){
                     phase = "Joint";
+                    thought = "Joint";
                     joint_time_engaged = ros::Time::now();
                     joint_last_detection = ros::Time::now();
                     env.rgvAFineComplete = true;
@@ -619,11 +644,13 @@ void MissionPlanner::fine_phase(){
             else{
                 // Output how long it has been localizing for
                 ROS_INFO("RGV A has been finely localized for %f seconds...", fine_length.toSec());
+                thought = "Localized for " + std::to_string(fine_length.toSec()) + " seconds";
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV A has started moving again. Returning to trail phase...");
+            thought = "Trailing again";
         }
     }
 
@@ -635,6 +662,7 @@ void MissionPlanner::fine_phase(){
             ros::Duration fine_length = (ros::Time::now() - fine_time_engaged) + time_finely_localized;
             if (fine_length > ros::Duration(drone.fine_duration)){
                 ROS_INFO("RGV B has been finely localized");
+                thought = "Localized";
                 env.rgvBFineComplete = true;
                 time_coarsely_localized = ros::Duration(0);
                 time_finely_localized = ros::Duration(0);
@@ -642,6 +670,7 @@ void MissionPlanner::fine_phase(){
                 // If RGV A has been finely localized as well, move to the joint phase
                 if (env.rgvAFineComplete){
                     phase = "Joint";
+                    thought = "Joint";
                     joint_time_engaged = ros::Time::now();
                     joint_last_detection = ros::Time::now();
                     env.rgvBFineComplete = true;
@@ -659,11 +688,13 @@ void MissionPlanner::fine_phase(){
             else{
                 // Output how long it has been localizing for
                 ROS_INFO("RGV B has been finely localized for %f seconds...", fine_length.toSec());
+                thought = "Localized for " + std::to_string(fine_length.toSec()) + " seconds";
             }
         } else {
             // The rgv has begun moving again, got back to trail phase
             phase = "Trail";
             ROS_INFO("RGV B has started moving again. Returning to trail phase...");
+            thought = "Trailing again";
         }
     }
 
@@ -672,6 +703,7 @@ void MissionPlanner::fine_phase(){
         phase = "Search";
         search_point_time = ros::Time::now();
         ROS_INFO("No RGVs detected for localization, returning to search...");
+        thought = "Lost RGV. Returning to search";
                 // Add the duration of the coarse phase to the search phase
 
         // Add the duration of the fine phase to the counter
@@ -708,6 +740,7 @@ void MissionPlanner::joint_phase(){
         if ((ros::Time::now() - joint_last_detection) > ros::Duration(drone.joint_detection_duration)){
             phase = "Joint Search";
             ROS_INFO("RGVs have been lost. Returning to search...");
+            thought = "Lost RGVs. Joint search";
         }
     }
 
@@ -716,11 +749,13 @@ void MissionPlanner::joint_phase(){
         env.jointComplete = true;
         phase = "Return Home";
         ROS_INFO("Joint phase has been completed. Returning to home...");
+        thought = "I am free! Returning home!"
     }
 
     else if (env.rgvAInView && env.rgvBInView){
         // Output how long it has been in the joint phase
         ROS_INFO("Joint phase has been engaged for %f seconds...", joint_length.toSec());
+        thought = "Joint phase engaged for " + std::to_string(joint_length.toSec()) + " seconds";
         joint_last_detection = ros::Time::now();
     }
 
@@ -752,11 +787,13 @@ void MissionPlanner::joint_search_phase(){
     if (env.rgvAInView && !env.JS_rgvA_detected){
         env.JS_rgvA_detected = true;
         ROS_INFO("RGV A has been detected. Continuing joint search...");
+        thought = "RGV A detected";
     }
 
     if (env.rgvBInView && !env.JS_rgvB_detected){
         env.JS_rgvB_detected = true;
         ROS_INFO("RGV B has been detected. Continuing joint search...");
+        thought = "RGV B detected";
     }
 
     if (env.JS_rgvA_detected && env.JS_rgvB_detected){
@@ -764,6 +801,7 @@ void MissionPlanner::joint_search_phase(){
         joint_time_engaged = ros::Time::now();
         joint_last_detection = ros::Time::now();
         ROS_INFO("Both RGVs have been detected. Moving to joint phase...");
+        thought = "Joint";
     }
 }
 
