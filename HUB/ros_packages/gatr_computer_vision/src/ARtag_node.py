@@ -102,7 +102,7 @@ def processImg(img):
         else:
             out_str = "No AR Tag %s" % rospy.get_time()
 
-    #rospy.loginfo(out_str)
+    rospy.loginfo(out_str)
     return corners_A, corners_B
     
 # Highlight the detected markers
@@ -274,7 +274,7 @@ if __name__ == '__main__': # <- Executable
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
-    totalFrameCount = 0 # Used for naming the images
+    saveFrameCount = 0 # Used for naming the images
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -286,7 +286,6 @@ if __name__ == '__main__': # <- Executable
             # Get the current video feed frame
             ret, img = cap.read()
             frameCount += 1                         # Update the frame count       
-            totalFrameCount += 1 
                 
 
             # Publish to ROS
@@ -308,11 +307,14 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
+                    # Save image frame
+                    saveFrameCount += 1 
+
                     # Resize the image
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                     # TEST SAVING IMAGE
-                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(totalFrameCount))
+                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
                     success = cv2.imwrite(imagePath, compressed_frame)
                     if success:
                         rospy.loginfo("Saved Secondary IMAGE frame")
