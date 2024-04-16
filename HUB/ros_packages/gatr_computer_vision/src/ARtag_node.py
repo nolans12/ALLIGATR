@@ -26,7 +26,7 @@ processFPS = 30
 frameCount = 0
 
 # Save FPS
-saveFPS = 1
+saveFPS = 3
 saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
