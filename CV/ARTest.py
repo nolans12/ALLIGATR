@@ -5,7 +5,7 @@ import time
 import csv
 
 # Try to open the 0 index for the secondary camera
-camera_index = 0
+camera_index = 1
 
 # Camera FPS
 camFPS = 60
