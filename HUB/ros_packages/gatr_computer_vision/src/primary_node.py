@@ -30,7 +30,7 @@ saveFPS = 1
 saveBool = 0        # Boolean to save video, 1 means to record video
 
 # Undistort bool
-undistBool = 1      # 1 to undistort
+undistBool = 0      # 1 to undistort
 
 # Compression Level
 # resize the image by this amount
@@ -127,8 +127,9 @@ def aruco_display(corners, image):
 # Function for shutting down the node
 def releaseObjects():
     global primaryVideoObj
-    primaryVideoObj.release()
-    rospy.loginfo("Successfully closed the primary video file.") 
+    if saveBool:
+        primaryVideoObj.release()
+        rospy.loginfo("Successfully closed the primary video file.") 
 
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
@@ -151,9 +152,6 @@ if __name__ == '__main__': # <- Executable
 
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
-
-    # Add callback for shutdown
-    rospy.on_shutdown(releaseObjects)
     
     ################## Publisher Definitions ###########################
     pub_corners_A = rospy.Publisher('CV/Primary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
@@ -173,6 +171,8 @@ if __name__ == '__main__': # <- Executable
 
     # Video file 
     if saveBool:
+        # Add callback for shutdown
+        rospy.on_shutdown(releaseObjects)
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
         filename = "primaryVideo%s.avi" % str(rospy.get_time())
         primaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
@@ -286,6 +286,7 @@ if __name__ == '__main__': # <- Executable
 
                     # Save video
                     primaryVideoObj.write(compressed_frame)
+                    rospy.loginfo("Saved Primary frame")
 
             if frameCount >= 60:
                 frameCount = 0  # Reset frame count

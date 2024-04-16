@@ -121,8 +121,9 @@ def aruco_display(corners, image):
 # Function for shutting down the node
 def releaseObjects():
     global secondaryVideoObj
-    secondaryVideoObj.release()
-    rospy.loginfo("Successfully closed the secondary video file.") 
+    if saveBool:
+        secondaryVideoObj.release()
+        rospy.loginfo("Successfully closed the secondary video file.") 
 
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
@@ -146,8 +147,6 @@ if __name__ == '__main__': # <- Executable
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
 
-    # Add callback for shutdown
-    rospy.on_shutdown(releaseObjects)
     
     ################## Publisher Definitions ###########################
     pub_corners_A = rospy.Publisher('CV/Secondary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
@@ -167,6 +166,8 @@ if __name__ == '__main__': # <- Executable
 
     # Video file
     if saveBool:
+        # Add callback for shutdown
+        rospy.on_shutdown(releaseObjects)
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
         filename = "secondaryVideo%s.avi" % str(rospy.get_time())
         secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
@@ -254,8 +255,6 @@ if __name__ == '__main__': # <- Executable
 
                     # Save video
                     secondaryVideoObj.write(compressed_frame)
-
-                    # Log info
                     rospy.loginfo("Saved Secondary frame")
             
             if frameCount >= 60:
