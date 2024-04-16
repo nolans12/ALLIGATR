@@ -31,7 +31,8 @@ saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 8.0
+COMPRESS_CONST = 8.0            # ROS Publish Compression
+COMPRESS_CONST_SAVE = 4.0       # Image save compression
 
 # Video object
 secondaryVideoObj = None
@@ -302,9 +303,9 @@ if __name__ == '__main__': # <- Executable
                     saveFrameCount += 1 
 
                     # Resize the image
-                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST_SAVE), int(1080/COMPRESS_CONST_SAVE)))
 
-                    # TEST SAVING IMAGE
+                    # Save the images
                     imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
                     success = cv2.imwrite(imagePath, compressed_frame)
                     if success:
@@ -331,7 +332,6 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B)
 
 
-    secondaryVideoObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
