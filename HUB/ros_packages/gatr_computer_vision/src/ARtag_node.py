@@ -309,7 +309,7 @@ if __name__ == '__main__': # <- Executable
                     saveFrameCount += 1 
 
                     # Resize the image
-                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST_SAVE), int(1080/COMPRESS_CONST_SAVE)))
 
                     # Save the images
                     imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))

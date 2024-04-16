@@ -2,7 +2,6 @@
 # <- This is the shebang line which tells the OS which interpreter to use
 import rospy
 import cv2
-import csv
 from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
