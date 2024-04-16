@@ -190,37 +190,37 @@ if __name__ == '__main__': # <- Executable
     br = CvBridge()
 
     # # Video file
-    # if saveBool:
-    #     # Hyperparameters
-    #     save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
+    if saveBool:
+        # Hyperparameters
+        save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
 
-    #     # Create a new directory for the data
-    #     data_dir = create_directory(save_location)
-    #     rospy.loginfo("New video directory created at: " + data_dir)
+        # Create a new directory for the data
+        data_dir = create_directory(save_location)
+        rospy.loginfo("New video directory created at: " + data_dir)
 
-    #     # Check if you have write permissions to the directory
-    #     if os.access(data_dir, os.W_OK):
-    #         rospy.loginfo("Have write permissions to the directory")
+        # Check if you have write permissions to the directory
+        if os.access(data_dir, os.W_OK):
+            rospy.loginfo("Have write permissions to the directory")
             
-    #         # wait for 1 second
-    #         rospy.sleep(1.0)
+            # wait for 1 second
+            rospy.sleep(1.0)
             
-    #     else:
-    #         rospy.loginfo("Do not have write permissions to the directory")
-    #         # You can add code here to handle the case where you don't have write permissions
+        else:
+            rospy.loginfo("Do not have write permissions to the directory")
+            # You can add code here to handle the case where you don't have write permissions
 
-    #         # Exit the program with an error
-    #         rospy.logfatal("Do not have write permissions to the directory. Exiting program.")
-    #         exit()
+            # Exit the program with an error
+            rospy.logfatal("Do not have write permissions to the directory. Exiting program.")
+            exit()
 
+        # Add callback for shutdown
+        rospy.on_shutdown(releaseObjects)
 
-    #     # Add callback for shutdown
-    #     rospy.on_shutdown(releaseObjects)
+        # Define compression
+        size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
+        filename = os.path.join(data_dir, "secondaryVideo.mp4")
+        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'H264'), saveFPS, size)
 
-    #     # Define compression
-    #     size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-    #     filename = os.path.join(data_dir, "secondaryVideo.mp4")
-    #     secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
@@ -268,7 +268,6 @@ if __name__ == '__main__': # <- Executable
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
-    tempBool = 1
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -279,29 +278,7 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
-            frameCount += 1                         # Update the frame count
-
-            # Get the size
-            if tempBool:
-                tempBool = 0
-                # Video file
-                if saveBool:
-                    # Hyperparameters
-                    save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
-
-                    # Create a new directory for the data
-                    data_dir = create_directory(save_location)
-                    rospy.loginfo("New video directory created at: " + data_dir)
-
-                    # Add callback for shutdown
-                    rospy.on_shutdown(releaseObjects)
-
-                    # Define compression
-                    size = (img.shape[1], img.shape[0])
-                    filename = os.path.join(data_dir, "secondaryVideo.avi")
-                    secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
-
-        
+            frameCount += 1                         # Update the frame count        
                 
 
             # Publish to ROS
@@ -326,9 +303,8 @@ if __name__ == '__main__': # <- Executable
                     # Resize the image
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
-                    # TEST NO COMPRESSION
                     # Save video
-                    success = secondaryVideoObj.write(img) # CHANGE FOR COMPRESSION
+                    success = secondaryVideoObj.write(compressed_frame) 
                     if success:
                         rospy.loginfo("Saved Secondary frame")
                     else:
