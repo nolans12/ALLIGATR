@@ -203,8 +203,8 @@ if __name__ == '__main__': # <- Executable
 
         # Define compression
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = os.path.join(data_dir, "secondaryVideo.avi")
-        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
+        filename = os.path.join(data_dir, "secondaryVideo.mp4")
+        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
