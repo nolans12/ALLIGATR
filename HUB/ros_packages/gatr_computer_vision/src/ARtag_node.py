@@ -221,6 +221,9 @@ if __name__ == '__main__': # <- Executable
         filename = os.path.join(data_dir, "secondaryVideo.mp4")
         secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'H264'), saveFPS, size)
 
+        if not secondaryVideoObj.isOpened():
+            rospy.loginfo("ERROR: VIDEO OBJECT DID NOT OPEN!")
+
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
