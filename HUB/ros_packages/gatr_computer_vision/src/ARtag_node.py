@@ -274,6 +274,7 @@ if __name__ == '__main__': # <- Executable
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
+    totalFrameCount = 0 # Used for naming the images
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -310,17 +311,19 @@ if __name__ == '__main__': # <- Executable
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
                     # TEST SAVING IMAGE
-                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(rospy.get_time()))
-                    test = cv2.imwrite(imagePath)
-                    if test:
+                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(totalFrameCount))
+                    success = cv2.imwrite(imagePath, compressed_frame)
+                    if success:
                         rospy.loginfo("Saved Secondary IMAGE frame")
+                    else:
+                        rospy.loginfo("FAILED Secondary IMAGE frame")
 
                     # Save video
-                    success = secondaryVideoObj.write(compressed_frame) 
-                    if success:
-                        rospy.loginfo("Saved Secondary frame")
-                    else:
-                        rospy.loginfo("FAILED SAVED VIDEO FRAME")
+                    # success = secondaryVideoObj.write(compressed_frame) 
+                    # if success:
+                    #     rospy.loginfo("Saved Secondary frame")
+                    # else:
+                    #     rospy.loginfo("FAILED SAVED VIDEO FRAME")
                     
             
             if frameCount >= 60:
