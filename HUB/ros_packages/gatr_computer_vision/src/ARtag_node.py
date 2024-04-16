@@ -189,22 +189,22 @@ if __name__ == '__main__': # <- Executable
     # Used to convert between ROS and OpenCV images
     br = CvBridge()
 
-    # Video file
-    if saveBool:
-        # Hyperparameters
-        save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
+    # # Video file
+    # if saveBool:
+    #     # Hyperparameters
+    #     save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
 
-        # Create a new directory for the data
-        data_dir = create_directory(save_location)
-        rospy.loginfo("New video directory created at: " + data_dir)
+    #     # Create a new directory for the data
+    #     data_dir = create_directory(save_location)
+    #     rospy.loginfo("New video directory created at: " + data_dir)
 
-        # Add callback for shutdown
-        rospy.on_shutdown(releaseObjects)
+    #     # Add callback for shutdown
+    #     rospy.on_shutdown(releaseObjects)
 
-        # Define compression
-        size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = os.path.join(data_dir, "secondaryVideo.mp4")
-        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
+    #     # Define compression
+    #     size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
+    #     filename = os.path.join(data_dir, "secondaryVideo.mp4")
+    #     secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
     rospy.loginfo("Establishing camera connection...")
@@ -260,10 +260,34 @@ if __name__ == '__main__': # <- Executable
         corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
 
+        tempBool = 1
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
             frameCount += 1                         # Update the frame count
+
+            # Get the size
+            if tempBool:
+                tempBool = 0
+                # Video file
+                if saveBool:
+                    # Hyperparameters
+                    save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
+
+                    # Create a new directory for the data
+                    data_dir = create_directory(save_location)
+                    rospy.loginfo("New video directory created at: " + data_dir)
+
+                    # Add callback for shutdown
+                    rospy.on_shutdown(releaseObjects)
+
+                    # Define compression
+                    size = (img.shape[1], img.shape[0])
+                    filename = os.path.join(data_dir, "secondaryVideo.mp4")
+                    secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
+
+        
+                
 
             # Publish to ROS
             if frameCount % (camFPS // pubFPS) == 0:
@@ -287,8 +311,9 @@ if __name__ == '__main__': # <- Executable
                     # Resize the image
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
+                    # TEST NO COMPRESSION
                     # Save video
-                    success = secondaryVideoObj.write(compressed_frame)
+                    success = secondaryVideoObj.write(img) # CHANGE FOR COMPRESSION
                     if success:
                         rospy.loginfo("Saved Secondary frame")
                     else:
