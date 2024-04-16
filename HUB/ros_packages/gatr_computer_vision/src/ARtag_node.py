@@ -296,12 +296,14 @@ if __name__ == '__main__': # <- Executable
                     # Add callback for shutdown
                     rospy.on_shutdown(releaseObjects)
 
-                    # Define compression
+                    # Define compression and outut the image size
                     size = (img.shape[1], img.shape[0])
+                    rospy.loginfo("Image size: " + str(size))
+
+
                     filename = os.path.join(data_dir, "secondaryVideo.mp4")
                     secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
-
-        
+                    
                 
 
             # Publish to ROS

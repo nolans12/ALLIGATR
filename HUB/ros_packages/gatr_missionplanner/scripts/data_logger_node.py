@@ -41,6 +41,7 @@ RGV_COUNTER = 0
 primaryVidBool = 1      # Set equal to 1 to save video, otherwise 0
 secondaryVidBool = 1    # Set equal to 1 to save video, otherwise 0
 saveFPS = 1
+SHOW_VID = 1 # Set equal to 1 to show video, otherwise 0
 COMPRESS_CONST = 4
 SAVE_SIZE = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST))  # Make sure this matches with the compression size output
 
@@ -230,9 +231,14 @@ def callbackphase(data):
 
 # Save secondary video
 def callback_SecondaryVid(data):
-    global secondaryVideoObj, secondary_video_timestamp_file
+    global secondaryVideoObj, secondary_video_timestamp_file, SHOW_VID
     br = CvBridge()
     img = br.imgmsg_to_cv2(data)        # Convert ROS Image message to OpenCV image
+
+    # Display the image
+    if SHOW_VID:
+        rospy.loginfo("Secondary frame received")
+        cv2.imshow("Secondary Video", img)
 
     # Save image and time to a file
     ros_now = rospy.get_time()
@@ -242,9 +248,14 @@ def callback_SecondaryVid(data):
 
 # Save primary video
 def callback_PrimaryVid(data):
-    global primaryVideoObj, primary_video_timestamp_file
+    global primaryVideoObj, primary_video_timestamp_file, SHOW_VID
     br = CvBridge()
     img = br.imgmsg_to_cv2(data)        # Convert ROS Image message to OpenCV image
+
+    # Display the image
+    if SHOW_VID:
+        rospy.loginfo("Primary frame received")
+        cv2.imshow("Primary Video", img)
 
     # Save image and time to a file
     ros_now = rospy.get_time()
