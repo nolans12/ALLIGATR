@@ -201,6 +201,10 @@ if __name__ == '__main__': # <- Executable
         # Check if you have write permissions to the directory
         if os.access(data_dir, os.W_OK):
             rospy.loginfo("Have write permissions to the directory")
+            
+            # wait for 1 second
+            rospy.sleep(1.0)
+            
         else:
             rospy.loginfo("Do not have write permissions to the directory")
             # You can add code here to handle the case where you don't have write permissions
