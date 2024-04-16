@@ -142,7 +142,7 @@ def create_directory(save_location):
     formatted_now = now.strftime("%Y_%m_%d_%H_%M_%S")
 
     # Create the directory name
-    data_dir_name = "videos_" + formatted_now
+    data_dir_name = "secondary_" + formatted_now
     data_dir = save_location + "/" + data_dir_name
 
     # Create the directory
@@ -198,7 +198,7 @@ if __name__ == '__main__': # <- Executable
 
         # Create a new directory for the data
         data_dir = create_directory(save_location)
-        rospy.loginfo("New video directory created at: " + data_dir)
+        rospy.loginfo("New image directory created at: " + data_dir)
 
         # Check if you have write permissions to the directory
         if os.access(data_dir, os.W_OK):
@@ -215,17 +215,8 @@ if __name__ == '__main__': # <- Executable
             rospy.logfatal("Do not have write permissions to the directory. Exiting program.")
             exit()
 
-        # Add callback for shutdown
-        rospy.on_shutdown(releaseObjects)
-
-        # Define compression
+        # Define compression for images
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = os.path.join(data_dir, "secondaryVideo.avi")
-        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
-
-        if not secondaryVideoObj.isOpened():
-            rospy.loginfo("ERROR: VIDEO OBJECT DID NOT OPEN!")
-            exit()
 
 
     # Now that ROS connection is established, begin searching for the camera
@@ -317,16 +308,9 @@ if __name__ == '__main__': # <- Executable
                     imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
                     success = cv2.imwrite(imagePath, compressed_frame)
                     if success:
-                        rospy.loginfo("Saved Secondary IMAGE frame")
+                        rospy.loginfo("Saved Secondary image frame")
                     else:
-                        rospy.loginfo("FAILED Secondary IMAGE frame")
-
-                    # Save video
-                    # success = secondaryVideoObj.write(compressed_frame) 
-                    # if success:
-                    #     rospy.loginfo("Saved Secondary frame")
-                    # else:
-                    #     rospy.loginfo("FAILED SAVED VIDEO FRAME")
+                        rospy.loginfo("FAILED Secondary image frame")
                     
             
             if frameCount >= 60:
