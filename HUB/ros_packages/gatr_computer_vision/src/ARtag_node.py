@@ -298,11 +298,18 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
+                    # If the corner_msgs_A/B are detected, output the corners onto the image frame, and then save this
+                    if corners_msg_A.data[0]:
+                        img = aruco_display(corners_msg_A, img)
+                    if corners_msg_B.data[0]:
+                        img = aruco_display(corners_msg_B, img)
+
                     # Save image frame
                     saveFrameCount += 1 
 
                     # Resize the image
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+
 
                     # TEST SAVING IMAGE
                     imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
