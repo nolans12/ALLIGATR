@@ -219,7 +219,7 @@ if __name__ == '__main__': # <- Executable
         # Define compression
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
         filename = os.path.join(data_dir, "secondaryVideo.mp4")
-        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'H264'), saveFPS, size)
+        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
 
         if not secondaryVideoObj.isOpened():
             rospy.loginfo("ERROR: VIDEO OBJECT DID NOT OPEN!")
