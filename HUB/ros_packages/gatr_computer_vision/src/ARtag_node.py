@@ -268,6 +268,7 @@ if __name__ == '__main__': # <- Executable
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
+    tempBool = 1
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -275,8 +276,6 @@ if __name__ == '__main__': # <- Executable
         corners_msg_A.data = [0, 0, 0, 0, 0, 0, 0, 0]
         corners_msg_B.data = [0, 0, 0, 0, 0, 0, 0, 0]
 
-
-        tempBool = 1
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
