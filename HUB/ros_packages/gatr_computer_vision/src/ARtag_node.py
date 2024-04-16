@@ -198,6 +198,22 @@ if __name__ == '__main__': # <- Executable
     #     data_dir = create_directory(save_location)
     #     rospy.loginfo("New video directory created at: " + data_dir)
 
+    #     # Check if you have write permissions to the directory
+    #     if os.access(data_dir, os.W_OK):
+    #         rospy.loginfo("Have write permissions to the directory")
+            
+    #         # wait for 1 second
+    #         rospy.sleep(1.0)
+            
+    #     else:
+    #         rospy.loginfo("Do not have write permissions to the directory")
+    #         # You can add code here to handle the case where you don't have write permissions
+
+    #         # Exit the program with an error
+    #         rospy.logfatal("Do not have write permissions to the directory. Exiting program.")
+    #         exit()
+
+
     #     # Add callback for shutdown
     #     rospy.on_shutdown(releaseObjects)
 
