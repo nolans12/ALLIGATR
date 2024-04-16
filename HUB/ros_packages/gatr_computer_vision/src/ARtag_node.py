@@ -298,8 +298,8 @@ if __name__ == '__main__': # <- Executable
 
                     # Define compression
                     size = (img.shape[1], img.shape[0])
-                    filename = os.path.join(data_dir, "secondaryVideo.mp4")
-                    secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MP4V'), saveFPS, size)
+                    filename = os.path.join(data_dir, "secondaryVideo.avi")
+                    secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
         
                 
