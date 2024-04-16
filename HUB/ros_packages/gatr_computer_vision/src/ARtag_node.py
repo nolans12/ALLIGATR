@@ -309,15 +309,18 @@ if __name__ == '__main__': # <- Executable
                     # Resize the image
                     compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
 
-                    #Show the image
-                    cv2.imshow("camera", compressed_frame)
+                    # TEST SAVING IMAGE
+                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(rospy.get_time()))
+                    test = cv2.imwrite(imagePath)
+                    if test:
+                        rospy.loginfo("Saved Secondary IMAGE frame")
 
                     # Save video
                     success = secondaryVideoObj.write(compressed_frame) 
                     if success:
                         rospy.loginfo("Saved Secondary frame")
                     else:
-                        rospy.loginfo("FAILED SAVED FRAME")
+                        rospy.loginfo("FAILED SAVED VIDEO FRAME")
                     
             
             if frameCount >= 60:
