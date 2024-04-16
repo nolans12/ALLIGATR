@@ -1,3 +1,0 @@
-/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/rebuild_cache.dir
-/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/main.dir
-/home/ckohl10/ALLIGATR/HUB/build/CMakeFiles/edit_cache.dir
