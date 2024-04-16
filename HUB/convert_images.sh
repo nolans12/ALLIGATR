@@ -11,7 +11,7 @@ check_ffmpeg() {
 # Function to convert JPG images to MP4
 convert_to_mp4() {
     input_dir="$1"
-    frame_rate="$2"
+    frame_rate="${2:-1}" # Default to 1 FPS if not provided
 
     # Get output filename
     output_file="$input_dir/video.mp4"
@@ -28,13 +28,19 @@ main() {
     check_ffmpeg
 
     # Check if correct number of arguments are provided
-    if [ "$#" -ne 2 ]; then
-        echo "Usage: $0 <frame_rate> <folder>"
+    if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+        echo "Usage: $0 [<frame_rate>] <folder>"
         exit 1
     fi
 
-    frame_rate="$1"
-    folder="$2"
+    # If only one argument provided, assume it's the folder and set frame_rate to default
+    if [ "$#" -eq 1 ]; then
+        frame_rate=1
+        folder="$1"
+    else
+        frame_rate="$1"
+        folder="$2"
+    fi
 
     # Check if folder exists
     if [ ! -d "$folder" ]; then
