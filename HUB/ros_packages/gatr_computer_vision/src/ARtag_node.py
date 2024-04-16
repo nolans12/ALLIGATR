@@ -7,6 +7,8 @@ from std_msgs.msg import String
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+from datetime import datetime
+import os
 
 # Try to open the 0 index for the secondary camera
 camera_index = 0
@@ -25,7 +27,7 @@ frameCount = 0
 
 # Save FPS
 saveFPS = 1
-saveBool = 0        # Boolean to save video, 1 means to record video
+saveBool = 1        # Boolean to save video, 1 means to record video
 
 # Compression Level
 # resize the image by this amount
@@ -121,12 +123,36 @@ def aruco_display(corners, image):
 # Function for shutting down the node
 def releaseObjects():
     global secondaryVideoObj
-    secondaryVideoObj.release()
-    rospy.loginfo("Successfully closed the secondary video file.") 
+    if saveBool:
+        secondaryVideoObj.release()
+        rospy.loginfo("Successfully closed the secondary video file.") 
 
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal
+
+# Create a new directory for the data
+def create_directory(save_location):
+    # Get the current date and time
+    now = datetime.now()
+
+    # Format the date and time
+    formatted_now = now.strftime("%Y_%m_%d_%H_%M_%S")
+
+    # Create the directory name
+    data_dir_name = "videos_" + formatted_now
+    data_dir = save_location + "/" + data_dir_name
+
+    # Create the directory
+    os.system("mkdir " + data_dir)
+    return data_dir
+
+# Check if the file opened correctly
+def check_file(file):
+    if file:
+        rospy.loginfo(file.name + " opened successfully")
+    else:
+        rospy.logfatal("Failed to open " + file.name)
 
 
 if __name__ == '__main__': # <- Executable 
@@ -146,8 +172,6 @@ if __name__ == '__main__': # <- Executable
     # This is how to initialize a publisher
     rospy.loginfo("Initializing ROS connection...")
 
-    # Add callback for shutdown
-    rospy.on_shutdown(releaseObjects)
     
     ################## Publisher Definitions ###########################
     pub_corners_A = rospy.Publisher('CV/Secondary/AR_corners_A', Int32MultiArray, queue_size=1)     # RGV A
@@ -167,8 +191,19 @@ if __name__ == '__main__': # <- Executable
 
     # Video file
     if saveBool:
+        # Hyperparameters
+        save_location = os.path.expanduser("~/ALLIGATR/HUB/videos")
+
+        # Create a new directory for the data
+        data_dir = create_directory(save_location)
+        rospy.loginfo("New video directory created at: " + data_dir)
+
+        # Add callback for shutdown
+        rospy.on_shutdown(releaseObjects)
+
+        # Define compression
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = "secondaryVideo%s.avi" % str(rospy.get_time())
+        filename = os.path.join(data_dir, "secondaryVideo.avi")
         secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), saveFPS, size)
 
     # Now that ROS connection is established, begin searching for the camera
@@ -254,8 +289,6 @@ if __name__ == '__main__': # <- Executable
 
                     # Save video
                     secondaryVideoObj.write(compressed_frame)
-
-                    # Log info
                     rospy.loginfo("Saved Secondary frame")
             
             if frameCount >= 60:

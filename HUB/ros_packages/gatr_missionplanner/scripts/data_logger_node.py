@@ -46,7 +46,6 @@ SAVE_SIZE = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST))  # Make sure th
 
 # Create a new directory for the data
 def create_directory(save_location):
-
     # Get the current date and time
     now = datetime.now()
 
