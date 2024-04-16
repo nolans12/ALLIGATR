@@ -126,6 +126,8 @@ def releaseObjects():
     if saveBool:
         secondaryVideoObj.release()
         rospy.loginfo("Successfully closed the secondary video file.") 
+    else:
+        rospy.logerr("Failed to close the secondary video file.")
 
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
