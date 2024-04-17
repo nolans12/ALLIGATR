@@ -140,12 +140,12 @@ int main(int argc, char** argv)
 		if (curr_waypoint_new != curr_waypoint_prev) {
 
 			//Check if the waypoint is out of bounds from the environment
-			if (mp.out_of_bounds(curr_waypoint_new) == true) {
-				ROS_WARN("Waypoint out of bounds! Aborting mission...");
-				//land();
-				//return 0;
-				mp.setPhase("ABORT");
-			}
+			// if (mp.out_of_bounds(curr_waypoint_new) == true) {
+			// 	ROS_WARN("Waypoint out of bounds! Aborting mission...");
+			// 	//land();
+			// 	//return 0;
+			// 	mp.setPhase("ABORT");
+			// }
 
 			// Set the new waypoint
 			//ROS_INFO("");

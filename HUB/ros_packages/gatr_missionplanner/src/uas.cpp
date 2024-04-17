@@ -48,7 +48,7 @@ uas::uas() {
     joint_reset_time = 120.0; // 10 seconds
 
     // Maximum range that a waypoint can be outputted from the drone's state
-    max_range = 4; // 0.5 m
+    max_range = 2; // 0.5 m
 
     p = 0;
     theta = -1.0f;
