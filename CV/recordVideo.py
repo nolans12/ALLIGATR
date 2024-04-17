@@ -38,8 +38,8 @@ secondaryFile = os.path.join(data_dir, 'secondaryVideo.avi')
 
 # Define the codec and create VideoWriter objects
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-outPrimary = cv2.VideoWriter(primaryFile, fourcc, 60.0, (1920, 1080))
-outSecondary = cv2.VideoWriter(secondaryFile, fourcc, 60.0, (1920, 1080))
+outPrimary = cv2.VideoWriter(primaryFile, fourcc, 5.0, (1920//COMPRESS_CONST, 1080//COMPRESS_CONST))
+outSecondary = cv2.VideoWriter(secondaryFile, fourcc, 5.0, (1920//COMPRESS_CONST, 1080//COMPRESS_CONST))
 
 # Setup the pipelines
 pipelineSecondary = 'nvarguscamerasrc sensor-id=' + str(0) + ' ! video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink'
@@ -71,11 +71,15 @@ while True:
     # Get the current video feed frame
     retPrimary, imgPrimary = capPrimary.read()
     retSecondary, imgSecondary = capSecondary.read()
+
+    # Compress the frames
+    compressedPrimary = cv2.resize(imgPrimary, (1920//COMPRESS_CONST, 1080//COMPRESS_CONST))
+    compressedSecondary = cv2.resize(imgSecondary, (1920//COMPRESS_CONST, 1080//COMPRESS_CONST))
     
 	# Save the frames
     if frameCount % (CAM_FPS // SAVE_FPS) == 0: 
-        outPrimary.write(imgPrimary)
-        outSecondary.write(imgSecondary)
+        outPrimary.write(compressedPrimary)
+        outSecondary.write(compressedSecondary)
 
 	# Quit
     key = cv2.waitKey(1) & 0xFF
