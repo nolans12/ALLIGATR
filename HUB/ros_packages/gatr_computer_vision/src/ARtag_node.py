@@ -26,12 +26,14 @@ processFPS = 30
 frameCount = 0
 
 # Save FPS
-saveFPS = 1
+saveFPS = 3
 saveBool = 1        # Boolean to save video, 1 means to record video
+saveFrameCount = 0  # Used for naming the images
 
 # Compression Level
 # resize the image by this amount
-COMPRESS_CONST = 8.0
+COMPRESS_CONST = 8.0            # ROS Publish Compression
+COMPRESS_CONST_SAVE = 4.0       # Image save compression
 
 # Video object
 secondaryVideoObj = None
@@ -39,6 +41,10 @@ secondaryVideoObj = None
 
 # Image callback for received image
 def callback_GAZEBO(data):
+    global frameCount
+    global saveFrameCount
+    frameCount += 1
+
     # Used to convert between ROS and OpenCV images
     br = CvBridge()
     
@@ -66,6 +72,24 @@ def callback_GAZEBO(data):
         pub_corners_A.publish(corners_msg_A)
     if corners_msg_B.data[0]:
         pub_corners_B.publish(corners_msg_B)
+
+    # Use save FPS to save the images
+    if saveBool:
+        if frameCount % (camFPS // saveFPS) == 0: 
+
+            # Update frame count
+            saveFrameCount += 1
+
+            # Compress image by resizing
+            compressed_frame = cv2.resize(outImage, (int(1920/COMPRESS_CONST_SAVE), int(1080/COMPRESS_CONST_SAVE)))
+
+            # Save the images
+            imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
+            success = cv2.imwrite(imagePath, compressed_frame)
+            if success:
+                rospy.loginfo("Saved Primary image frame")
+            else:
+                rospy.loginfo("FAILED Primary image frame")
     
     cv2.waitKey(1)
 
@@ -102,7 +126,7 @@ def processImg(img):
         else:
             out_str = "No AR Tag %s" % rospy.get_time()
 
-    #rospy.loginfo(out_str)
+    rospy.loginfo(out_str)
     return corners_A, corners_B
     
 # Highlight the detected markers
@@ -142,7 +166,7 @@ def create_directory(save_location):
     formatted_now = now.strftime("%Y_%m_%d_%H_%M_%S")
 
     # Create the directory name
-    data_dir_name = "videos_" + formatted_now
+    data_dir_name = "secondary_" + formatted_now
     data_dir = save_location + "/" + data_dir_name
 
     # Create the directory
@@ -198,7 +222,7 @@ if __name__ == '__main__': # <- Executable
 
         # Create a new directory for the data
         data_dir = create_directory(save_location)
-        rospy.loginfo("New video directory created at: " + data_dir)
+        rospy.loginfo("New image directory created at: " + data_dir)
 
         # Check if you have write permissions to the directory
         if os.access(data_dir, os.W_OK):
@@ -215,17 +239,8 @@ if __name__ == '__main__': # <- Executable
             rospy.logfatal("Do not have write permissions to the directory. Exiting program.")
             exit()
 
-        # Add callback for shutdown
-        rospy.on_shutdown(releaseObjects)
-
-        # Define compression
+        # Define compression for images
         size = (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)) 
-        filename = os.path.join(data_dir, "secondaryVideo.mp4")
-        secondaryVideoObj = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'MJPG'), saveFPS, size)
-
-        if not secondaryVideoObj.isOpened():
-            rospy.loginfo("ERROR: VIDEO OBJECT DID NOT OPEN!")
-            exit()
 
 
     # Now that ROS connection is established, begin searching for the camera
@@ -274,6 +289,7 @@ if __name__ == '__main__': # <- Executable
 
 
     # Begin the main loop that consistently outputs AR tag corners when running
+    saveFrameCount = 0 # Used for naming the images
     while not rospy.is_shutdown():
         # Output messages
         corners_msg_A = Int32MultiArray()
@@ -284,7 +300,7 @@ if __name__ == '__main__': # <- Executable
         if cap.isOpened():                          # Capture image while camera is opened
             # Get the current video feed frame
             ret, img = cap.read()
-            frameCount += 1                         # Update the frame count        
+            frameCount += 1                         # Update the frame count       
                 
 
             # Publish to ROS
@@ -306,18 +322,25 @@ if __name__ == '__main__': # <- Executable
             # Save image
             if saveBool:
                 if frameCount % (camFPS // saveFPS) == 0: 
+                    # If the corner_msgs_A/B are detected, output the corners onto the image frame, and then save this
+                    if corners_msg_A.data[0]:
+                        img = aruco_display(corners_msg_A, img)
+                    if corners_msg_B.data[0]:
+                        img = aruco_display(corners_msg_B, img)
+
+                    # Save image frame
+                    saveFrameCount += 1 
+
                     # Resize the image
-                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST), int(1080/COMPRESS_CONST)))
+                    compressed_frame = cv2.resize(img, (int(1920/COMPRESS_CONST_SAVE), int(1080/COMPRESS_CONST_SAVE)))
 
-                    #Show the image
-                    cv2.imshow("camera", compressed_frame)
-
-                    # Save video
-                    success = secondaryVideoObj.write(compressed_frame) 
+                    # Save the images
+                    imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
+                    success = cv2.imwrite(imagePath, compressed_frame)
                     if success:
-                        rospy.loginfo("Saved Secondary frame")
+                        rospy.loginfo("Saved Secondary image frame")
                     else:
-                        rospy.loginfo("FAILED SAVED FRAME")
+                        rospy.loginfo("FAILED Secondary image frame")
                     
             
             if frameCount >= 60:
@@ -338,7 +361,6 @@ if __name__ == '__main__': # <- Executable
             pub_corners_B.publish(corners_msg_B)
 
 
-    secondaryVideoObj.release()
     cv2.destroyAllWindows()         # Close everything and release the camera
     cap.release()
     rospy.loginfo("End of program") # This will output to the terminal

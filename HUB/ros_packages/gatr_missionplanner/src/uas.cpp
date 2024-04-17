@@ -29,9 +29,9 @@ uas::uas() {
     stopped_threshold = 0.5;
 
     // Can change this to be anything in bounds
-    trail_altitude = 32.0 * 0.3048; // 30 ft to m
-    coarse_altitude = 32.0 * 0.3048; // 30 ft to m
-    fine_altitude = 32.0 * 0.3048; // 30 ft to m
+    trail_altitude = 30.0 * 0.3048; // 30 ft to m
+    coarse_altitude = 30.0 * 0.3048; // 30 ft to m
+    fine_altitude = 30.0 * 0.3048; // 30 ft to m
 
     // Time durations for each phase before moving on to the next phase
     coarse_duration = 60.0; // 10 seconds
@@ -48,7 +48,7 @@ uas::uas() {
     joint_reset_time = 120.0; // 10 seconds
 
     // Maximum range that a waypoint can be outputted from the drone's state
-    max_range = 4; // 0.5 m
+    max_range = 2; // 0.5 m
 
     p = 0;
     theta = -1.0f;
