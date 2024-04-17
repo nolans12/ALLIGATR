@@ -7,6 +7,7 @@ from datetime import datetime
 # Specify the recording and save FPS
 CAM_FPS = 60
 SAVE_FPS = 60
+COMPRESS_CONST = 4
 
 # Create a new directory for the videos
 def create_directory(save_location):
