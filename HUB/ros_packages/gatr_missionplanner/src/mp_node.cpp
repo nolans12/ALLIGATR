@@ -61,6 +61,8 @@ int main(int argc, char** argv)
 	//create local reference frame 
 	initialize_local_frame();
 
+	mp.output_drone_state();
+
 	set_speed(0.1); // m/s
 
 	//request takeoff

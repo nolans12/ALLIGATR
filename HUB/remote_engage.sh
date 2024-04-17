@@ -41,10 +41,10 @@ SOURCE_FILE="src/main.cpp"
 # Function to kill all child processes when script exits
 function cleanup {
     # Send a shutdown request to all running ROS nodes
-    rosnode kill -a
+    #rosnode kill -a
 
     # Wait for a bit to allow the ROS nodes to shutdown
-    sleep 2
+    #sleep 2
 
     # Kill all child processes
     pkill -P $$ -2

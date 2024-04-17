@@ -92,7 +92,7 @@ std::vector<double> local_2_enu(std::vector<double> current_pos_local)
 
 	x = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
 	y = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
-	z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
+	//z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z; //Disabled for workaround
 
 	std::vector<double> current_pos_g(4);
 	current_pos_g[0] = x;
@@ -236,12 +236,15 @@ void set_destination_enu(float x, float y, float z, float psi)
 	// float deg2rad = (M_PI/180);
 	// float Xlocal = x*cos((correction_heading_g + local_offset_g - 90)*deg2rad) - y*sin((correction_heading_g + local_offset_g - 90)*deg2rad);
 	// float Ylocal = x*sin((correction_heading_g + local_offset_g - 90)*deg2rad) + y*cos((correction_heading_g + local_offset_g - 90)*deg2rad);
-	// float Zlocal = z;
+	float Zlocal = z;
 
 	// x = Xlocal + correction_vector_g.position.x + local_offset_pose_g.x;
 	// y = Ylocal + correction_vector_g.position.y + local_offset_pose_g.y;
 	// z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
 	//ROS_INFO("Destination set to x: %f y: %f z: %f origin frame", x, y, z);
+
+	// Needed so waypoints don't get set super low
+	z = Zlocal + correction_vector_g.position.z + local_offset_pose_g.z;
 
 	waypoint_g.pose.position.x = x;
 	waypoint_g.pose.position.y = y;

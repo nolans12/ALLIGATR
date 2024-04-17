@@ -29,9 +29,16 @@ uas::uas() {
     stopped_threshold = 0.5;
 
     // Can change this to be anything in bounds
+<<<<<<< HEAD
     trail_altitude = 40.0 * 0.3048; // 30 ft to m
     coarse_altitude = 40.0 * 0.3048; // 30 ft to m
     fine_altitude = 40.0 * 0.3048; // 30 ft to m
+=======
+    trail_altitude = 30.0 * 0.3048; // 30 ft to m
+    coarse_altitude = 30.0 * 0.3048; // 30 ft to m
+    fine_altitude = 30.0 * 0.3048; // 30 ft to m
+    bounds_altitude = 15.0 * 0.3048; // 30 ft to m
+>>>>>>> f733a713ed9e10c3f8b34e7025fd98efc98c4d3e
 
     // Time durations for each phase before moving on to the next phase
     coarse_duration = 60.0; // 10 seconds
@@ -53,7 +60,7 @@ uas::uas() {
     p = 0;
     theta = -1.0f;
     theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
-    orbit_radius = 3.0f; // radius of the orbital path [m]
+    orbit_radius = 2.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
     jointComplete = false;
     status = "STANDBY";
