@@ -932,8 +932,6 @@ std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> 
      * Output:
      *         waypoint - 1x4 double vector of commanded point & yaw
      */
-    waypoint[0] = (env.bounds[0][0]+env.bounds[1][0])/2.0;
-    waypoint[1] = (env.bounds[0][1]+env.bounds[1][1])/2.0;
     waypoint[2] = (env.bounds[0][2]+env.bounds[1][2])/2.0;
     waypoint[3] = getYaw(waypoint);
 
@@ -1374,7 +1372,7 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     // }
 
 
-    if (waypoint[2] < env.bounds[0][2]){
+    if (waypoint[2] < drone.bounds_altitude){
         output_drone_state();
         ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", + env.bounds[0][0], env.bounds[1][0], env.bounds[0][1], env.bounds[1][1]);
         say("Out of bounds");
@@ -1499,6 +1497,11 @@ std::vector<double> MissionPlanner::filter_waypoint(std::vector<double> waypoint
         // scale the normal vector to the max range
         waypoint[0] = drone.state[0] + normal[0]*drone.max_range;
         waypoint[1] = drone.state[1] + normal[1]*drone.max_range;
+    }
+
+    if (waypoint[2] < env.bounds[0][2]){
+        waypoint[2] = env.bounds[0][2];
+        ROS_INFO("Waypoint altitude is below the minimum altitude. Setting to minimum altitude...");
     }
 
     return waypoint;
