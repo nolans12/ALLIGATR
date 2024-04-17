@@ -4,10 +4,10 @@ environment::environment() {
     // time = 0.;
     // timeStep = 1.;
     // Bounds are in the form {{xMin, yMin, zMin}, {xMax, yMax, zMax}}
-    bounds = {{0.0, 0.0, 30.0 * 0.3048}, {150.0 * 0.3048, 150.0 * 0.3048, 60.0 * 0.3048}};
+    bounds = {{0.0, 0.0, 30.0 * 0.3048}, {80.0 * 0.3048, 80.0 * 0.3048, 60.0 * 0.3048}};
     rgvAPosition = {14.0, 9.0, 0.0, 0.0};
     rgvBPosition = {27.0, 35.0, 0.0, 0.0};
-    homePosition = {-30.0, 0.0};
+    homePosition = {0.0, 0.0};
     rgvAInView = false;
     rgvBInView = false;
     rgvACoarseComplete = false;

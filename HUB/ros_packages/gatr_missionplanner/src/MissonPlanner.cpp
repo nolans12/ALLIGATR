@@ -1170,6 +1170,8 @@ std::vector<double> MissionPlanner::fine_motion(std::vector<double> waypoint) {
     //waypoint[3] = getYaw(waypoint);
     waypoint[2] = drone.fine_altitude;
 
+    waypoint = filter_waypoint(waypoint);
+
     return waypoint;
 }
 
