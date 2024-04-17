@@ -28,6 +28,7 @@ frameCount = 0
 # Save FPS
 saveFPS = 3
 saveBool = 1        # Boolean to save video, 1 means to record video
+saveFrameCount = 0  # Used for naming the images
 
 # Compression Level
 # resize the image by this amount
@@ -40,6 +41,10 @@ secondaryVideoObj = None
 
 # Image callback for received image
 def callback_GAZEBO(data):
+    global frameCount
+    global saveFrameCount
+    frameCount += 1
+
     # Used to convert between ROS and OpenCV images
     br = CvBridge()
     
@@ -67,6 +72,24 @@ def callback_GAZEBO(data):
         pub_corners_A.publish(corners_msg_A)
     if corners_msg_B.data[0]:
         pub_corners_B.publish(corners_msg_B)
+
+    # Use save FPS to save the images
+    if saveBool:
+        if frameCount % (camFPS // saveFPS) == 0: 
+
+            # Update frame count
+            saveFrameCount += 1
+
+            # Compress image by resizing
+            compressed_frame = cv2.resize(outImage, (int(1920/COMPRESS_CONST_SAVE), int(1080/COMPRESS_CONST_SAVE)))
+
+            # Save the images
+            imagePath = os.path.join(data_dir, "image%s.jpg" % str(saveFrameCount))
+            success = cv2.imwrite(imagePath, compressed_frame)
+            if success:
+                rospy.loginfo("Saved Primary image frame")
+            else:
+                rospy.loginfo("FAILED Primary image frame")
     
     cv2.waitKey(1)
 

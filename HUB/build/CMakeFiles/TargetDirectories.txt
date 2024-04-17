@@ -1,0 +1,3 @@
+/home/mini/ALLIGATR/HUB/build/CMakeFiles/rebuild_cache.dir
+/home/mini/ALLIGATR/HUB/build/CMakeFiles/main.dir
+/home/mini/ALLIGATR/HUB/build/CMakeFiles/edit_cache.dir
