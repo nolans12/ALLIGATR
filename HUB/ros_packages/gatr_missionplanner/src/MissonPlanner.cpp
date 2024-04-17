@@ -276,9 +276,9 @@ void MissionPlanner::boundary_control_phase(){
     
     //////// OVERRIDE ////////
 
-    phase = "Search";
-    search_point_time = ros::Time::now();
-    ROS_INFO("Boundary control phase overridden. Search phase sent instead...");
+    // phase = "Search";
+    // search_point_time = ros::Time::now();
+    // ROS_INFO("Boundary control phase overridden. Search phase sent instead...");
 
     //////////////////////////
 
@@ -287,11 +287,11 @@ void MissionPlanner::boundary_control_phase(){
         phase = "Boundary Control";
     }
 
-    else if(ros::Time::now() - out_of_bounds_time > ros::Duration(drone.boundary_duration)){
-        // If the drone has been within bounds for more than X seconds, move to the search phase
-        phase = "ABORT";
-        ROS_FATAL("Drone has been within bounds for %f seconds. ABORTING", (ros::Time::now() - out_of_bounds_time).toSec());
-    }
+    // else if(ros::Time::now() - out_of_bounds_time > ros::Duration(drone.boundary_duration)){
+    //     // If the drone has been within bounds for more than X seconds, move to the search phase
+    //     phase = "ABORT";
+    //     ROS_FATAL("Drone has been within bounds for %f seconds. ABORTING", (ros::Time::now() - out_of_bounds_time).toSec());
+    // }
 
     // If the drone is not out of bounds, move to the search phase
     else{
@@ -936,6 +936,8 @@ std::vector<double> MissionPlanner::boundary_control_motion(std::vector<double> 
     waypoint[1] = (env.bounds[0][1]+env.bounds[1][1])/2.0;
     waypoint[2] = (env.bounds[0][2]+env.bounds[1][2])/2.0;
     waypoint[3] = getYaw(waypoint);
+
+    filter_waypoint(waypoint);
     return waypoint;
 }
 
@@ -1360,6 +1362,25 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", bounds_g[0][0], bounds_g[1][0], bounds_g[0][1], bounds_g[1][1]);
     //     return true;
     // }
+
+    //return false;
+
+
+    // if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1] || waypoint[2] < env.bounds[0][2]){
+    //     output_drone_state();
+    //     ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", + env.bounds[0][0], env.bounds[1][0], env.bounds[0][1], env.bounds[1][1]);
+    //     say("Out of bounds");
+    //     return true;
+    // }
+
+
+    if (waypoint[2] < env.bounds[0][2]){
+        output_drone_state();
+        ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", + env.bounds[0][0], env.bounds[1][0], env.bounds[0][1], env.bounds[1][1]);
+        say("Out of bounds");
+        return true;
+    }
+
     return false;
 }
 
