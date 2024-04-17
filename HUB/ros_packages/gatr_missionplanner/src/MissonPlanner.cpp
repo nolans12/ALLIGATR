@@ -1361,7 +1361,7 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     return true;
     // }
 
-    //return false;
+    return false;
 
 
     // if (waypoint[0] < env.bounds[0][0] || waypoint[0] > env.bounds[1][0] || waypoint[1] < env.bounds[0][1] || waypoint[1] > env.bounds[1][1] || waypoint[2] < env.bounds[0][2]){
@@ -1371,12 +1371,7 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     //     return true;
     // }
 
-
-<<<<<<< HEAD
-    if (waypoint[2] < env.bounds[0][2] - 10.0){
-=======
     if (waypoint[2] < drone.bounds_altitude){
->>>>>>> f733a713ed9e10c3f8b34e7025fd98efc98c4d3e
         output_drone_state();
         ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", + env.bounds[0][0], env.bounds[1][0], env.bounds[0][1], env.bounds[1][1]);
         say("Out of bounds");
