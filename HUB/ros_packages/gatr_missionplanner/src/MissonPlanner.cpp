@@ -1374,7 +1374,7 @@ bool MissionPlanner::out_of_bounds(std::vector<double> waypoint){
     // }
 
 
-    if (waypoint[2] < env.bounds[0][2]){
+    if (waypoint[2] < env.bounds[0][2] - 10.0){
         output_drone_state();
         ROS_ERROR("Bounds are x: %f to %f, y: %f to %f. Waypoint is out of bounds!", + env.bounds[0][0], env.bounds[1][0], env.bounds[0][1], env.bounds[1][1]);
         say("Out of bounds");

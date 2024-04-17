@@ -29,9 +29,9 @@ uas::uas() {
     stopped_threshold = 0.5;
 
     // Can change this to be anything in bounds
-    trail_altitude = 30.0 * 0.3048; // 30 ft to m
-    coarse_altitude = 30.0 * 0.3048; // 30 ft to m
-    fine_altitude = 30.0 * 0.3048; // 30 ft to m
+    trail_altitude = 40.0 * 0.3048; // 30 ft to m
+    coarse_altitude = 40.0 * 0.3048; // 30 ft to m
+    fine_altitude = 40.0 * 0.3048; // 30 ft to m
 
     // Time durations for each phase before moving on to the next phase
     coarse_duration = 60.0; // 10 seconds
