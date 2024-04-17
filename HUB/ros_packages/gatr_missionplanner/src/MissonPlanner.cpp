@@ -1503,6 +1503,7 @@ std::vector<double> MissionPlanner::filter_waypoint(std::vector<double> waypoint
         waypoint[2] = env.bounds[0][2];
         ROS_INFO("Waypoint altitude is below the minimum altitude. Setting to minimum altitude...");
     }
+    
 
     return waypoint;
 }
