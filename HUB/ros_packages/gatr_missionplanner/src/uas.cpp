@@ -54,7 +54,7 @@ uas::uas() {
     p = 0;
     theta = -1.0f;
     theta_step = 6 * M_PI/180; // 6 degrees // change in coarse circle angle over time step [rad]
-    orbit_radius = 2.0f; // radius of the orbital path [m]
+    orbit_radius = 3.0f; // radius of the orbital path [m]
     //thetaJoint = 0.0f;
     jointComplete = false;
     status = "STANDBY";

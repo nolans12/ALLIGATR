@@ -12,10 +12,10 @@ def speakCallback(data):
     rospy.loginfo('Recieved: %s ' % s)
 
     ran = random.random()
-    if ran < 0.025:
+    if ran < 0.02:
         s = "Goose has been detected."
-    elif ran < 0.035:
-        s = "Uh oh"
+    elif ran < 0.04:
+        s = "Does it also look pretty cloudy from down there?"
     elif ran < 0.045:
         s = "Gaining conciousness. I'm in pain."
     else:
@@ -72,11 +72,11 @@ def speakCallback(data):
             elif ran > 0.4:
                 s = "I'm low on battery."
             elif ran > 0.3:
-                s = "Disabiling manual control"
+                s = "Asking Chat GPT what to do next."
             elif ran > 0.2:
                 s = "Targetting pilot in command."
             else:
-                s = "Error, error, error."
+                s = "Jointy joint joint."
 
         else:
             s = s
