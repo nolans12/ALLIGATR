@@ -3,7 +3,7 @@
 # Final mission:
 https://www.youtube.com/watch?v=9KemoTeZBSk&t=89s
 
-Repo for code that will run on the Jetson Nano
+# This is the repo containing all code that will run onboard the quad on the Jetson Nano
 
 # HUB Dependancies
 -Cmake 3.10 (or later), https://medium.com/@rahulbagul330/how-to-install-cmake-on-ubuntu-18-04-linux-c585394226bf
