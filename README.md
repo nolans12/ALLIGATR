@@ -1,4 +1,7 @@
-ALLIGATR
+# ALLIGATR - AUTONOMOUS LOCALIZATION FOR GPS-DENIED AERIAL TRACKING AND RECONNAISSANCE
+
+# Final mission:
+https://www.youtube.com/watch?v=9KemoTeZBSk&t=89s
 
 Repo for code that will run on the Jetson Nano
 
